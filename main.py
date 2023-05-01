@@ -53,7 +53,7 @@ def main() -> None:
                  [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0]]
 
     # Двухмерный список для хранения спрайтов шахматных клеток
-    squares_list: list[list[tp.Union[Square, None]]] = []
+    squares_list: list[list[SquareObject]] = []
 
     # Группа для хранения спрайтов шахматных клеток
     squares_group = pg.sprite.Group()
@@ -95,7 +95,9 @@ def main() -> None:
                 squares_group.add(square)
                 inner_list.append(square)
             else:
-                inner_list.append(None)
+                nonexistent_square = NonexistentSquare(x, y)
+                squares_group.add(nonexistent_square)
+                inner_list.append(nonexistent_square)
             x += SQUARE_SIDE_SIZE
         y += SQUARE_SIDE_SIZE
         x = 0
@@ -128,7 +130,7 @@ def main() -> None:
                 square_clicked = get_square_by_coordinates(squares_list, pg.mouse.get_pos(), (x_screen, y_screen))
 
                 # Если полученная клетка не равна None, то меняем её цвет и обновляем экран
-                if square_clicked is not None:
+                if (square_clicked is not None) and square_clicked.is_exist:
                     square_clicked.change_regime()
                     screen.blit(background, (0, 0))
                     squares_group.draw(screen)
@@ -146,6 +148,22 @@ def main() -> None:
                 new_mouse_pos = pg.mouse.get_pos()
                 x_shift = new_mouse_pos[0] - mouse_pos[0]
                 y_shift = new_mouse_pos[1] - mouse_pos[1]
+
+                # Рассчитываем потенциальные новые абсолютные координаты экрана
+                x_screen_test = x_screen - x_shift
+                y_screen_test = y_screen - y_shift
+
+                # Рассчитываем размеры поля
+                field_width = len(squares_list[0]) * get_square_side_size(squares_list)
+                field_height = len(squares_list) * get_square_side_size(squares_list)
+
+                # Если координата x выходит за пределы поля больше чем наполовину размера экрана, то обнуляем сдвиг по x
+                if (x_screen_test < -(SCREEN_WIDTH / 2)) or (x_screen_test + (SCREEN_WIDTH / 2) > field_width):
+                    x_shift = 0
+
+                # Если координата y выходит за пределы поля больше чем наполовину размера экрана, то обнуляем сдвиг по y
+                if (y_screen_test < -(SCREEN_HEIGHT / 2)) or (y_screen_test + (SCREEN_HEIGHT / 2) > field_height):
+                    y_shift = 0
 
                 # Обновляем координаты экрана относительно карты уровня
                 x_screen -= x_shift
@@ -167,8 +185,54 @@ def main() -> None:
             elif e.type == pg.MOUSEBUTTONUP and e.button == 3:
                 is_map_moving = False
 
+            # Если колёсико мышки прокручено вперёд
+            elif e.type == pg.MOUSEBUTTONDOWN and e.button == 4:
 
-def get_square_side_size(squares_list: list[list[tp.Union[Square, None]]]) -> int:
+                # Если размер клетки уже превосходит допустимое значение, то пропускаем итерацию
+                if squares_list[0][0].side_size > min(SCREEN_WIDTH, SCREEN_HEIGHT) * MAX_SQUARE_SIDE_SIZE:
+                    continue
+
+                # Увеличиваем масштаб поля
+                zoom_in_field(squares_list)
+
+                # Проверяем и при наличии исправляем выход за пределы поля
+                x_screen, y_screen = fix_out_of_field(x_screen,
+                                                      y_screen,
+                                                      screen,
+                                                      squares_group,
+                                                      squares_list,
+                                                      background)
+
+                # Перерисовываем шахматные клетки
+                screen.blit(background, (0, 0))
+                squares_group.draw(screen)
+                pg.display.update()
+
+            # Если колёсико мышки прокручено назад
+            elif e.type == pg.MOUSEBUTTONDOWN and e.button == 5:
+
+                # Если размер клетки уже меньше допустимого значения, то пропускаем итерацию
+                if squares_list[0][0].side_size < max(SCREEN_WIDTH, SCREEN_HEIGHT) * MIN_SQUARE_SIDE_SIZE:
+                    continue
+
+                # Уменьшаем масштаб поля
+                zoom_out_field(squares_list)
+
+                # Проверяем и при наличии исправляем выход за пределы поля
+                x_screen, y_screen = fix_out_of_field(x_screen,
+                                                      y_screen,
+                                                      screen,
+                                                      squares_group,
+                                                      squares_list,
+                                                      background)
+
+                # Перерисовываем шахматные клетки
+                screen.blit(background, (0, 0))
+                squares_group.draw(screen)
+                pg.display.update()
+
+
+def get_square_side_size(squares_list: list[list[SquareObject]]) -> int:
     """
     Функция для получения текущего размера стороны шахматной клетки.
 
@@ -184,9 +248,9 @@ def get_square_side_size(squares_list: list[list[tp.Union[Square, None]]]) -> in
                 return squares_list[i][j].side_size
 
 
-def get_square_by_coordinates(squares_list: list[list[tp.Union[Square, None]]],
+def get_square_by_coordinates(squares_list: list[list[SquareObject]],
                               square_pos: tuple[int, int],
-                              screen_pos: tuple[int, int]) -> tp.Union[Square, None]:
+                              screen_pos: tuple[int, int]) -> tp.Union[SquareObject, None]:
     """
     Функция для нахождения клетки по её координатам.
 
@@ -200,7 +264,7 @@ def get_square_by_coordinates(squares_list: list[list[tp.Union[Square, None]]],
     x_absolute = square_pos[0] + screen_pos[0]
     y_absolute = square_pos[1] + screen_pos[1]
 
-    # Если x или y меньше 0, то возвращаем None
+    # Если абсолютные x или y меньше 0, то возвращаем None
     if x_absolute < 0 or y_absolute < 0:
         return None
 
@@ -218,6 +282,142 @@ def get_square_by_coordinates(squares_list: list[list[tp.Union[Square, None]]],
 
     # Возвращаем найденную клетку
     return found_square
+
+
+def zoom_in_field(squares_list: list[list[SquareObject]]) -> None:
+    """
+    Функция для увеличения масштаба поля.
+
+    :param squares_list: Двухмерный список с шахматными клетками игрового поля.
+    """
+
+    # Увеличиваем размер каждой клетки поля
+    for i in range(len(squares_list)):
+        for j in range(len(squares_list[i])):
+            if squares_list[i][j] is not None:
+                squares_list[i][j].increase_size()
+
+    # Выравниваем поле
+    level_field(squares_list)
+
+
+def zoom_out_field(squares_list: list[list[SquareObject]]) -> None:
+    """
+    Функция для уменьшения масштаба поля.
+
+    :param squares_list: Двухмерный список с шахматными клетками игрового поля.
+    """
+
+    # Уменьшаем размер каждой клетки поля
+    for i in range(len(squares_list)):
+        for j in range(len(squares_list[i])):
+            if squares_list[i][j] is not None:
+                squares_list[i][j].decrease_size()
+
+    # Выравниваем поле
+    level_field(squares_list)
+
+
+def level_field(squares_list: list[list[SquareObject]]) -> None:
+    """
+    Функция для выравнивания шахматного поля (можно использовать при изменении размеров шахматных клеток).
+
+    :param squares_list: Двухмерный список с шахматными клетками игрового поля.
+    """
+
+    # Если поле пусто, то завершаем выполнение функции
+    if len(squares_list) == 0:
+        return
+
+    # Обновляем координаты всех клеток в соответствии с их размерами
+    x = squares_list[0][0].rect.x
+    y = squares_list[0][0].rect.y
+    for i in range(len(squares_list)):
+        for j in range(len(squares_list[i])):
+            squares_list[i][j].rect.x = x
+            squares_list[i][j].rect.y = y
+            x += get_square_side_size(squares_list)
+        y += get_square_side_size(squares_list)
+        x = squares_list[0][0].rect.x
+
+
+def fix_out_of_field(x_screen: int,
+                     y_screen: int,
+                     screen: pg.Surface,
+                     squares_group: pg.sprite.Group,
+                     squares_list: list[list[SquareObject]],
+                     background: pg.Surface) -> tuple[int, int]:
+    """
+    Функция для проверки и при наличии исправления выхода за пределы поля.
+
+    :param x_screen: Абсолютная координата x экрана.
+    :param y_screen: Абсолютная координата y экрана.
+    :param screen: Поверхность экрана.
+    :param squares_group: Группа клеток-спрайтов.
+    :param squares_list: Двухмерный список клеток-спрайтов.
+    :param background: Поверхность фона.
+    :return: Новые координаты (x, y) экрана.
+    """
+
+    # Рассчитываем размеры поля
+    field_width = len(squares_list[0]) * get_square_side_size(squares_list)
+    field_height = len(squares_list) * get_square_side_size(squares_list)
+
+    # По-умолчанию ставим флаг, что экран выходит за поле
+    is_out_of_field = True
+
+    # Цикл длится, пока выход за пределы поле не будет исправлен
+    while is_out_of_field:
+
+        # Указываем, что пока выхода за пределы поля не обнаружено
+        is_out_of_field = False
+
+        # Проверяем выход за пределы поля по X влево.
+        # При наличии исправляем на один пиксель и указываем, что выход за поле обнаружен
+        if x_screen < -(SCREEN_WIDTH / 2):
+            is_out_of_field = True
+            for s in squares_group:
+                s.move(-1, 0)
+            x_screen += 1
+            screen.blit(background, (0, 0))
+            squares_group.draw(screen)
+            pg.display.update()
+
+        # Проверяем выход за пределы поля по X вправо.
+        # При наличии исправляем на один пиксель и указываем, что выход за поле обнаружен
+        if x_screen + (SCREEN_WIDTH / 2) > field_width:
+            is_out_of_field = True
+            for s in squares_group:
+                s.move(1, 0)
+            x_screen -= 1
+            screen.blit(background, (0, 0))
+            squares_group.draw(screen)
+            pg.display.update()
+
+        # Проверяем выход за пределы поля по Y влево.
+        # При наличии исправляем на один пиксель и указываем, что выход за поле обнаружен
+        if y_screen < -(SCREEN_HEIGHT / 2):
+            is_out_of_field = True
+            for s in squares_group:
+                s.move(0, -1)
+            y_screen += 1
+            screen.blit(background, (0, 0))
+            squares_group.draw(screen)
+            pg.display.update()
+
+        # Проверяем выход за пределы поля по Y вправо.
+        # При наличии исправляем на один пиксель и указываем, что выход за поле обнаружен
+        if y_screen + (SCREEN_HEIGHT / 2) > field_height:
+            is_out_of_field = True
+            for s in squares_group:
+                s.move(0, 1)
+            y_screen -= 1
+            screen.blit(background, (0, 0))
+            squares_group.draw(screen)
+            pg.display.update()
+
+    # Возвращаем координаты экрана
+    return x_screen, y_screen
 
 
 # Запускаем Main-функцию
