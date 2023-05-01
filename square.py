@@ -16,21 +16,30 @@ SQUARE_BORDER_WIDTH = 1
 # Цвет границы шахматной клетки
 SQUARE_BORDER_COLOR = "#000000"
 
-# Стандартная скорость изменения размера шахматной клетки
-CHANGE_SIZE_RATE = 1
+# Стандартная скорость изменения размера шахматной клетки (в процентах)
+CHANGE_SIZE_RATE = 0.05
+
+# Цвет для несуществующей клетки
+NONEXISTENT_SQUARE_COLOR = "#000000"
+
+# Минимальный размер стороны шахматной клетки (в процентах от размера экрана)
+MIN_SQUARE_SIDE_SIZE = 0.03
+
+# Максимальный размер стороны шахматной клетки (в процентах от размера экрана)
+MAX_SQUARE_SIDE_SIZE = 0.2
 
 
-class Square(pg.sprite.Sprite):
+class SquareObject(pg.sprite.Sprite):
     """
-    Класс для реализации спрайта шахматной клетки.
+    Класс для реализации шаблона спрайта шахматной клетки.
     """
 
     def __init__(self, x: int, y: int) -> None:
         """
         Инициализация шахматной клетки.
 
-        :param x: Координата x на экране.
-        :param y: Координата y на экране.
+        :param x:
+        :param y:
         """
 
         # Инициализируем спрайт
@@ -39,21 +48,14 @@ class Square(pg.sprite.Sprite):
         # Сохраняем размер стороны клетки
         self.side_size = SQUARE_SIDE_SIZE
 
-        # Задаём поверхность клетки и закрашиваем её в соответсвующий цвет
+        # Задаём поверхность клетки
         self.image = pg.Surface((self.side_size, self.side_size))
-        self.image.fill(SQUARE_COLOR)
-
-        # Рисуем границы клетки
-        pg.draw.rect(self.image,
-                     SQUARE_BORDER_COLOR,
-                     pg.Rect(0, 0, self.side_size, self.side_size),
-                     SQUARE_BORDER_WIDTH)
 
         # Задаём область клетки, основываясь на переданных координатах
         self.rect = pg.Rect(x, y, self.side_size, self.side_size)
 
-        # Флаг, показывающий активность/неактивность клетки
-        self.is_activated = False
+        # Указываем, что эта клетка не существует (т.к. это лишь шаблон)
+        self.is_exist = False
 
     def move(self, x_shift: int, y_shift: int) -> None:
         """
@@ -65,6 +67,64 @@ class Square(pg.sprite.Sprite):
 
         # Сдвигаем область клетки на заданные координатные сдвиги
         self.rect.move_ip(x_shift, y_shift)
+
+    def increase_size(self) -> None:
+        """
+        Функция для увеличения размера шахматной клетки на стандартную величину.
+        (Важно: данная функция влияет лишь на размеры клетки, а не на её позицию)
+        """
+
+        # Увеличиваем размер стороны на стандартную величину
+        self.side_size += int(self.side_size * CHANGE_SIZE_RATE) + 1
+
+        # Переформатируем клетку, учитывая увеличение её стороны
+        self.image = pg.Surface((self.side_size, self.side_size))
+        self.rect = pg.Rect(self.rect.x, self.rect.y, self.side_size, self.side_size)
+
+    def decrease_size(self) -> None:
+        """
+        Функция для уменьшения размера шахматной клетки на стандартную величину.
+        (Важно: данная функция влияет лишь на размеры клетки, а не на её позицию)
+        """
+
+        # Уменьшаем размер стороны на стандартную величину
+        self.side_size -= int(self.side_size * CHANGE_SIZE_RATE) + 1
+
+        # Переформатируем клетку, учитывая уменьшение её стороны
+        self.image = pg.Surface((self.side_size, self.side_size))
+        self.rect = pg.Rect(self.rect.x, self.rect.y, self.side_size, self.side_size)
+
+
+class Square(SquareObject):
+    """
+    Класс для реализации спрайта обычной шахматной клетки.
+    """
+
+    def __init__(self, x: int, y: int) -> None:
+        """
+        Инициализация шахматной клетки.
+
+        :param x: Координата x на экране.
+        :param y: Координата y на экране.
+        """
+
+        # Инициализируем шаблон клетки
+        super().__init__(x, y)
+
+        # Закрашиваем клетку в соответсвующий цвет
+        self.image.fill(SQUARE_COLOR)
+
+        # Рисуем границы клетки
+        pg.draw.rect(self.image,
+                     SQUARE_BORDER_COLOR,
+                     pg.Rect(0, 0, self.side_size, self.side_size),
+                     SQUARE_BORDER_WIDTH)
+
+        # Флаг, показывающий активность/неактивность клетки
+        self.is_activated = False
+
+        # Указываем, что эта клетка существует
+        self.is_exist = True
 
     def change_regime(self) -> None:
         """
@@ -97,3 +157,63 @@ class Square(pg.sprite.Sprite):
                      new_border_color,
                      pg.Rect(0, 0, self.side_size, self.side_size),
                      SQUARE_BORDER_WIDTH)
+
+    def increase_size(self) -> None:
+        """
+        Функция для увеличения размера шахматной клетки на стандартную величину.
+        (Важно: данная функция влияет лишь на размеры клетки, а не на её позицию)
+        """
+
+        # Вызываем родительскую функцию увеличения клетки
+        super().increase_size()
+
+        # Перерисовываем клетку с учётом увеличения её стороны
+        self.image.fill(SQUARE_COLOR)
+        pg.draw.rect(self.image,
+                     SQUARE_BORDER_COLOR,
+                     pg.Rect(0, 0, self.side_size, self.side_size),
+                     SQUARE_BORDER_WIDTH)
+
+        # Если клетка активирована, то возвращаем ей активный цвет
+        if self.is_activated:
+            self.change_color(SQUARE_ACTIVATED_COLOR, SQUARE_BORDER_COLOR)
+
+    def decrease_size(self) -> None:
+        """
+        Функция для уменьшения размера шахматной клетки на стандартную величину.
+        (Важно: данная функция влияет лишь на размеры клетки, а не на её позицию)
+        """
+
+        # Вызываем родительскую функцию уменьшения клетки
+        super().decrease_size()
+
+        # Перерисовываем клетку с учётом уменьшения её стороны
+        self.image.fill(SQUARE_COLOR)
+        pg.draw.rect(self.image,
+                     SQUARE_BORDER_COLOR,
+                     pg.Rect(0, 0, self.side_size, self.side_size),
+                     SQUARE_BORDER_WIDTH)
+
+        # Если клетка активирована, то возвращаем ей активный цвет
+        if self.is_activated:
+            self.change_color(SQUARE_ACTIVATED_COLOR, SQUARE_BORDER_COLOR)
+
+
+class NonexistentSquare(SquareObject):
+    """
+    Класс для реализации несуществующей шахматной клетки.
+    """
+
+    def __init__(self, x: int, y: int) -> None:
+        """
+        Инициализируем несуществующую шахматную клетку.
+
+        :param x: Координата x на экране.
+        :param y: Координата y на экране.
+        """
+
+        # Инициализируем шаблон клетки
+        super().__init__(x, y)
+
+        # Указываем, что клетка не существует
+        self.is_exist = False
