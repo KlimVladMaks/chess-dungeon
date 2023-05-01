@@ -61,9 +61,6 @@ def main() -> None:
     # Часы для регулировки FPS
     clock = pg.time.Clock()
 
-    # Флаг, показывающий, что пользователь нажимает на шахматную клетку
-    is_clicking_on_square = False
-
     # Флаг, показывающий, что пользователь двигает карту
     is_map_moving = False
 
@@ -124,18 +121,26 @@ def main() -> None:
                 pg.quit()
                 return
 
-            # Если нажата левая клавиша мыши, то ставим флаг нажатия на клетку и сохраняем позицию курсора
+            # Если нажата левая клавиша мыши
             elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
-                is_clicking_on_square = True
+
+                # Получаем нажатую клетку
+                square_clicked = get_square_by_coordinates(squares_list, pg.mouse.get_pos(), (x_screen, y_screen))
+
+                # Если полученная клетка не равна None, то меняем её цвет и обновляем экран
+                if square_clicked is not None:
+                    square_clicked.change_regime()
+                    screen.blit(background, (0, 0))
+                    squares_group.draw(screen)
+                    pg.display.update()
+
+            # Если нажата правая клавиша мыши, то ставим флаг движения карты и сохраняем позицию курсора
+            elif e.type == pg.MOUSEBUTTONDOWN and e.button == 3:
+                is_map_moving = True
                 mouse_pos = pg.mouse.get_pos()
 
-            # Если мышь движется с установленным флагом нажатия на клетку или флагом движения карты
-            elif e.type == pg.MOUSEMOTION and (is_clicking_on_square or is_map_moving):
-
-                # Меняем флаг нажатия на клетку на флаг движения карты
-                if not is_map_moving:
-                    is_clicking_on_square = False
-                    is_map_moving = True
+            # Если мышь движется с установленным флагом движения карты
+            elif e.type == pg.MOUSEMOTION and is_map_moving:
 
                 # Находим сдвиг по x и y
                 new_mouse_pos = pg.mouse.get_pos()
@@ -153,30 +158,30 @@ def main() -> None:
                 # Сохраняем новую позицию курсора
                 mouse_pos = new_mouse_pos
 
-                # Отрисовываем шахматные клетки
+                # Перерисовываем шахматные клетки
                 screen.blit(background, (0, 0))
                 squares_group.draw(screen)
                 pg.display.update()
 
-            # Если левая кнопка мыши отпущена
-            elif e.type == pg.MOUSEBUTTONUP and e.button == 1:
-
-                # Если это был клик по клетке
-                if is_clicking_on_square:
-
-                    # Получаем нажатую клетку
-                    square_clicked = get_square_by_coordinates(squares_list, pg.mouse.get_pos(), (x_screen, y_screen))
-
-                    # Если полученная клетка не равна None, то меняем её цвет и обновляем экран
-                    if square_clicked is not None:
-                        square_clicked.change_regime()
-                        screen.blit(background, (0, 0))
-                        squares_group.draw(screen)
-                        pg.display.update()
-
-                # Снимаем флаг нажатия на клетку и флаг движения карты
-                is_clicking_on_square = False
+            # Если отпущена правая клавиша мыши, то снимаем флаг движения карты
+            elif e.type == pg.MOUSEBUTTONUP and e.button == 3:
                 is_map_moving = False
+
+
+def get_square_side_size(squares_list: list[list[tp.Union[Square, None]]]) -> int:
+    """
+    Функция для получения текущего размера стороны шахматной клетки.
+
+    :param squares_list: Двухмерный список с шахматными клетками игрового поля.
+    :return: Текущий размер стороны шахматной клетки.
+    """
+
+    # Перебираем элементы списка и возвращаем размер стороны первой попавшейся шахматной клетки
+    # т.к. у всех клеток должен быть одинаковый размер стороны
+    for i in range(len(squares_list)):
+        for j in range(len(squares_list[i])):
+            if squares_list[i][j] is not None:
+                return squares_list[i][j].side_size
 
 
 def get_square_by_coordinates(squares_list: list[list[tp.Union[Square, None]]],
@@ -203,8 +208,8 @@ def get_square_by_coordinates(squares_list: list[list[tp.Union[Square, None]]],
     try:
 
         # Рассчитываем позицию клетки и извлекаем её из двухмерного списка
-        square_col = x_absolute // SQUARE_SIDE_SIZE
-        square_row = y_absolute // SQUARE_SIDE_SIZE
+        square_col = x_absolute // get_square_side_size(squares_list)
+        square_row = y_absolute // get_square_side_size(squares_list)
         found_square = squares_list[square_row][square_col]
 
     # При выходе из диапазона возвращаем None
