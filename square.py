@@ -1,7 +1,8 @@
 import pygame as pg
+import typing as tp
 
 # Размер стороны шахматной клетки
-SQUARE_SIDE_SIZE = 40
+SQUARE_SIDE_SIZE = 50
 
 # Цвет шахматной клетки
 SQUARE_COLOR = "#FFFFFF"
@@ -14,6 +15,9 @@ SQUARE_BORDER_WIDTH = 1
 
 # Цвет границы шахматной клетки
 SQUARE_BORDER_COLOR = "#000000"
+
+# Стандартная скорость изменения размера шахматной клетки
+CHANGE_SIZE_RATE = 1
 
 
 class Square(pg.sprite.Sprite):
@@ -32,18 +36,21 @@ class Square(pg.sprite.Sprite):
         # Инициализируем спрайт
         pg.sprite.Sprite.__init__(self)
 
+        # Сохраняем размер стороны клетки
+        self.side_size = SQUARE_SIDE_SIZE
+
         # Задаём поверхность клетки и закрашиваем её в соответсвующий цвет
-        self.image = pg.Surface((SQUARE_SIDE_SIZE, SQUARE_SIDE_SIZE))
+        self.image = pg.Surface((self.side_size, self.side_size))
         self.image.fill(SQUARE_COLOR)
 
         # Рисуем границы клетки
         pg.draw.rect(self.image,
                      SQUARE_BORDER_COLOR,
-                     pg.Rect(0, 0, SQUARE_SIDE_SIZE, SQUARE_SIDE_SIZE),
+                     pg.Rect(0, 0, self.side_size, self.side_size),
                      SQUARE_BORDER_WIDTH)
 
         # Задаём область клетки, основываясь на переданных координатах
-        self.rect = pg.Rect(x, y, SQUARE_SIDE_SIZE, SQUARE_SIDE_SIZE)
+        self.rect = pg.Rect(x, y, self.side_size, self.side_size)
 
         # Флаг, показывающий активность/неактивность клетки
         self.is_activated = False
@@ -88,5 +95,5 @@ class Square(pg.sprite.Sprite):
         self.image.fill(new_square_color)
         pg.draw.rect(self.image,
                      new_border_color,
-                     pg.Rect(0, 0, SQUARE_SIDE_SIZE, SQUARE_SIDE_SIZE),
+                     pg.Rect(0, 0, self.side_size, self.side_size),
                      SQUARE_BORDER_WIDTH)
