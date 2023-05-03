@@ -34,6 +34,19 @@ class Piece():
             return True
     
         return False
+    
+    def is_into_map(self, x: int, y: int):
+        """
+        Проверяет, не пытается ли что-нибудь улизнуть за пределы массива
+        """
+
+        if (y >= 0
+            and y < len(self.field)
+                and x >= 0
+                    and x < len(self.field[y])):
+            return True
+        
+        return False
 
     def get_view(self) -> list:
         """
@@ -125,7 +138,7 @@ class Piece():
 
 
         #проверяем, что не выходим за краницы массивав
-        if y >= 0 and y < len(self.field) and x >=0 and x < len(self.field[0]):
+        if self.is_into_map(x, y):
             #создаём путь, куда попадают видимые клетки
             #первая клетка всегда попадает в путь
             #если клетка - стена то клетки после неё не попадают в видимые клетки
@@ -152,7 +165,7 @@ class Piece():
                 x += pdx
                 y += pdy
             
-            if y >= 0 and y < len(self.field) and x >=0 and x < len(self.field[0]):
+            if self.is_into_map(x, y):
                 #вновь проверяем, а не смотрим ли мы сквозь стену?
                 way.append((y,x))
                 if self.is_wall(y, x):
