@@ -34,6 +34,20 @@ class Piece():
     
         return False
 
+    def is_into_map(self, x: int, y: int):
+        """
+        Проверяет, не пытается ли что-нибудь улизнуть за пределы массива
+        """
+
+        if (y >= 0
+            and y < len(self.field)
+                and x >= 0
+                    and x < len(self.field[y])):
+            return True
+        
+        return False
+
+
     def get_move(self):
         """
         Функция возвращает все клетки до которых можно дойти
@@ -62,41 +76,29 @@ class Piece():
             # ах да, ещё проверка выхода за пределы массива
             if (not (cells[i][0] + 1, cells[i][1]) in cells
                     and len_way[i] < self.move
-                        and cells[i][0] + 1 >= 0
-                            and cells[i][0] + 1 < len(self.field)
-                                and cells[i][1] >= 0
-                                    and cells[i][1] < len(self.field[0])
-                                        and not self.is_wall(cells[i][0] + 1, cells[i][1])):
+                        and self.is_into_map(cells[i][1], cells[i][0] + 1)
+                            and not self.is_wall(cells[i][0] + 1, cells[i][1])):
                 cells.append((cells[i][0] + 1, cells[i][1]))
                 len_way.append(len_way[i] + 1)
 
             if (not (cells[i][0] - 1, cells[i][1]) in cells
                     and len_way[i] < self.move
-                        and cells[i][0] - 1 >= 0
-                            and cells[i][0] - 1 < len(self.field)
-                                and cells[i][1] >= 0
-                                    and cells[i][1] < len(self.field[0])
-                                        and not self.is_wall(cells[i][0] - 1, cells[i][1])):
+                        and self.is_into_map(cells[i][1], cells[i][0] - 1)
+                            and not self.is_wall(cells[i][0] - 1, cells[i][1])):
                 cells.append((cells[i][0] - 1, cells[i][1]))
                 len_way.append(len_way[i] + 1)
             
             if (not (cells[i][0], cells[i][1] + 1) in cells
                     and len_way[i] < self.move
-                        and cells[i][0] >= 0
-                            and cells[i][0] < len(self.field)
-                                and cells[i][1] + 1 >=0
-                                    and cells[i][1] + 1 < len(self.field[0])
-                                        and not self.is_wall(cells[i][0], cells[i][1] + 1)):
+                        and self.is_into_map(cells[i][1] + 1, cells[i][0])
+                            and not self.is_wall(cells[i][0], cells[i][1] + 1)):
                 cells.append((cells[i][0], cells[i][1] + 1))
                 len_way.append(len_way[i] + 1)
 
             if (not (cells[i][0], cells[i][1] - 1) in cells
                     and len_way[i] < self.move
-                        and cells[i][0] >= 0
-                            and cells[i][0] < len(self.field)
-                                and cells[i][1] - 1 >=0
-                                    and cells[i][1] - 1 < len(self.field[0])
-                                        and not self.is_wall(cells[i][0], cells[i][1] - 1)):
+                        and self.is_into_map(cells[i][1] - 1, cells[i][0])
+                            and not self.is_wall(cells[i][0], cells[i][1] - 1)):
                 cells.append((cells[i][0], cells[i][1] - 1))
                 len_way.append(len_way[i] + 1)
 
