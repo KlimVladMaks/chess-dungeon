@@ -1,6 +1,5 @@
 import pygame as pg
 import typing as tp
-from square import *
 from field import *
 
 # Ширина и высота экрана
