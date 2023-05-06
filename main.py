@@ -205,11 +205,14 @@ def main() -> None:
                             select_piece_for_move = None
 
                     #Если кликнули на клетку
-                    elif not select_piece_for_cast is None:
+                    elif not select_piece_for_cast is None and square_clicked.is_activated:
 
                         #и она выделена
-                        if square_clicked.is_activated:
-                            select_piece_for_cast.spell_list[0].cast(select_piece_for_cast, square_clicked.inner_piece)
+                        select_piece_for_cast.spell_list[0].cast(select_piece_for_cast, square_clicked.inner_piece)
+                            
+                        #Если фигуры хп падают до 0 и ниже, удаляем её с поля
+                        if square_clicked.inner_piece.hp <= 0:
+                            square_clicked.del_inner_piece()
 
                         #Пока что просто получаем в консоле результат
 
@@ -219,17 +222,8 @@ def main() -> None:
                         for cell in square_for_cast:
                             cell.change_regime()
 
-                        #Если фигуры хп падают до 0 и ниже, удаляем её с поля
-                        if square_clicked.inner_piece.hp <= 0:
-                            square_clicked.del_inner_piece()
-
-                        #ОЧЕНЬ БОЛЬШОЙ КОСТЫЛЬ
-                        #опять страдаем от того, что не обновилась область движения
-                        first_piece.moves = first_piece.get_moves()
-                        second_piece.moves = second_piece.get_moves()
-
-
                     field.update()
+                    
                     """
                     Отключаем свободную раскраску
                     else:
