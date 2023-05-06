@@ -80,10 +80,6 @@ def main() -> None:
     first_piece.cell.add_inner_piece(first_piece)
     second_piece.cell.add_inner_piece(second_piece)
 
-    #это нужно, чтобы фигура увидела, что ей преграждает обзор другая фигура (неудобно, надо переделать)
-    first_piece.moves = first_piece.get_moves()
-    second_piece.moves = second_piece.get_moves()
-
     #флаг, что выбрана фигура для движения
     select_piece_for_move = None
     #флаг, что выбрана фигура для атаки
@@ -136,7 +132,7 @@ def main() -> None:
                             #снимаем метку
                             select_piece_for_move = None
                             #И обратно закрашиваем клетки
-                            square_for_move = piece.moves
+                            square_for_move = piece.get_moves()
                             for cell in square_for_move:
                                 cell.change_regime()
                         
@@ -144,13 +140,13 @@ def main() -> None:
                             
                             #Если у нас уже была выделена клетка, а теперь попытка выделить другую - удаляем старую закраску
                             if not select_piece_for_move is None:
-                                square_for_move = select_piece_for_move.moves
+                                square_for_move = select_piece_for_move.get_moves()
                                 for cell in square_for_move:
                                     cell.change_regime()
 
                             #ставим метку на фигуру и расскрашиваем область для движения
                             select_piece_for_move = piece
-                            square_for_move = piece.moves
+                            square_for_move = piece.get_moves()
                             for cell in square_for_move:
                                 cell.change_regime()
 
@@ -197,7 +193,7 @@ def main() -> None:
                         if square_clicked.is_activated:
 
                             #убираем выделение
-                            square_for_move = select_piece_for_move.moves
+                            square_for_move = select_piece_for_move.get_moves()
                             for cell in square_for_move:
                                 cell.change_regime()
 
@@ -208,14 +204,6 @@ def main() -> None:
 
                             select_piece_for_move = None
 
-
-                            #ОЧЕНЬ БОЛЬШОЙ КОСТЫЛЬ
-                            #а вот тут опять проблема, что вторая фигура не обновляет движение с учётом нового препятсвия,
-                            #так что пока костыльное:
-                            #PS Та фигура, что была передвинута обновилась нормально
-                            first_piece.moves = first_piece.get_moves()
-                            second_piece.moves = second_piece.get_moves()
-                    
                     #Если кликнули на клетку
                     elif not select_piece_for_cast is None:
 
