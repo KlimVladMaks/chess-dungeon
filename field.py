@@ -28,6 +28,17 @@ MIN_SQUARE_SIDE_SIZE = 0.03
 # Максимальный размер стороны шахматной клетки (в процентах от размера экрана)
 MAX_SQUARE_SIDE_SIZE = 0.2
 
+# Цвет для занятой клетки
+SQUARE_OCCUPIED_COLOR = "#FFFF00"
+
+
+class _Piece:
+    """
+    Фиктивный класс шахматной фигуры.
+    (Используется для задания типа данных).
+    """
+    pass
+
 
 class SquareTemplate(pg.sprite.Sprite):
     """
@@ -60,6 +71,10 @@ class SquareTemplate(pg.sprite.Sprite):
 
         # Указываем, что эта клетка не существует (т.к. это лишь шаблон)
         self.is_exist = False
+
+        # Свойство для хранения фигуры, стоящей на клетке
+        # (В данном классе всегда равно None, так как это просто шаблон)
+        self.inner_piece = None
 
     def get_pos(self) -> tuple[int, int]:
         """
@@ -108,6 +123,27 @@ class SquareTemplate(pg.sprite.Sprite):
         self.image = pg.Surface((self.side_size, self.side_size))
         self.rect = pg.Rect(self.rect.x, self.rect.y, self.side_size, self.side_size)
 
+    def add_inner_piece(self, piece: _Piece) -> None:
+        """
+        Функция, не используемая для данного класса.
+        Всегда возвращает None.
+        """
+        return None
+
+    def get_inner_piece(self) -> tp.Union[_Piece, None]:
+        """
+        Функция, не используемая для данного класса.
+        Всегда возвращает None.
+        """
+        return None
+
+    def del_inner_piece(self) -> None:
+        """
+        Функция, не используемая для данного класса.
+        Всегда возвращает None.
+        """
+        return None
+
 
 class Square(SquareTemplate):
     """
@@ -141,6 +177,13 @@ class Square(SquareTemplate):
         # Указываем, что эта клетка существует
         self.is_exist = True
 
+        # Свойство для хранения фигуры, стоящей на данной клетке
+        # (содержит None, если на клетки не стоит фигура)
+        self.inner_piece: tp.Union[_Piece, None] = None
+
+        # Флаг, показывающий занята или свободна клетка
+        self.is_occupied = False
+
     def change_regime(self) -> None:
         """
         Функция для изменения режима шахматной клетки.
@@ -150,13 +193,14 @@ class Square(SquareTemplate):
 
         # Если клетка активна, то меняем аё цвет на обычный и убираем флаг активации
         if self.is_activated:
-            self.change_color(SQUARE_COLOR, SQUARE_BORDER_COLOR)
             self.is_activated = False
 
         # Если клетка неактивна, то меняем её цвет на активный и ставим флаг активации
         else:
-            self.change_color(SQUARE_ACTIVATED_COLOR, SQUARE_BORDER_COLOR)
             self.is_activated = True
+
+        # Обновляем клетку
+        self.update()
 
     def change_color(self, new_square_color: str, new_border_color: str) -> None:
         """
@@ -172,6 +216,43 @@ class Square(SquareTemplate):
                      new_border_color,
                      pg.Rect(0, 0, self.side_size, self.side_size),
                      SQUARE_BORDER_WIDTH)
+
+        # Если клетка занята, рисуем дополнительный круг
+        if self.is_occupied:
+            pg.draw.circle(self.image,
+                           SQUARE_OCCUPIED_COLOR,
+                           (self.side_size // 2,
+                            self.side_size // 2),
+                           self.side_size // 2)
+
+    def update(self):
+        """
+        Функция для обновления шахматной клетки.
+        """
+
+        # Если клетка активирована, то закрашиваем её в активированный цвет
+        if self.is_activated:
+            self.image.fill(SQUARE_ACTIVATED_COLOR)
+            pg.draw.rect(self.image,
+                         SQUARE_BORDER_COLOR,
+                         pg.Rect(0, 0, self.side_size, self.side_size),
+                         SQUARE_BORDER_WIDTH)
+
+        # Иначе, закрашиваем её в обычный цвет
+        else:
+            self.image.fill(SQUARE_COLOR)
+            pg.draw.rect(self.image,
+                         SQUARE_BORDER_COLOR,
+                         pg.Rect(0, 0, self.side_size, self.side_size),
+                         SQUARE_BORDER_WIDTH)
+
+        # Если клетка занята, то рисуем дополнительный круг
+        if self.is_occupied:
+            pg.draw.circle(self.image,
+                           SQUARE_OCCUPIED_COLOR,
+                           (self.side_size // 2,
+                            self.side_size // 2),
+                           self.side_size // 2 - 1)
 
     def increase_size(self) -> None:
         """
@@ -212,6 +293,63 @@ class Square(SquareTemplate):
         # Если клетка активирована, то возвращаем ей активный цвет
         if self.is_activated:
             self.change_color(SQUARE_ACTIVATED_COLOR, SQUARE_BORDER_COLOR)
+
+    def add_inner_piece(self, piece: _Piece) -> None:
+        """
+        Функция для добавления фигуры на клетку.
+        (Если на клетке уже стоит фигура, то старая фигура будет удалена).
+
+        :param piece: Шахматная фигура.
+        """
+
+        # Размещаем фигуру на клетке
+        self.inner_piece = piece
+
+        # Вызываем функцию для переведения клетки в занятый режим
+        self.occupy()
+
+    def get_inner_piece(self) -> tp.Union[_Piece, None]:
+        """
+        Функция для получения фигуры, стоящей на клетке.
+
+        :return: Фигура, стоящая на клетке или None, если на клетке не стоит фигура.
+        """
+
+        # Возвращаем фигуру, стоящую на клетке
+        return self.inner_piece
+
+    def del_inner_piece(self) -> None:
+        """
+        Функция для удаления фигуры, стоящей на клетке.
+        """
+
+        # Удаляем фигуру, стоящую на клетке
+        self.inner_piece = None
+
+        # Вызываем функцию для переведения клетки в незанятый режим
+        self.deoccupy()
+
+    def occupy(self) -> None:
+        """
+        Функция, переводящая клетку в занятый режим.
+        """
+
+        # Ставим флаг, что клетка занята
+        self.is_occupied = True
+
+        # Обновляем клетку
+        self.update()
+
+    def deoccupy(self) -> None:
+        """
+        Функция, переводящая клетку в незанятый режим.
+        """
+
+        # Ставим флаг, что клетка не занята
+        self.is_occupied = False
+
+        # Обновляем клетку
+        self.update()
 
 
 class NonexistentSquare(SquareTemplate):
