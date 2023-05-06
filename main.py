@@ -172,7 +172,7 @@ def main() -> None:
                             
                             #Если у нас уже была выделена клетка, а теперь попытка выделить другую - удаляем старую закраску
                             if not select_piece_for_cast is None:
-                                square_for_cast = piece.spell_list[0].target(piece)
+                                square_for_cast = select_piece_for_cast.spell_list[0].target(select_piece_for_cast)
                                 for cell in square_for_cast:
                                     cell.change_regime()
 
