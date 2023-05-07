@@ -12,10 +12,12 @@ get_object_in_cell переименовать
 BARRIERS = [False]
 FOGS = [False]
 
-class _Square():
+class _Square:
 
     """
-    Какая-то заглушка
+    Фиктивный класс шахматной клетки.
+    (Используется для задания типа данных).
+    Функции прописаны для возможности тестового запуска.
     """
 
     def __init__(self):
@@ -23,7 +25,6 @@ class _Square():
         self.y = 0
         self.is_exist = True
         self.inner_piece = None
-
         
     def get_inner_piece(self, x, y):
         return 0
@@ -31,19 +32,25 @@ class _Square():
     def get_pos(self):
         return 0, 0
 
-class _Field():
+class _Field:
 
     """
-    Какая-то заглушка
+    Фиктивный класс шахматной доски.
+    (Используется для задания типа данных).
+    Функции прописаны для возможности тестового запуска.
     """
     
     def get_square_by_pos(self, x, y):
         return _Square()
     
 
-class Piece():
+class Piece:
 
-    def __init__(self, field, cell, max_hp: int, accuracy: float, damage: int, radius_move: int, radius_fov: int):
+    """
+    Класс для шаблона Фигуры.
+    """
+
+    def __init__(self, field: _Field, cell: _Square, max_hp: int, accuracy: float, damage: int, radius_move: int, radius_fov: int):
 
         """
         :cell: клетка на которой расположена фигура
@@ -61,10 +68,8 @@ class Piece():
 
         self.cell = cell
         self.field = field
-        self.radius_fov = radius_fov #радиус обзора
-        self.radius_move = radius_move #дальность движения
-        self.fovs = self.get_fovs()
-        self.moves = self.get_moves()
+        self.radius_fov = radius_fov
+        self.radius_move = radius_move
         self.max_hp = max_hp
         self.hp = max_hp
         self.accuracy = accuracy
@@ -74,8 +79,8 @@ class Piece():
     def is_barrier(self, row_pos: int, col_pos: int) -> bool:
 
         """
-        Функция проверяет, является ли клетка непроницаемой для движения
-        !!!Не вызывайте функцию, если не уверены, что клетка существует
+        Функция проверяет, является ли клетка непроницаемой для движения.
+        !!!Не вызывайте функцию, если не уверены, что клетка существует.
         """
 
         #запрашиваем у поля клетку по координатам
@@ -90,8 +95,8 @@ class Piece():
     def is_fog(self, row_pos: int, col_pos: int) -> bool:
 
         """
-        Функция проверяет, является ли клетка непроницаемой для обзора
-        !!!Не вызывайте функцию, если не уверены, что клетка существует
+        Функция проверяет, является ли клетка непроницаемой для обзора.
+        !!!Не вызывайте функцию, если не уверены, что клетка существует.
         """
 
         #запрашиваем у поля клетку по координатам
@@ -105,7 +110,7 @@ class Piece():
 
     def is_into_map(self, row_pos: int, col_pos: int) -> bool:
         """
-        Проверяет, существует ли клетка по данной координате
+        Проверяет, существует ли клетка по данной координате.
         """
 
         #запрашиваем у поля клетку по координатам
@@ -117,10 +122,10 @@ class Piece():
         return True
 
 
-    def get_moves(self) -> list[tuple[int]]:
+    def get_moves(self) -> list[tuple[_Square, _Square]]:
         """
-        Функция возвращает все клетки до которых можно дойти
-        Работает это через обход в ширину со стартовой клетки
+        Функция возвращает все клетки до которых можно дойти.
+        Работает это через обход в ширину со стартовой клетки.
         """
 
         #храним индекс рассматриваемого элемента, симмулируя очередь
@@ -177,7 +182,7 @@ class Piece():
             #переходим к следующему элементу
             i += 1
 
-        #Переводим позиции в клетки
+        #переводим позиции в клетки
         moving_cell = []
         for pos in moves:
             cell = self.field.get_square_by_pos(pos[0], pos[1])
@@ -187,10 +192,10 @@ class Piece():
         return moving_cell
     
 
-    def get_fovs(self) -> list:
+    def get_fovs(self) -> list[tuple[_Square, _Square]]:
         """
         Функция возвращает список всех видимых клеток.
-        Функция вызывает функцию прорисовки растровой линии от центра до каждой клетки границы (граница беспрерывная спутенькой)
+        Функция вызывает функцию прорисовки растровой линии от центра до каждой клетки границы (граница беспрерывная спутенькой).
         """
         fovs = set()
 
@@ -247,11 +252,11 @@ class Piece():
         return foving_cell
         
 
-    def get_view_for_line(self, start: tuple[int], end: tuple[int])  -> list[tuple[int]]:
+    def get_view_for_line(self, start: tuple[int], end: tuple[int])  -> list[tuple[int, int]]:
         """
         Функция вычисляет через какие точки проходит линия обзора от одной клетки до другой.
-        И возвращает путь до первой стены
-        Здесь x представляет колонку (col), а y - строчку (row)
+        И возвращает путь до первой стены.
+        Здесь x представляет колонку (col), а y - строчку (row).
         """
         #забираем координаты стартовой клетки и конечной
         x0, y0 = start
@@ -319,30 +324,28 @@ class Piece():
             
         return way
     
-    def moving(self, new_cell) -> tuple[_Square, _Square]:
+    def moving(self, new_cell: _Square) -> tuple[_Square, _Square]:
 
         """
-        Функция переставляет фигуру на новую клетку
-        Возвращает пару - клетку с которой ушла и клетку на которую пришла фигура
+        Функция переставляет фигуру на новую клетку.
+        Возвращает пару - клетку с которой ушла и клетку на которую пришла фигура.
         """
 
         old_cell = self.cell
         self.cell = new_cell
-        self.fovs = self.get_fovs()
-        self.moves = self.get_moves()
 
         return old_cell, new_cell
 
-    def prepare_spell(self, ind_spell: int):
+    def prepare_spell(self, ind_spell: int) -> list[_Square]:
         
         """
         Функция вызывается, когда пользователь нажимает на способность.
-        Возвращает клетки, на которые можно использовать способность
+        Возвращает клетки, на которые можно использовать способность.
         """
 
         return self.spell_list[ind_spell].target(self)
 
-    def use_spell(self, ind_spell: int, object: _Square):
+    def use_spell(self, ind_spell: int, object: _Square) -> None:
 
         """
         Функция вызывается, когда пользователь активирует способность.
@@ -353,7 +356,11 @@ class Piece():
 
 class Pawn(Piece):
 
-    def __init__(self, field, cell, max_hp: int, accuracy: float, damage: int, radius_move: int, radius_fov: int):
+    """
+    Класс пешки
+    """
+
+    def __init__(self, field: _Field, cell: _Square, max_hp: int, accuracy: float, damage: int, radius_move: int, radius_fov: int):
         #инициируем фигуру
         super().__init__(field, cell, max_hp, accuracy, damage, radius_move, radius_fov)
         #собираем спелы специальной функцией
@@ -366,7 +373,7 @@ class Pawn(Piece):
         !x и y инверсированны относительно обычной координатной оси
         """
 
-        def first_spell_target(self) -> list[_Square()]:
+        def first_spell_target(self) -> list[_Square]:
             row_pos, col_pos = self.cell.get_pos()
             x, y = row_pos, col_pos
             
