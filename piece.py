@@ -11,6 +11,7 @@ get_object_in_cell переименовать
 #Списки условных обозначений, являющиеся стеной
 BARRIERS = [False]
 FOGS = [False]
+NAME_TO_IND = {'attack': 1, 'move': 0}
 
 class _Square:
 
@@ -27,6 +28,12 @@ class _Square:
         self.inner_piece = None
         
     def get_inner_piece(self, x, y):
+        return 0
+    
+    def del_inner_piece(self):
+        return 0
+    
+    def add_inner_piece(self):
         return 0
     
     def get_pos(self):
@@ -64,6 +71,7 @@ class Piece:
         :accuracy: базовый шанс попадания при атаке от 0 до 1
         :damage: базовый урон атаки
         :spell_list: лист со скилами
+        :active_turn: bool параметр хранящий может ли походить клетка в этот ход
         """
 
         self.cell = cell
@@ -74,7 +82,9 @@ class Piece:
         self.hp = max_hp
         self.accuracy = accuracy
         self.damage = damage
-        self.spell_list = []
+        Moving = Spell(1, "Перемещение", "Переместитесь на клетку в зоне движения", self.get_moves, self.moving)
+        self.spell_list = [Moving]
+        self.active_turn = True
 
     def is_barrier(self, row_pos: int, col_pos: int) -> bool:
 
@@ -191,6 +201,17 @@ class Piece:
 
         return moving_cell
     
+    def moving(self, new_cell: _Square) -> None:
+
+        """
+        Функция переставляет фигуру на новую клетку.
+        Возвращает пару - клетку с которой ушла и клетку на которую пришла фигура.
+        """
+
+        old_cell = self.cell
+        self.cell = new_cell
+        old_cell.del_inner_piece()
+        new_cell.add_inner_piece(self)
 
     def get_fovs(self) -> list[tuple[_Square, _Square]]:
         """
@@ -324,37 +345,39 @@ class Piece:
             
         return way
     
-    def moving(self, new_cell: _Square) -> tuple[_Square, _Square]:
+    def new_turn(self) -> None:
 
         """
-        Функция переставляет фигуру на новую клетку.
-        Возвращает пару - клетку с которой ушла и клетку на которую пришла фигура.
+        Функция восстанавливает значение активности фигуры
         """
 
-        old_cell = self.cell
-        self.cell = new_cell
+        self.active_turn = True
 
-        return old_cell, new_cell
-
-    def prepare_spell(self, ind_spell: int) -> list[_Square]:
+    def prepare_spell(self, name_spell: int) -> list[_Square]:
         
         """
         Функция вызывается, когда пользователь нажимает на способность.
         Возвращает клетки, на которые можно использовать способность.
+        :name_spell: кодовое слово способности
         """
 
-        return self.spell_list[ind_spell].target(self)
+        ind_spell = NAME_TO_IND[name_spell]
 
-    def cast_spell(self, ind_spell: int, object) -> None:
+        return self.spell_list[ind_spell].target()
+
+    def cast_spell(self, name_spell: int, cell: _Square) -> None:
 
         """
         Функция вызывается, когда пользователь активирует способность.
         Производит эффект способности
-        :ind_spell: индекс способности в списке
-        :object: объект взаимодействия. Спецефичен для каждой способности
+        :name_spell: кодовое слово способности
+        :cell: клетка на которую способность использовали
         """
 
-        self.spell_list[ind_spell].cast(self, object)
+        ind_spell = NAME_TO_IND[name_spell]
+
+        self.spell_list[ind_spell].cast(cell)
+        self.active_turn = False
 
 class Pawn(Piece):
 
@@ -375,54 +398,57 @@ class Pawn(Piece):
         !x и y инверсированны относительно обычной координатной оси
         """
 
-        def first_spell_target(self) -> list[_Square]:
-            row_pos, col_pos = self.cell.get_pos()
-            x, y = row_pos, col_pos
-            
-            #задаём список возможных целей для атаки
-            #пешка атакует на одну клетку вокруг себя
-            potential = [
-                (x - 1, y - 1),
-                (x - 1, y),
-                (x - 1, y + 1),
-                (x + 1, y - 1),
-                (x + 1, y + 1),
-                (x + 1, y),
-                (x, y - 1),
-                (x, y + 1)
-                ]
-
-            target_list = []
-            
-            #cреди этих клеток можно атаковать только те, на которых стоят фигуры (система свой-чужой не работает хе)
-            for cell in potential:
-                if self.is_into_map(cell[0], cell[1]) and isinstance(self.field.get_square_by_pos(cell[0], cell[1]).inner_piece, Piece):
-                    target_list.append(self.field.get_square_by_pos(cell[0], cell[1]))
-
-            return target_list
-        
-        def first_spell_cast(self, other: Piece) -> None:
-            #Если фигура попала, она наносит урон равный своим хп
-            if random.random() < self.accuracy:
-                print(f"Атакующая фигура попала и нанесла {self.damage} урона!")
-                other.hp -= self.damage
-                print(f"Оставшиеся хп жертвы: {other.hp}/{other.max_hp}")
-                #Если фигуры хп падают до 0 и ниже, удаляем её с поля
-                if other.hp <= 0:
-                    print("Сильный удар разбивает жертву в каменную крошку!")
-                    other.cell.del_inner_piece()
-            else:
-                print(f"Атакующая фигура промахнулась")
-
         #Создаём способность Атака и добавляем её в список способностей
-        Atacke = Spell(1, "Атака", "Атакуйте выбранную цель", first_spell_target, first_spell_cast)
+        Atacke = Spell(1, "Атака", "Атакуйте выбранную цель", self.attack_spell_target, self.attack_spell_cast)
         self.spell_list.append(Atacke)
+
+    #Функции различных способностей
+    #ATTACK
+
+    def attack_spell_target(self) -> list[_Square]:
+        row_pos, col_pos = self.cell.get_pos()
+        x, y = row_pos, col_pos
+            
+        #задаём список возможных целей для атаки
+        #пешка атакует на одну клетку вокруг себя
+        potential = [
+            (x - 1, y - 1),
+            (x - 1, y),
+            (x - 1, y + 1),
+            (x + 1, y - 1),
+            (x + 1, y + 1),
+            (x + 1, y),
+            (x, y - 1),
+            (x, y + 1)
+        ]
+
+        target_list = []
+            
+        #cреди этих клеток можно атаковать только те, на которых стоят фигуры (система свой-чужой не работает хе)
+        for cell in potential:
+            if self.is_into_map(cell[0], cell[1]) and isinstance(self.field.get_square_by_pos(cell[0], cell[1]).inner_piece, Piece):
+                 target_list.append(self.field.get_square_by_pos(cell[0], cell[1]))
+
+        return target_list
+        
+    def attack_spell_cast(self, other: _Square) -> None:
+
+        #забираем фигуру из клетки
+        other = other.inner_piece
+
+        #Если фигура попала, она наносит урон равный своим хп
+        if random.random() < self.accuracy:
+            print(f"Атакующая фигура попала и нанесла {self.damage} урона!")
+            other.hp -= self.damage
+            print(f"Оставшиеся хп жертвы: {other.hp}/{other.max_hp}")
+            #Если фигуры хп падают до 0 и ниже, удаляем её с поля
+            if other.hp <= 0:
+                print("Сильный удар разбивает жертву в каменную крошку!")
+                other.cell.del_inner_piece()
+        else:
+            print(f"Атакующая фигура промахнулась")
 
 if __name__ == '__main__':
     
     b = Pawn(_Field(), _Square(), 10, 0.5, 2, 3, 1)
     a = Pawn(_Field(), _Square(), 10, 0.5, 2, 3, 1)
-
-    for i in range(10):
-        a.spell_list[0].cast(a, b)
-        print(b.hp)

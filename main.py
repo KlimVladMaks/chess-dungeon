@@ -132,7 +132,7 @@ def main() -> None:
                             #снимаем метку
                             select_piece_for_move = None
                             #И обратно закрашиваем клетки
-                            square_for_move = piece.get_moves()
+                            square_for_move = piece.prepare_spell('move')
                             for cell in square_for_move:
                                 cell.change_regime()
                         
@@ -140,13 +140,13 @@ def main() -> None:
                             
                             #Если у нас уже была выделена клетка, а теперь попытка выделить другую - удаляем старую закраску
                             if not select_piece_for_move is None:
-                                square_for_move = select_piece_for_move.get_moves()
+                                square_for_move = select_piece_for_move.prepare_spell('move')
                                 for cell in square_for_move:
                                     cell.change_regime()
 
                             #ставим метку на фигуру и расскрашиваем область для движения
                             select_piece_for_move = piece
-                            square_for_move = piece.get_moves()
+                            square_for_move = piece.prepare_spell('move')
                             for cell in square_for_move:
                                 cell.change_regime()
 
@@ -164,7 +164,7 @@ def main() -> None:
                             #снимаем метку
                             select_piece_for_cast = None
                             #И обратно закрашиваем клетки
-                            square_for_cast = piece.prepare_spell(0)
+                            square_for_cast = piece.prepare_spell('attack')
                             for cell in square_for_cast:
                                 cell.change_regime()
                         
@@ -172,13 +172,13 @@ def main() -> None:
                             
                             #Если у нас уже была выделена клетка, а теперь попытка выделить другую - удаляем старую закраску
                             if not select_piece_for_cast is None:
-                                square_for_cast = select_piece_for_cast.prepare_spell(0)
+                                square_for_cast = select_piece_for_cast.prepare_spell('attack')
                                 for cell in square_for_cast:
                                     cell.change_regime()
 
                             #ставим метку на фигуру и расскрашиваем область для атаки
                             select_piece_for_cast = piece
-                            square_for_cast = piece.prepare_spell(0)
+                            square_for_cast = piece.prepare_spell('attack')
                             for cell in square_for_cast:
                                 cell.change_regime()
 
@@ -193,30 +193,29 @@ def main() -> None:
                         if square_clicked.is_activated:
 
                             #убираем выделение
-                            square_for_move = select_piece_for_move.get_moves()
+                            square_for_move = select_piece_for_move.prepare_spell('move')
                             for cell in square_for_move:
                                 cell.change_regime()
 
                             #Передвигаем
-                            old_cell, new_cell = select_piece_for_move.moving(square_clicked)
-                            old_cell.del_inner_piece()
-                            new_cell.add_inner_piece(select_piece_for_move)
+                            select_piece_for_move.cast_spell('move', square_clicked)
 
                             select_piece_for_move = None
 
                     #Если кликнули на клетку
                     elif not select_piece_for_cast is None and square_clicked.is_activated:
 
-                        #и она выделена
-                        select_piece_for_cast.cast_spell(0, square_clicked.inner_piece)
-
-                        #Пока что просто получаем в консоле результат
-
                         #убираем выделение
-                        select_piece_for_cast = None
-                        square_for_cast = piece.prepare_spell(0)
+                        square_for_cast = piece.prepare_spell('attack')
                         for cell in square_for_cast:
                             cell.change_regime()
+
+                        #и она выделена
+                        select_piece_for_cast.cast_spell('attack', square_clicked)
+
+                        select_piece_for_cast = None
+
+                        #Пока что просто получаем в консоле результат
 
                     field.update()
 
