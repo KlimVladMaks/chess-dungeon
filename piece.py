@@ -350,6 +350,10 @@ class Piece:
         """
         Функция восстанавливает значение активности фигуры
         """
+        
+        for spell in self.spell_list:
+            if spell.cooldown_now > 0:
+                spell.cooldown_now -= 1
 
         self.active_turn = True
 
@@ -377,6 +381,7 @@ class Piece:
         ind_spell = NAME_TO_IND[name_spell]
 
         self.spell_list[ind_spell].cast(cell)
+        self.spell_list[ind_spell].cooldown_now = self.spell_list[ind_spell].cooldown
         self.active_turn = False
 
 class Pawn(Piece):

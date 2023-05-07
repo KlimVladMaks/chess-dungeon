@@ -3,7 +3,7 @@ import typing as tp
 class Spell:
     
     """
-    Этот класс хранит информацию о способности определённой фигуры
+    Этот класс хранит информацию о способности фигуры
     """
 
     def __init__(self, cooldown: int, name: str, description: str, target = None, cast = None):
@@ -18,7 +18,7 @@ class Spell:
         """
 
         self.cooldown = cooldown
-        self.cooldown_now = cooldown
+        self.cooldown_now = 0
         self.name = name
         self.description = description
         self.target = target
