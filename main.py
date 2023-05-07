@@ -116,7 +116,7 @@ def main() -> None:
 
                 # Если клетка относится к классу Square, то меняем её режим и обновляем поле
                 if isinstance(square_clicked, Square):
-# "0" = 39
+
                     #Тестовая часть управления фигурой
                     
                     #Тут если зажата клавиша "M" и не выделена фигура для атаки
@@ -164,7 +164,7 @@ def main() -> None:
                             #снимаем метку
                             select_piece_for_cast = None
                             #И обратно закрашиваем клетки
-                            square_for_cast = piece.spell_list[0].target(piece)
+                            square_for_cast = piece.prepare_spell(0)
                             for cell in square_for_cast:
                                 cell.change_regime()
                         
@@ -172,13 +172,13 @@ def main() -> None:
                             
                             #Если у нас уже была выделена клетка, а теперь попытка выделить другую - удаляем старую закраску
                             if not select_piece_for_cast is None:
-                                square_for_cast = select_piece_for_cast.spell_list[0].target(select_piece_for_cast)
+                                square_for_cast = select_piece_for_cast.prepare_spell(0)
                                 for cell in square_for_cast:
                                     cell.change_regime()
 
                             #ставим метку на фигуру и расскрашиваем область для атаки
                             select_piece_for_cast = piece
-                            square_for_cast = piece.spell_list[0].target(piece)
+                            square_for_cast = piece.prepare_spell(0)
                             for cell in square_for_cast:
                                 cell.change_regime()
 
@@ -208,22 +208,18 @@ def main() -> None:
                     elif not select_piece_for_cast is None and square_clicked.is_activated:
 
                         #и она выделена
-                        select_piece_for_cast.spell_list[0].cast(select_piece_for_cast, square_clicked.inner_piece)
-                            
-                        #Если фигуры хп падают до 0 и ниже, удаляем её с поля
-                        if square_clicked.inner_piece.hp <= 0:
-                            square_clicked.del_inner_piece()
+                        select_piece_for_cast.cast_spell(0, square_clicked.inner_piece)
 
                         #Пока что просто получаем в консоле результат
 
                         #убираем выделение
                         select_piece_for_cast = None
-                        square_for_cast = piece.spell_list[0].target(piece)
+                        square_for_cast = piece.prepare_spell(0)
                         for cell in square_for_cast:
                             cell.change_regime()
 
                     field.update()
-                    
+
                     """
                     Отключаем свободную раскраску
                     else:

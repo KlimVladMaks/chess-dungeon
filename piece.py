@@ -345,11 +345,13 @@ class Piece:
 
         return self.spell_list[ind_spell].target(self)
 
-    def use_spell(self, ind_spell: int, object: _Square) -> None:
+    def cast_spell(self, ind_spell: int, object) -> None:
 
         """
         Функция вызывается, когда пользователь активирует способность.
         Производит эффект способности
+        :ind_spell: индекс способности в списке
+        :object: объект взаимодействия. Спецефичен для каждой способности
         """
 
         self.spell_list[ind_spell].cast(self, object)
@@ -399,12 +401,16 @@ class Pawn(Piece):
 
             return target_list
         
-        def first_spell_cast(self, other) -> None:
+        def first_spell_cast(self, other: Piece) -> None:
             #Если фигура попала, она наносит урон равный своим хп
             if random.random() < self.accuracy:
                 print(f"Атакующая фигура попала и нанесла {self.damage} урона!")
                 other.hp -= self.damage
                 print(f"Оставшиеся хп жертвы: {other.hp}/{other.max_hp}")
+                #Если фигуры хп падают до 0 и ниже, удаляем её с поля
+                if other.hp <= 0:
+                    print("Сильный удар разбивает жертву в каменную крошку!")
+                    other.cell.del_inner_piece()
             else:
                 print(f"Атакующая фигура промахнулась")
 
