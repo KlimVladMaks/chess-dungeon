@@ -31,11 +31,13 @@ MAX_SQUARE_SIDE_SIZE = 0.2
 # Цвет для занятой клетки
 SQUARE_OCCUPIED_COLOR = "#FFFF00"
 
+# Цвет для занятой выбранной клетки
+SQUARE_SELECTED_COLOR = "#8B00FF"
+
 
 class _Piece:
     """
     Фиктивный класс шахматной фигуры.
-    (Используется для задания типа данных).
     """
     pass
 
@@ -75,6 +77,10 @@ class SquareTemplate(pg.sprite.Sprite):
         # Свойство для хранения фигуры, стоящей на клетке
         # (В данном классе всегда равно None, так как это просто шаблон)
         self.inner_piece = None
+
+        # Флаг, указывающий на то, является ли фигура на клетке выбранной
+        # (В данном классе всегда равно False, так как это просто шаблон)
+        self.is_selected = False
 
     def get_pos(self) -> tuple[int, int]:
         """
@@ -144,6 +150,20 @@ class SquareTemplate(pg.sprite.Sprite):
         """
         return None
 
+    def select(self) -> None:
+        """
+        Функция, не используемая для данного класса.
+        Всегда возвращает None.
+        """
+        return None
+
+    def deselect(self) -> None:
+        """
+        Функция, не используемая для данного класса.
+        Всегда возвращает None.
+        """
+        return None
+
 
 class Square(SquareTemplate):
     """
@@ -183,6 +203,9 @@ class Square(SquareTemplate):
 
         # Флаг, показывающий занята или свободна клетка
         self.is_occupied = False
+
+        # Флаг, указывающий на то, является ли фигура на клетке выбранной
+        self.is_selected = False
 
     def change_regime(self) -> None:
         """
@@ -248,11 +271,22 @@ class Square(SquareTemplate):
 
         # Если клетка занята, то рисуем дополнительный круг
         if self.is_occupied:
-            pg.draw.circle(self.image,
-                           SQUARE_OCCUPIED_COLOR,
-                           (self.side_size // 2,
-                            self.side_size // 2),
-                           self.side_size // 2 - 1)
+
+            # Если клетка выбран раскашиваем круг одним цветом
+            if self.is_selected:
+                pg.draw.circle(self.image,
+                               SQUARE_SELECTED_COLOR,
+                               (self.side_size // 2,
+                                self.side_size // 2),
+                               self.side_size // 2 - 1)
+
+            # Иначе раскашиваем круг другим цветом
+            else:
+                pg.draw.circle(self.image,
+                               SQUARE_OCCUPIED_COLOR,
+                               (self.side_size // 2,
+                                self.side_size // 2),
+                               self.side_size // 2 - 1)
 
     def increase_size(self) -> None:
         """
@@ -351,6 +385,28 @@ class Square(SquareTemplate):
         # Обновляем клетку
         self.update()
 
+    def select(self) -> None:
+        """
+        Функция для выделения выбранной клетки.
+        """
+
+        # Ставим флаг, что клетка выбрана
+        self.is_selected = True
+
+        # Обновляем клетку
+        self.update()
+
+    def deselect(self) -> None:
+        """
+        Функция для отмены выделения выбранной клетки.
+        """
+
+        # Ставим флаг, что клетка не выбрана
+        self.is_selected = False
+
+        # Обновляем клетку
+        self.update()
+
 
 class NonexistentSquare(SquareTemplate):
     """
@@ -378,7 +434,9 @@ class Field:
     Класс для реализации игрового поля.
     """
 
-    def __init__(self, screen: pg.Surface,
+    def __init__(self,
+                 screen: pg.Surface,
+                 screen_field: pg.Surface,
                  background: pg.Surface,
                  screen_absolute_coordinates: list[int],
                  field_map: list[list[int]]) -> None:
@@ -386,6 +444,7 @@ class Field:
         Функция для инициализации игрового поля.
 
         :param screen: Экран игры.
+        :param screen_field: Экран игрового поля.
         :param background: Фон игры.
         :param screen_absolute_coordinates: Абсолютные координаты экрана игры.
         :param field_map: Карта игрового поля.
@@ -393,6 +452,9 @@ class Field:
 
         # Сохраняем экран игры
         self.screen = screen
+
+        # Сохраняем экран игрового поля
+        self.screen_field = screen_field
 
         # Сохраняем фон игры
         self.background = background
@@ -542,8 +604,9 @@ class Field:
         """
 
         # Перерисовываем игровое поле
-        self.screen.blit(self.background, (0, 0))
-        self.squares_group.draw(self.screen)
+        self.screen_field.blit(self.background, (0, 0))
+        self.squares_group.draw(self.screen_field)
+        self.screen.blit(self.screen_field, (0, 0))
         pg.display.update()
 
     def move(self, x_shift: int, y_shift: int) -> None:
@@ -564,8 +627,8 @@ class Field:
         field_height = self.get_field_height()
 
         # Получаем размеры экрана
-        screen_width = self.screen.get_width()
-        screen_height = self.screen.get_height()
+        screen_width = self.screen_field.get_width()
+        screen_height = self.screen_field.get_height()
 
         # Если координата x выходит за пределы поля больше чем наполовину размера экрана, то обнуляем сдвиг по x
         if (x_screen_test < -(screen_width / 2)) or (x_screen_test + (screen_width / 2) > field_width):
