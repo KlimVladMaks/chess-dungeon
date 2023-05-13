@@ -2,6 +2,7 @@ import pygame as pg
 import typing as tp
 from field import *
 from piece import *
+from interface import *
 
 # Ширина и высота экрана
 SCREEN_WIDTH = 800
@@ -61,6 +62,9 @@ def main() -> None:
     # Создаём экран игры
     screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+    # Создаём поверхность, предназначенную для отображения игрового поля
+    screen_field = pg.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+
     # Задаём заголовок игры
     pg.display.set_caption("Chess Dungeon")
 
@@ -71,22 +75,29 @@ def main() -> None:
     pg.display.update()
 
     # Создаём игровое поле
-    field = Field(screen, background, screen_absolute_coordinates, START_FIELD_MAP)
+    field = Field(screen, screen_field, background, screen_absolute_coordinates, START_FIELD_MAP)
 
-    #Тест расположения фигуры
+    # Создаём интерфейс для управления фигурами
+    interface = Interface(screen, field)
+
+    # Переменная для хранения выбранной фигуры
+    selected_piece: tp.Union[Piece, None] = None
+
+    interface.add_buttons(["move", "attack"])
+
+    # Тест расположения фигуры
     first_piece = Pawn(field, field.get_square_by_pos(6, 6), 10, 0.5, 2, 3, 1)
     second_piece = Pawn(field, field.get_square_by_pos(5, 6), 10, 0.5, 2, 3, 1)
 
     first_piece.cell.add_inner_piece(first_piece)
     second_piece.cell.add_inner_piece(second_piece)
 
-    #флаг, что выбрана фигура для движения
+    # флаг, что выбрана фигура для движения
     select_piece_for_move = None
-    #флаг, что выбрана фигура для атаки
+    # флаг, что выбрана фигура для атаки
     select_piece_for_cast = None
 
-    #Тест расположения фигуры - КОНЕЦ
-
+    # Тест расположения фигуры - КОНЕЦ
 
     # Отрисовываем игровое поле
     field.update()
@@ -111,111 +122,170 @@ def main() -> None:
                 # Получаем относительные координаты клика
                 click_coordinates = pg.mouse.get_pos()
 
+                # Если координаты клика попадают в область интерфейса
+                if interface.are_interface_coordinates(click_coordinates[0], click_coordinates[1]):
+
+                    # Получаем нажатую кнопку интерфейса
+                    button = interface.get_button_by_coordinates(click_coordinates[0], click_coordinates[1])
+
+                    # Если кнопка не нажата (т.е. было возвращено значение None), то пропускаем итерацию
+                    if button is None:
+                        continue
+
+                    # ОТЛАДКА: выводим действие нажатой кнопки в консоль
+                    print(button.action)
+
+                    # Если выбрана кнопка движения
+                    if button.action == "move":
+                        pass
+
                 # Получаем нажатую клетку
                 square_clicked = field.get_square_by_coordinates(click_coordinates[0], click_coordinates[1])
 
-                # Если клетка относится к классу Square, то меняем её режим и обновляем поле
+                # Если клетка относится к классу Square (т.е. существует)
                 if isinstance(square_clicked, Square):
 
-                    #Тестовая часть управления фигурой
-                    
-                    #Тут если зажата клавиша "M" и не выделена фигура для атаки
-                    #Это выделение фигуры для последующего движения
+                    # Если на клетке ничего нет, то пропускаем итерацию
+                    if square_clicked is None:
+                        continue
+
+                    # Если на клетке находится ранее не выбранная фигура
+                    if isinstance(square_clicked.inner_piece, Piece) and (square_clicked.inner_piece != selected_piece):
+
+                        # Если существовала ранее выбранная фигура, то убираем выделение у её клетки
+                        if selected_piece is not None:
+                            selected_piece.cell.deselect()
+
+                        # Сохраняем выбранную фигуру
+                        selected_piece = square_clicked.inner_piece
+
+                        # Выделяем клетку, на которой стоит выбранная фигура
+                        selected_piece.cell.select()
+
+                        # Очищаем группу со старыми кнопками
+                        interface.buttons_group.empty()
+
+                        """
+                        По идее, нужно брать список действий из фигуры, но пока задаём вручную.
+                        """
+
+                        # Задаём новые кнопки с действиями
+                        interface.add_buttons(["move", "attack"])
+
+                        # Открываем интерфейс
+                        interface.open()
+
+                    # Если на клетке находится ранее выбранная фигура
+                    elif isinstance(square_clicked.inner_piece, Piece) and square_clicked.inner_piece == selected_piece:
+
+                        # Отменяем выделение клетки, на которой стоит выбранная фигура
+                        selected_piece.cell.deselect()
+
+                        # Очищаем переменную с выбранной фигурой
+                        selected_piece = None
+
+                        # Закрываем интерфейс
+                        interface.close()
+
+                    # Тестовая часть управления фигурой
+
+                    # Тут если зажата клавиша "M" и не выделена фигура для атаки
+                    # Это выделение фигуры для последующего движения
                     if (isinstance(square_clicked.inner_piece, Piece)
-                        and True in pg.key.get_pressed() and pg.key.get_pressed().index(True) == 16
+                            and True in pg.key.get_pressed() and pg.key.get_pressed().index(True) == 16
                             and select_piece_for_cast is None):
-                        
+
                         piece = square_clicked.inner_piece
 
-                        #Если был повторный клик по выделенной фигуре
+                        # Если был повторный клик по выделенной фигуре
                         if select_piece_for_move == piece:
-                            #снимаем метку
+                            # снимаем метку
                             select_piece_for_move = None
-                            #И обратно закрашиваем клетки
+                            # И обратно закрашиваем клетки
                             square_for_move = piece.prepare_spell('move')
                             for cell in square_for_move:
                                 cell.change_regime()
-                        
+
                         else:
-                            
-                            #Если у нас уже была выделена клетка, а теперь попытка выделить другую - удаляем старую закраску
+
+                            # Если у нас уже была выделена клетка, а теперь попытка выделить другую - удаляем старую закраску
                             if not select_piece_for_move is None:
                                 square_for_move = select_piece_for_move.prepare_spell('move')
                                 for cell in square_for_move:
                                     cell.change_regime()
 
-                            #ставим метку на фигуру и расскрашиваем область для движения
+                            # ставим метку на фигуру и расскрашиваем область для движения
                             select_piece_for_move = piece
                             square_for_move = piece.prepare_spell('move')
                             for cell in square_for_move:
                                 cell.change_regime()
 
-                    #Тут если зажата клавиша "0" и не выделена фигура для движения
-                    #Это выделение фигуры для последующей атаки
+                    # Тут если зажата клавиша "0" и не выделена фигура для движения
+                    # Это выделение фигуры для последующей атаки
                     elif (isinstance(square_clicked.inner_piece, Piece)
-                        and True in pg.key.get_pressed() and pg.key.get_pressed().index(True) == 39
-                            and select_piece_for_move is None):
-                        
+                          and True in pg.key.get_pressed() and pg.key.get_pressed().index(True) == 39
+                          and select_piece_for_move is None):
+
                         piece = square_clicked.inner_piece
-                        
-                        #Если был повторный клик по выделенной фигуре
+
+                        # Если был повторный клик по выделенной фигуре
                         if select_piece_for_cast == piece:
 
-                            #снимаем метку
+                            # снимаем метку
                             select_piece_for_cast = None
-                            #И обратно закрашиваем клетки
+                            # И обратно закрашиваем клетки
                             square_for_cast = piece.prepare_spell('attack')
                             for cell in square_for_cast:
                                 cell.change_regime()
-                        
+
                         else:
-                            
-                            #Если у нас уже была выделена клетка, а теперь попытка выделить другую - удаляем старую закраску
+
+                            # Если у нас уже была выделена клетка, а теперь попытка выделить другую - удаляем старую закраску
                             if not select_piece_for_cast is None:
                                 square_for_cast = select_piece_for_cast.prepare_spell('attack')
                                 for cell in square_for_cast:
                                     cell.change_regime()
 
-                            #ставим метку на фигуру и расскрашиваем область для атаки
+                            # ставим метку на фигуру и расскрашиваем область для атаки
                             select_piece_for_cast = piece
                             square_for_cast = piece.prepare_spell('attack')
                             for cell in square_for_cast:
                                 cell.change_regime()
 
-                            #для удобства и наглядности, если целей для атаки нет - снимаем выделение
+                            # для удобства и наглядности, если целей для атаки нет - снимаем выделение
                             if not square_for_cast:
                                 select_piece_for_cast = None
 
-                    #если кликнули клетку с выделенной для перемещения фигурой
+                    # если кликнули клетку с выделенной для перемещения фигурой
                     elif not select_piece_for_move is None:
-                        
-                        #и она выделена
+
+                        # и она выделена
                         if square_clicked.is_activated:
 
-                            #убираем выделение
+                            # убираем выделение
                             square_for_move = select_piece_for_move.prepare_spell('move')
                             for cell in square_for_move:
                                 cell.change_regime()
 
-                            #Передвигаем
+                            # Передвигаем
                             select_piece_for_move.cast_spell('move', square_clicked)
 
                             select_piece_for_move = None
 
-                    #Если кликнули на клетку
+                    # Если кликнули на клетку
                     elif not select_piece_for_cast is None and square_clicked.is_activated:
 
-                        #убираем выделение
+                        # убираем выделение
                         square_for_cast = piece.prepare_spell('attack')
                         for cell in square_for_cast:
                             cell.change_regime()
 
-                        #и она выделена
+                        # и она выделена
                         select_piece_for_cast.cast_spell('attack', square_clicked)
 
                         select_piece_for_cast = None
 
-                        #Пока что просто получаем в консоле результат
+                        # Пока что просто получаем в консоле результат
 
                     field.update()
 
@@ -225,7 +295,6 @@ def main() -> None:
                         square_clicked.change_regime()
                         field.update()
                     """
-
 
             # Если нажата правая клавиша мыши, то ставим флаг движения карты и флаг для пропуска первого сдвига
             elif e.type == pg.MOUSEBUTTONDOWN and e.button == 3:
