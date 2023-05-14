@@ -83,7 +83,8 @@ def main() -> None:
     # Переменная для хранения выбранной фигуры
     selected_piece: tp.Union[Piece, None] = None
 
-    interface.add_buttons(["move", "attack"])
+    # Переменная для хранения выбранного действия
+    selected_action: tp.Union[str, None] = None
 
     # Тест расположения фигуры
     first_piece = Pawn(field, field.get_square_by_pos(6, 6), 10, 0.5, 2, 3, 1)
@@ -132,12 +133,49 @@ def main() -> None:
                     if button is None:
                         continue
 
-                    # ОТЛАДКА: выводим действие нажатой кнопки в консоль
-                    print(button.action)
-
                     # Если выбрана кнопка движения
                     if button.action == "move":
-                        pass
+
+                        # Если ранее было выбрано действие атаки, то убираем для него выделенные клетки
+                        if selected_action == "attack":
+                            square_for_cast = selected_piece.prepare_spell('attack')
+                            for cell in square_for_cast:
+                                cell.change_regime()
+
+                        # Меняем режим доступных для движения клеток (снимаем или добавляем выделение)
+                        square_for_move = selected_piece.prepare_spell('move')
+                        for cell in square_for_move:
+                            cell.change_regime()
+
+                        # Добавляем или убираем движение в качестве выбранного действия
+                        # (Движение может быть добавлена как выделенное действие
+                        # лишь при наличии хотя бы одной выделенной клетки)
+                        if square_for_move and (selected_action != "move"):
+                            selected_action = "move"
+                        else:
+                            selected_action = None
+
+                    # Если выбрана кнопка атаки
+                    elif button.action == "attack":
+
+                        # Если ранее было выбрано действие движения, то убираем для него выделенные клетки
+                        if selected_action == "move":
+                            square_for_cast = selected_piece.prepare_spell('move')
+                            for cell in square_for_cast:
+                                cell.change_regime()
+
+                        # Меняем режим доступных для атаки клеток (снимаем или добавляем выделение)
+                        square_for_cast = selected_piece.prepare_spell('attack')
+                        for cell in square_for_cast:
+                            cell.change_regime()
+
+                        # Добавляем или убираем атаку в качестве выбранного действия
+                        # (Атака может быть добавлена как выделенное действие
+                        # лишь при наличии хотя бы одной выделенной клетки)
+                        if square_for_cast and (selected_action != "attack"):
+                            selected_action = "attack"
+                        else:
+                            selected_action = None
 
                 # Получаем нажатую клетку
                 square_clicked = field.get_square_by_coordinates(click_coordinates[0], click_coordinates[1])
@@ -145,12 +183,36 @@ def main() -> None:
                 # Если клетка относится к классу Square (т.е. существует)
                 if isinstance(square_clicked, Square):
 
-                    # Если на клетке ничего нет, то пропускаем итерацию
-                    if square_clicked is None:
-                        continue
+                    # Если на клетке стоит фигура, выделенная для действия, направленного на неё
+                    if isinstance(square_clicked.inner_piece, Piece) and square_clicked.is_activated:
+
+                        # Если выбрано действие атаки
+                        if selected_action == "attack":
+
+                            # Очищаем раннее выделенные для атаки клетки
+                            square_for_cast = selected_piece.prepare_spell('attack')
+                            for cell in square_for_cast:
+                                cell.change_regime()
+
+                            # Атакуем выбранную фигуру
+                            selected_piece.cast_spell('attack', square_clicked)
+
+                            # Указываем, что клетка на которой стоит фигура, теперь не является выделенной
+                            selected_piece.cell.deselect()
+
+                            # Очищаем переменные с выделенными фигурой и действием
+                            selected_piece = None
+                            selected_action = None
+
+                            # Закрываем интерфейс
+                            interface.close()
 
                     # Если на клетке находится ранее не выбранная фигура
-                    if isinstance(square_clicked.inner_piece, Piece) and (square_clicked.inner_piece != selected_piece):
+                    elif isinstance(square_clicked.inner_piece, Piece) and (square_clicked.inner_piece != selected_piece):
+
+                        # Если уже есть выбранное действие, то пропускаем итерацию
+                        if selected_action is not None:
+                            continue
 
                         # Если существовала ранее выбранная фигура, то убираем выделение у её клетки
                         if selected_piece is not None:
@@ -181,11 +243,51 @@ def main() -> None:
                         # Отменяем выделение клетки, на которой стоит выбранная фигура
                         selected_piece.cell.deselect()
 
+                        # Если есть выделенные для движения клетки, то очищаем их
+                        square_for_move = selected_piece.prepare_spell('move')
+                        if square_for_move[0].is_activated:
+                            for cell in square_for_move:
+                                cell.change_regime()
+
+                        # Если есть выделенные для атаки клетки, то очищаем их
+                        square_for_move = selected_piece.prepare_spell('attack')
+                        if len(square_for_move) > 0 and square_for_move[0].is_activated:
+                            for cell in square_for_move:
+                                cell.change_regime()
+
                         # Очищаем переменную с выбранной фигурой
                         selected_piece = None
 
+                        # Очищаем переменную с выбранным действием
+                        selected_action = None
+
                         # Закрываем интерфейс
                         interface.close()
+
+                    # Если нажатая клетка была выделена для определённого действия (не связанного с другими фигурами)
+                    elif square_clicked.is_activated:
+
+                        # Если выбранным действием является движение
+                        if selected_action == "move":
+
+                            # Очищаем выделенные клетки доступные для движения
+                            square_for_move = selected_piece.prepare_spell('move')
+                            for cell in square_for_move:
+                                cell.change_regime()
+
+                            # Перемещаем фигуру
+                            selected_piece.cast_spell('move', square_clicked)
+
+                            # Указываем, что клетка на которой раньше стояла фигура, теперь не является выделенной
+                            selected_piece.cell.deselect()
+
+                            # Очищаем переменные с выделенными фигурой и действием
+                            selected_piece = None
+                            selected_action = None
+
+                            # Закрываем интерфейс
+                            interface.close()
+
 
                     # Тестовая часть управления фигурой
 
