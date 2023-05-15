@@ -781,10 +781,14 @@ class Field:
             # переходим к следующему элементу
             i += 1
 
-        way = [self.get_square_by_pos(moves[i][0], moves[i][1])]
+        if way_is_find:
+            way = [self.get_square_by_pos(moves[i][0], moves[i][1])]
 
-        while i != -1:
-            i = preview_cell[i]
-            way.append(self.get_square_by_pos(moves[i][0], moves[i][1]))
+            while i != -1:
+                i = preview_cell[i]
+                way.append(self.get_square_by_pos(moves[i][0], moves[i][1]))
 
-        return way[::-1]
+            return way[::-1]
+        
+        else:
+            return []
