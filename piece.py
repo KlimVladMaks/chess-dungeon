@@ -213,10 +213,11 @@ class Piece:
         old_cell.del_inner_piece()
         new_cell.add_inner_piece(self)
 
-    def get_fovs(self) -> list[tuple[_Square, _Square]]:
+    def get_fovs(self, cell = None) -> list[tuple[_Square, _Square]]:
         """
         Функция возвращает список всех видимых клеток.
         Функция вызывает функцию прорисовки растровой линии от центра до каждой клетки границы (граница беспрерывная спутенькой).
+        :cell: передаётся, если требуется найти обзор не из текущей клетки
         """
         fovs = set()
 
@@ -225,7 +226,13 @@ class Piece:
         r = self.radius_fov
         x = 0
         y = r
-        start_y, start_x = self.cell.get_pos()
+        
+
+        if cell is None:
+            start_y, start_x = self.cell.get_pos()
+        else:
+            start_y, start_x = cell.get_pos()
+
         for i in range(4 * r):
 
             #рисуется растровая линия от клетки с фигурой до каждой пограничной
@@ -457,3 +464,5 @@ if __name__ == '__main__':
     
     b = Pawn(_Field(), _Square(), 10, 0.5, 2, 3, 1)
     a = Pawn(_Field(), _Square(), 10, 0.5, 2, 3, 1)
+
+    print(isinstance(a, Piece))
