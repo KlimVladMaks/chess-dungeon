@@ -784,7 +784,7 @@ class Field:
         if way_is_find:
             way = [self.get_square_by_pos(moves[i][0], moves[i][1])]
 
-            while i != -1:
+            while preview_cell[i] != -1:
                 i = preview_cell[i]
                 way.append(self.get_square_by_pos(moves[i][0], moves[i][1]))
 
