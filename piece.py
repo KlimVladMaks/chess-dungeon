@@ -114,18 +114,6 @@ class Piece:
                 moves.append((moves[i][0] + 1, moves[i][1]))
                 len_way.append(len_way[i] + 1)
 
-            print(not (moves[i][0] - 1, moves[i][1]) in moves)
-            print(len_way[i] < self.radius_move)
-            print(self.field.is_into_map(moves[i][0] - 1, moves[i][1]))
-            print(not self.field.is_barrier(moves[i][0] - 1, moves[i][1]))
-            print(self.field.get_square_by_pos(moves[i][0] - 1, moves[i][1]).inner_piece is None)
-
-            print((not (moves[i][0] - 1, moves[i][1]) in moves
-                    and len_way[i] < self.radius_move
-                        and self.field.is_into_map(moves[i][0] - 1, moves[i][1])
-                            and not self.field.is_barrier(moves[i][0] - 1, moves[i][1])
-                                and self.field.get_square_by_pos(moves[i][0] - 1, moves[i][1]).inner_piece is None))
-
             if (not (moves[i][0] - 1, moves[i][1]) in moves
                     and len_way[i] < self.radius_move
                         and self.field.is_into_map(moves[i][0] - 1, moves[i][1])
@@ -153,7 +141,6 @@ class Piece:
             #переходим к следующему элементу
             i += 1
 
-            print(moves)
 
         #переводим позиции в клетки
         moving_cell = []
@@ -161,8 +148,6 @@ class Piece:
             cell = self.field.get_square_by_pos(pos[0], pos[1])
             if cell != self.cell:
                 moving_cell.append(cell)
-        
-        print(moving_cell)
 
         return moving_cell
     
