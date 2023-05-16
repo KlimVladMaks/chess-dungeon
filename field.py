@@ -672,7 +672,7 @@ class Field:
 
         :param row_pos Позиция строки клетки.
         :param col_pos Позиция столбца клетки.
-        :return: Возвращает True, если клетка не проницаема для движения, иначе False.
+        :return: Возвращает True, если клетка непроницаема для движения, иначе False.
         """
 
         # запрашиваем у поля клетку по координатам
@@ -681,9 +681,9 @@ class Field:
         # спрашиваем у клетки преграждает ли она проход
         # (Пока просто проверяем, существует ли клетка)
         if cell.is_exist:
-            return True
+            return False
 
-        return False
+        return True
 
     """Совместно с svgarik"""
     def is_fog(self, row_pos: int, col_pos: int) -> bool:
@@ -693,7 +693,7 @@ class Field:
 
         :param row_pos Позиция строки клетки.
         :param col_pos Позиция столбца клетки.
-        :return: Возвращает True, если клетка не проницаема для обзора, иначе False.
+        :return: Возвращает True, если клетка непроницаема для обзора, иначе False.
         """
 
         # запрашиваем у поля клетку по координатам
@@ -702,9 +702,9 @@ class Field:
         # спрашиваем у клетки преграждает ли она обзор
         # (Пока просто проверяем, существует ли клетка)
         if cell.is_exist:
-            return True
+            return False
 
-        return False
+        return True
 
     """Совместно с svgarik"""
     def get_way(self, start: Square, end: Square) -> list[tp.Union[SquareTemplate, None]]:
@@ -716,7 +716,7 @@ class Field:
         :return: Список клеток, составляющих кратчайший маршрут между начальной и конечной клетками.
         """
 
-        # храним индекс рассматриваемого элемента, симулируя очередь
+        # храним индекс рассматриваемого элемента, симулируя очередьf
         # и саму очередь, в которой храним клетку от которой параллельно идём
         # и ещё один массив, чтобы узнавать длину и при этом спокойно узнавать, были ли мы уже в этой клетке
         # и массив со ссылкой на обратную клетку пришли для восстановления пути
@@ -781,10 +781,14 @@ class Field:
             # переходим к следующему элементу
             i += 1
 
-        way = [self.get_square_by_pos(moves[i][0], moves[i][1])]
+        if way_is_find:
+            way = [self.get_square_by_pos(moves[i][0], moves[i][1])]
 
-        while i != -1:
-            i = preview_cell[i]
-            way.append(self.get_square_by_pos(moves[i][0], moves[i][1]))
+            while i != -1:
+                i = preview_cell[i]
+                way.append(self.get_square_by_pos(moves[i][0], moves[i][1]))
 
-        return way[::-1]
+            return way[::-1]
+        
+        else:
+            return None
