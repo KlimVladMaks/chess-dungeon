@@ -2,12 +2,6 @@ import typing as tp
 from spell import *
 import random
 
-"""
-fick me 
-get_square_by_pos.is_exist потом переделать на нужный атрибут
-get_object_in_cell переименовать
-"""
-
 #Списки условных обозначений, являющиеся стеной
 BARRIERS = [False]
 FOGS = [False]
@@ -82,57 +76,12 @@ class Piece:
         self.hp = max_hp
         self.accuracy = accuracy
         self.damage = damage
-        Moving = Spell(1, "Перемещение", "Переместитесь на клетку в зоне движения", self.get_moves, self.moving)
+        Moving = Spell(1, "Перемещение", "Переместитесь на клетку в зоне движения", None, self.get_moves, self.moving)
         self.spell_list = [Moving]
         self.active_turn = True
 
-    def is_barrier(self, row_pos: int, col_pos: int) -> bool:
-
-        """
-        Функция проверяет, является ли клетка непроницаемой для движения.
-        !!!Не вызывайте функцию, если не уверены, что клетка существует.
-        """
-
-        #запрашиваем у поля клетку по координатам
-        cell = self.field.get_square_by_pos(row_pos, col_pos)
-        
-        #спрашиваем у клетки преграждает ли она проход
-        if cell.is_exist in BARRIERS:
-            return True
-    
-        return False
-    
-    def is_fog(self, row_pos: int, col_pos: int) -> bool:
-
-        """
-        Функция проверяет, является ли клетка непроницаемой для обзора.
-        !!!Не вызывайте функцию, если не уверены, что клетка существует.
-        """
-
-        #запрашиваем у поля клетку по координатам
-        cell = self.field.get_square_by_pos(row_pos, col_pos)
-
-        #спрашиваем у клетки преграждает ли она обзор
-        if cell.is_exist in FOGS:
-            return True
-    
-        return False
-
-    def is_into_map(self, row_pos: int, col_pos: int) -> bool:
-        """
-        Проверяет, существует ли клетка по данной координате.
-        """
-
-        #запрашиваем у поля клетку по координатам
-        cell = self.field.get_square_by_pos(row_pos, col_pos)
-
-        if cell is None:
-            return False
-        
-        return True
-
-
     def get_moves(self) -> list[tuple[_Square, _Square]]:
+        
         """
         Функция возвращает все клетки до которых можно дойти.
         Работает это через обход в ширину со стартовой клетки.
@@ -147,7 +96,7 @@ class Piece:
 
         #проверим о выходе за пределы массива (зачем?)
         row_pos, col_pos = self.cell.get_pos()
-        if self.is_into_map(row_pos, col_pos):
+        if self.field.is_into_map(row_pos, col_pos):
             moves.append((row_pos, col_pos))
             len_way.append(0)
 
@@ -159,38 +108,39 @@ class Piece:
 
             if (not (moves[i][0] + 1, moves[i][1]) in moves #ещё не посетили
                     and len_way[i] < self.radius_move #не дальше, чем движение клетки
-                        and self.is_into_map(moves[i][0] + 1, moves[i][1]) #в пределах поля
-                            and not self.is_barrier(moves[i][0] + 1, moves[i][1]) #можно пройти
+                        and self.field.is_into_map(moves[i][0] + 1, moves[i][1]) #в пределах поля
+                            and not self.field.is_barrier(moves[i][0] + 1, moves[i][1]) #можно пройти
                                 and self.field.get_square_by_pos(moves[i][0] + 1, moves[i][1]).inner_piece is None): #нет фигуры
                 moves.append((moves[i][0] + 1, moves[i][1]))
                 len_way.append(len_way[i] + 1)
 
             if (not (moves[i][0] - 1, moves[i][1]) in moves
                     and len_way[i] < self.radius_move
-                        and self.is_into_map(moves[i][0] - 1, moves[i][1])
-                            and not self.is_barrier(moves[i][0] - 1, moves[i][1])
+                        and self.field.is_into_map(moves[i][0] - 1, moves[i][1])
+                            and not self.field.is_barrier(moves[i][0] - 1, moves[i][1])
                                 and self.field.get_square_by_pos(moves[i][0] - 1, moves[i][1]).inner_piece is None):
                 moves.append((moves[i][0] - 1, moves[i][1]))
                 len_way.append(len_way[i] + 1)
             
             if (not (moves[i][0], moves[i][1] + 1) in moves
                     and len_way[i] < self.radius_move
-                        and self.is_into_map(moves[i][0], moves[i][1] + 1)
-                            and not self.is_barrier(moves[i][0], moves[i][1] + 1)
+                        and self.field.is_into_map(moves[i][0], moves[i][1] + 1)
+                            and not self.field.is_barrier(moves[i][0], moves[i][1] + 1)
                                 and self.field.get_square_by_pos(moves[i][0], moves[i][1] + 1).inner_piece is None):
                 moves.append((moves[i][0], moves[i][1] + 1))
                 len_way.append(len_way[i] + 1)
 
             if (not (moves[i][0], moves[i][1] - 1) in moves
                     and len_way[i] < self.radius_move
-                        and self.is_into_map(moves[i][0], moves[i][1] - 1)
-                            and not self.is_barrier(moves[i][0], moves[i][1] - 1)
+                        and self.field.is_into_map(moves[i][0], moves[i][1] - 1)
+                            and not self.field.is_barrier(moves[i][0], moves[i][1] - 1)
                                 and self.field.get_square_by_pos(moves[i][0], moves[i][1] - 1).inner_piece is None):
                 moves.append((moves[i][0], moves[i][1] - 1))
                 len_way.append(len_way[i] + 1)
 
             #переходим к следующему элементу
             i += 1
+
 
         #переводим позиции в клетки
         moving_cell = []
@@ -213,10 +163,11 @@ class Piece:
         old_cell.del_inner_piece()
         new_cell.add_inner_piece(self)
 
-    def get_fovs(self) -> list[tuple[_Square, _Square]]:
+    def get_fovs(self, cell = None) -> list[tuple[_Square, _Square]]:
         """
         Функция возвращает список всех видимых клеток.
         Функция вызывает функцию прорисовки растровой линии от центра до каждой клетки границы (граница беспрерывная спутенькой).
+        :cell: передаётся, если требуется найти обзор не из текущей клетки
         """
         fovs = set()
 
@@ -225,7 +176,13 @@ class Piece:
         r = self.radius_fov
         x = 0
         y = r
-        start_y, start_x = self.cell.get_pos()
+        
+
+        if cell is None:
+            start_y, start_x = self.cell.get_pos()
+        else:
+            start_y, start_x = cell.get_pos()
+
         for i in range(4 * r):
 
             #рисуется растровая линия от клетки с фигурой до каждой пограничной
@@ -310,12 +267,12 @@ class Piece:
 
 
         #проверяем, что не выходим за краницы массива
-        if self.is_into_map(y, x):
+        if self.field.is_into_map(y, x):
             #создаём путь, куда попадают видимые клетки
             #первая клетка всегда попадает в путь
             #если клетка - стена то клетки после неё не попадают в видимые клетки
             way = [(y, x)]
-            if self.is_fog(y, x):
+            if self.field.is_fog(y, x):
                 return way
         else:
             return []
@@ -337,10 +294,10 @@ class Piece:
                 x += pdx
                 y += pdy
             
-            if self.is_into_map(y, x):
+            if self.field.is_into_map(y, x):
                 #вновь проверяем, а не смотрим ли мы сквозь стену?
                 way.append((y, x))
-                if self.is_fog(y, x):
+                if self.field.is_fog(y, x):
                     return way
             
         return way
@@ -404,14 +361,23 @@ class Pawn(Piece):
         """
 
         #Создаём способность Атака и добавляем её в список способностей
-        Atacke = Spell(1, "Атака", "Атакуйте выбранную цель", self.attack_spell_target, self.attack_spell_cast)
+        Atacke = Spell(1, "Атака", "Атакуйте выбранную цель", self.attack_spell_zone, self.attack_spell_target, self.attack_spell_cast)
         self.spell_list.append(Atacke)
 
     #Функции различных способностей
     #ATTACK
 
-    def attack_spell_target(self) -> list[_Square]:
-        row_pos, col_pos = self.cell.get_pos()
+    def attack_spell_zone(self, host_cell: _Square = None) -> list[tuple[int, int]]:
+
+        """
+        Воспомогательная функция, возвращающая набор координат потенциальных клеток.
+        Требуется отдельная фильтрация и перевод в объекты класса Square
+        """
+
+        if host_cell is None:
+            host_cell = self.cell
+
+        row_pos, col_pos = host_cell.get_pos()
         x, y = row_pos, col_pos
             
         #задаём список возможных целей для атаки
@@ -427,11 +393,17 @@ class Pawn(Piece):
             (x, y + 1)
         ]
 
+        return potential
+
+    def attack_spell_target(self) -> list[_Square]:
+
+        potential = self.attack_spell_zone()
+
         target_list = []
             
         #cреди этих клеток можно атаковать только те, на которых стоят фигуры (система свой-чужой не работает хе)
         for cell in potential:
-            if self.is_into_map(cell[0], cell[1]) and isinstance(self.field.get_square_by_pos(cell[0], cell[1]).inner_piece, Piece):
+            if self.field.is_into_map(cell[0], cell[1]) and isinstance(self.field.get_square_by_pos(cell[0], cell[1]).inner_piece, Piece):
                  target_list.append(self.field.get_square_by_pos(cell[0], cell[1]))
 
         return target_list
@@ -457,3 +429,5 @@ if __name__ == '__main__':
     
     b = Pawn(_Field(), _Square(), 10, 0.5, 2, 3, 1)
     a = Pawn(_Field(), _Square(), 10, 0.5, 2, 3, 1)
+
+    print(isinstance(a, Piece))

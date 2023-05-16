@@ -2,6 +2,7 @@ import pygame as pg
 import typing as tp
 from field import *
 from piece import *
+from enemy import *
 from interface import *
 
 # Ширина и высота экрана
@@ -89,9 +90,12 @@ def main() -> None:
     # Тест расположения фигуры
     first_piece = Pawn(field, field.get_square_by_pos(6, 6), 10, 0.5, 2, 3, 1)
     second_piece = Pawn(field, field.get_square_by_pos(5, 6), 10, 0.5, 2, 3, 1)
-
     first_piece.cell.add_inner_piece(first_piece)
     second_piece.cell.add_inner_piece(second_piece)
+
+    enemy = EnemyPawn(field, field.get_square_by_pos(15, 17), 10, 0.5, 2, 3, 5)
+    enemy.set_way_patrol(field.get_square_by_pos(7, 6))
+    enemy.cell.add_inner_piece(enemy)
 
     # флаг, что выбрана фигура для движения
     select_piece_for_move = None
@@ -116,6 +120,11 @@ def main() -> None:
             if e.type == pg.QUIT:
                 pg.quit()
                 return
+            
+            #(!!!!!) тест врага
+            elif e.type == pg.KEYDOWN and e.key == 110:
+                enemy.new_turn()
+                field.update()
 
             # Если нажата левая клавиша мыши
             elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
