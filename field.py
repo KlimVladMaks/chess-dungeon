@@ -656,6 +656,10 @@ class Field:
         :return: Возвращает True, если клетка существует, иначе False.
         """
 
+        #также убеждаемся, что мы не просим отрицательные индексы
+        if row_pos < 0 or col_pos < 0:
+            return False
+
         # запрашиваем у поля клетку по координатам
         cell = self.get_square_by_pos(row_pos, col_pos)
 
@@ -741,6 +745,7 @@ class Field:
             # проверяем были ли мы уже в соседних клетках от текущей
             # и, если не были и туда идти не больше radius_move добавляем в очередь
             # ах да, ещё проверка выхода за пределы массива
+
 
             if moves[i] == (end_row_pos, end_col_pos):
                 way_is_find = True
