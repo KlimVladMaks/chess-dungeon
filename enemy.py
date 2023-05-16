@@ -359,6 +359,8 @@ class EnemyPiece(Piece):
 
         print('Новый ход')
 
+        super().new_turn()
+
         if self.action == 'patrol':
             print('Новый ход', self.action)
             self.patrol_step()
@@ -366,8 +368,7 @@ class EnemyPiece(Piece):
         elif self.action == 'attack':
             print('Новый ход', self.action)
             self.alarm()
-
-        super().new_turn()
+            
 
 class EnemyPawn(EnemyPiece, Pawn):
 
