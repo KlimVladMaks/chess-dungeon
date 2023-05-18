@@ -50,11 +50,11 @@ class Button(pg.sprite.Sprite):
         # Задаём поверхность кнопки
         self.image = pg.Surface((button_size[0], button_size[1]))
 
-        # Закрашиваем кнопку в соответствии с типом действия кнопки
+        # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
         if self.action == "move":
-            self.image.fill(MOVE_BUTTON_COLOR)
+            self.image = pg.image.load("design/Move.png")
         elif self.action == "attack":
-            self.image.fill(ATTACK_BUTTON_COLOR)
+            self.image = pg.image.load("design/Attack.png")
 
         # Задаём поверхность кнопки
         self.rect = pg.Rect(coordinates[0], coordinates[1], button_size[0], button_size[1])
