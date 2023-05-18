@@ -182,14 +182,14 @@ class Square(SquareTemplate):
         # Инициализируем шаблон клетки
         super().__init__(x, y, field)
 
-        # Закрашиваем клетку в соответсвующий цвет
-        self.image.fill(SQUARE_COLOR)
+        # Задаём клетке поверхность с изображением
+        self.image = pg.image.load("design/Active.png")
 
         # Рисуем границы клетки
-        pg.draw.rect(self.image,
-                     SQUARE_BORDER_COLOR,
-                     pg.Rect(0, 0, self.side_size, self.side_size),
-                     SQUARE_BORDER_WIDTH)
+        # pg.draw.rect(self.image,
+        #              SQUARE_BORDER_COLOR,
+        #              pg.Rect(0, 0, self.side_size, self.side_size),
+        #              SQUARE_BORDER_WIDTH)
 
         # Флаг, показывающий активность/неактивность клетки
         self.is_activated = False
@@ -253,40 +253,36 @@ class Square(SquareTemplate):
         Функция для обновления шахматной клетки.
         """
 
-        # Если клетка активирована, то закрашиваем её в активированный цвет
+        # Если клетка активирована, то задаём ей активированный дизайн
         if self.is_activated:
-            self.image.fill(SQUARE_ACTIVATED_COLOR)
-            pg.draw.rect(self.image,
-                         SQUARE_BORDER_COLOR,
-                         pg.Rect(0, 0, self.side_size, self.side_size),
-                         SQUARE_BORDER_WIDTH)
+            self.image = pg.image.load("design/way.png")
+            # pg.draw.rect(self.image,
+            #              SQUARE_BORDER_COLOR,
+            #              pg.Rect(0, 0, self.side_size, self.side_size),
+            #              SQUARE_BORDER_WIDTH)
 
-        # Иначе, закрашиваем её в обычный цвет
+        # Иначе, задаём ей обычный дизайн
         else:
-            self.image.fill(SQUARE_COLOR)
-            pg.draw.rect(self.image,
-                         SQUARE_BORDER_COLOR,
-                         pg.Rect(0, 0, self.side_size, self.side_size),
-                         SQUARE_BORDER_WIDTH)
+            self.image = pg.image.load("design/Active.png")
+            # pg.draw.rect(self.image,
+            #              SQUARE_BORDER_COLOR,
+            #              pg.Rect(0, 0, self.side_size, self.side_size),
+            #              SQUARE_BORDER_WIDTH)
 
-        # Если клетка занята, то рисуем дополнительный круг
+        # Если клетка занята, то рисуем на ней фигуру
         if self.is_occupied:
 
-            # Если клетка выбран раскашиваем круг одним цветом
+            # Если клетка выбран, то рисуем выбранную версию фигуры
             if self.is_selected:
-                pg.draw.circle(self.image,
-                               SQUARE_SELECTED_COLOR,
-                               (self.side_size // 2,
-                                self.side_size // 2),
-                               self.side_size // 2 - 1)
+                self.image = pg.image.load("design/PawnActive.png")
 
-            # Иначе раскашиваем круг другим цветом
+            # Если клетка активирована, то рисуем атакуемую версию фигуры
+            elif self.is_activated:
+                self.image = pg.image.load("design/attacked.png")
+
+            # Иначе рисуем стандартную версию фигуру
             else:
-                pg.draw.circle(self.image,
-                               SQUARE_OCCUPIED_COLOR,
-                               (self.side_size // 2,
-                                self.side_size // 2),
-                               self.side_size // 2 - 1)
+                self.image = pg.image.load("design/Pawn.png")
 
     def increase_size(self) -> None:
         """
@@ -424,6 +420,9 @@ class NonexistentSquare(SquareTemplate):
 
         # Инициализируем шаблон клетки
         super().__init__(x, y, field)
+
+        # Задаём клетке поверхность с изображением
+        self.image = pg.image.load("design/NonActive.png")
 
         # Указываем, что клетка не существует
         self.is_exist = False
@@ -647,6 +646,7 @@ class Field:
         self.screen_absolute_coordinates[1] -= y_shift
 
     """Совместно с svgarik"""
+
     def is_into_map(self, row_pos: int, col_pos: int) -> bool:
         """
         Функция, проверяющая, существует ли клетка с заданными координатами.
@@ -656,7 +656,7 @@ class Field:
         :return: Возвращает True, если клетка существует, иначе False.
         """
 
-        #также убеждаемся, что мы не просим отрицательные индексы
+        # также убеждаемся, что мы не просим отрицательные индексы
         if row_pos < 0 or col_pos < 0:
             return False
 
@@ -669,6 +669,7 @@ class Field:
         return True
 
     """Совместно с svgarik"""
+
     def is_barrier(self, row_pos: int, col_pos: int) -> bool:
         """
         Функция, проверяющая, является ли заданная клетка непроницаемой для движения.
@@ -690,6 +691,7 @@ class Field:
         return True
 
     """Совместно с svgarik"""
+
     def is_fog(self, row_pos: int, col_pos: int) -> bool:
         """
         Функция, проверяющая, является ли заданная клетка непроницаемой для обзора.
@@ -711,6 +713,7 @@ class Field:
         return True
 
     """Совместно с svgarik"""
+
     def get_way(self, start: Square, end: Square) -> list[tp.Union[SquareTemplate, None]]:
         """
         Функция, возвращающая кратчайший маршрут между двумя клетками.
@@ -745,7 +748,6 @@ class Field:
             # проверяем были ли мы уже в соседних клетках от текущей
             # и, если не были и туда идти не больше radius_move добавляем в очередь
             # ах да, ещё проверка выхода за пределы массива
-
 
             if moves[i] == (end_row_pos, end_col_pos):
                 way_is_find = True
@@ -794,6 +796,6 @@ class Field:
                 way.append(self.get_square_by_pos(moves[i][0], moves[i][1]))
 
             return way[::-1]
-        
+
         else:
             return None
