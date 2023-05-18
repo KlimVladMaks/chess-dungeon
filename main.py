@@ -123,8 +123,8 @@ def main() -> None:
                 pg.quit()
                 return
 
-            # Если нажата кнопка N
-            elif e.type == pg.KEYDOWN and e.key == 110:
+            # Если нажата кнопка Enter
+            elif e.type == pg.KEYDOWN and e.key == pg.K_RETURN:
 
                 # Делаем новый ход для каждой фигуры и обновляем поле
                 for piece in pieces:
@@ -194,6 +194,9 @@ def main() -> None:
                             selected_action = "attack"
                         else:
                             selected_action = None
+
+                    # Переходим к следующей итерации цикла
+                    continue
 
                 # Получаем нажатую клетку
                 square_clicked = field.get_square_by_coordinates(click_coordinates[0], click_coordinates[1])
