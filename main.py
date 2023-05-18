@@ -70,8 +70,7 @@ def main() -> None:
     pg.display.set_caption("Chess Dungeon")
 
     # Устанавливаем фон
-    background = pg.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
-    background.fill(BACKGROUND_COLOR)
+    background = pg.image.load("design/background.png")
     screen.blit(background, (0, 0))
     pg.display.update()
 
@@ -156,11 +155,13 @@ def main() -> None:
                             square_for_cast = selected_piece.prepare_spell('attack')
                             for cell in square_for_cast:
                                 cell.change_regime()
+                            field.update()
 
                         # Меняем режим доступных для движения клеток (снимаем или добавляем выделение)
                         square_for_move = selected_piece.prepare_spell('move')
                         for cell in square_for_move:
                             cell.change_regime()
+                        field.update()
 
                         # Добавляем или убираем движение в качестве выбранного действия
                         # (Движение может быть добавлена как выделенное действие
@@ -178,11 +179,13 @@ def main() -> None:
                             square_for_cast = selected_piece.prepare_spell('move')
                             for cell in square_for_cast:
                                 cell.change_regime()
+                            field.update()
 
                         # Меняем режим доступных для атаки клеток (снимаем или добавляем выделение)
                         square_for_cast = selected_piece.prepare_spell('attack')
                         for cell in square_for_cast:
                             cell.change_regime()
+                        field.update()
 
                         # Добавляем или убираем атаку в качестве выбранного действия
                         # (Атака может быть добавлена как выделенное действие
