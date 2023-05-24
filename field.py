@@ -183,7 +183,7 @@ class Square(SquareTemplate):
         super().__init__(x, y, field)
 
         # Задаём клетке поверхность с изображением
-        self.image = pg.image.load("design/Active.png")
+        self.image = pg.image.load("design/square.png")
 
         # Рисуем границы клетки
         # pg.draw.rect(self.image,
@@ -255,7 +255,7 @@ class Square(SquareTemplate):
 
         # Если клетка активирована, то задаём ей активированный дизайн
         if self.is_activated:
-            self.image = pg.image.load("design/way.png")
+            self.image = pg.image.load("design/activated_square.png")
             # pg.draw.rect(self.image,
             #              SQUARE_BORDER_COLOR,
             #              pg.Rect(0, 0, self.side_size, self.side_size),
@@ -263,7 +263,7 @@ class Square(SquareTemplate):
 
         # Иначе, задаём ей обычный дизайн
         else:
-            self.image = pg.image.load("design/Active.png")
+            self.image = pg.image.load("design/square.png")
             # pg.draw.rect(self.image,
             #              SQUARE_BORDER_COLOR,
             #              pg.Rect(0, 0, self.side_size, self.side_size),
@@ -274,15 +274,15 @@ class Square(SquareTemplate):
 
             # Если клетка выбран, то рисуем выбранную версию фигуры
             if self.is_selected:
-                self.image = pg.image.load("design/PawnActive.png")
+                self.image = pg.image.load("design/selected_pawn.png")
 
             # Если клетка активирована, то рисуем атакуемую версию фигуры
             elif self.is_activated:
-                self.image = pg.image.load("design/attacked.png")
+                self.image = pg.image.load("design/attacked_pawn.png")
 
             # Иначе рисуем стандартную версию фигуру
             else:
-                self.image = pg.image.load("design/Pawn.png")
+                self.image = pg.image.load("design/pawn.png")
 
     def increase_size(self) -> None:
         """
@@ -422,7 +422,7 @@ class NonexistentSquare(SquareTemplate):
         super().__init__(x, y, field)
 
         # Задаём клетке поверхность с изображением
-        self.image = pg.image.load("design/NonActive.png")
+        self.image = pg.image.load("design/barrier.png")
 
         # Указываем, что клетка не существует
         self.is_exist = False
