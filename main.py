@@ -179,6 +179,9 @@ def main() -> None:
                         # Если выбрано действие атаки
                         if game.selected_action == "attack":
 
+                            # Очищаем ранее активированные клетки
+                            game.clear_activated_squares()
+
                             # Атакуем выбранную фигуру
                             game.selected_piece.cast_spell('attack', square_clicked)
 
@@ -194,6 +197,10 @@ def main() -> None:
 
                         # Если уже есть выбранное действие, то пропускаем итерацию
                         if game.selected_action is not None:
+                            continue
+
+                        # Если игрок нажал на вражескую фигуру, то пропускаем итерацию
+                        if "Enemy" in type(square_clicked.inner_piece).__name__:
                             continue
 
                         # Если существовала ранее выбранная фигура, то завершаем предыдущий игровой такт

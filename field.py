@@ -185,12 +185,6 @@ class Square(SquareTemplate):
         # Задаём клетке поверхность с изображением
         self.image = pg.image.load("design/square.png")
 
-        # Рисуем границы клетки
-        # pg.draw.rect(self.image,
-        #              SQUARE_BORDER_COLOR,
-        #              pg.Rect(0, 0, self.side_size, self.side_size),
-        #              SQUARE_BORDER_WIDTH)
-
         # Флаг, показывающий активность/неактивность клетки
         self.is_activated = False
 
@@ -256,33 +250,43 @@ class Square(SquareTemplate):
         # Если клетка активирована, то задаём ей активированный дизайн
         if self.is_activated:
             self.image = pg.image.load("design/activated_square.png")
-            # pg.draw.rect(self.image,
-            #              SQUARE_BORDER_COLOR,
-            #              pg.Rect(0, 0, self.side_size, self.side_size),
-            #              SQUARE_BORDER_WIDTH)
 
         # Иначе, задаём ей обычный дизайн
         else:
             self.image = pg.image.load("design/square.png")
-            # pg.draw.rect(self.image,
-            #              SQUARE_BORDER_COLOR,
-            #              pg.Rect(0, 0, self.side_size, self.side_size),
-            #              SQUARE_BORDER_WIDTH)
 
         # Если клетка занята, то рисуем на ней фигуру
         if self.is_occupied:
 
-            # Если клетка выбран, то рисуем выбранную версию фигуры
-            if self.is_selected:
-                self.image = pg.image.load("design/selected_pawn.png")
+            # Если на клетке стоит белая пешка
+            if type(self.inner_piece).__name__ == "Pawn":
 
-            # Если клетка активирована, то рисуем атакуемую версию фигуры
-            elif self.is_activated:
-                self.image = pg.image.load("design/attacked_pawn.png")
+                # Если клетка выбрана
+                if self.is_selected:
+                    self.image = pg.image.load("design/selected_pawn.png")
 
-            # Иначе рисуем стандартную версию фигуру
-            else:
-                self.image = pg.image.load("design/pawn.png")
+                # Если клетка активирована
+                elif self.is_activated:
+                    self.image = pg.image.load("design/attacked_pawn.png")
+
+                # Иначе
+                else:
+                    self.image = pg.image.load("design/pawn.png")
+
+            # Если на клетке стоит чёрная пешка
+            elif type(self.inner_piece).__name__ == "EnemyPawn":
+
+                # Если клетка выбрана
+                if self.is_selected:
+                    self.image = pg.image.load("design/selected_pawn.png")
+
+                # Если клетка активирована
+                elif self.is_activated:
+                    self.image = pg.image.load("design/attacked_black_pawn.png")
+
+                # Иначе
+                else:
+                    self.image = pg.image.load("design/black_pawn.png")
 
     def increase_size(self) -> None:
         """
