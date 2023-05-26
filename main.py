@@ -140,29 +140,13 @@ def main() -> None:
                     if button is None:
                         continue
 
-                    # Если выбрана кнопка движения
-                    if button.action == "move":
+                    # Если ранее было какое-либо выбранное действие и оно не равно новому выбранному действию,
+                    # то очищаем выделенные для него клетки
+                    if (game.selected_action is not None) and (game.selected_action != button.action):
+                        game.clear_activated_squares()
 
-                        # Если ранее было какое-либо выбранное действие и это не движение,
-                        # то очищаем выделенные для него клетки
-                        if (game.selected_action is not None) and (game.selected_action != "move"):
-                            game.clear_activated_squares()
-
-                        # Изменяем режим движения для выбранной фигуры
-                        # (Выбранное действие обновляется автоматически)
-                        game.toggle_move_mode()
-
-                    # Если выбрана кнопка атаки
-                    elif button.action == "attack":
-
-                        # Если ранее было какое-либо выбранное действие и это не атака,
-                        # то очищаем выделенные для него клетки
-                        if (game.selected_action is not None) and (game.selected_action != "attack"):
-                            game.clear_activated_squares()
-
-                        # Изменяем режим атаки для выбранной фигуры
-                        # (Выбранное действие обновляется автоматически)
-                        game.toggle_attack_mode()
+                    # Изменяем режим для выбранного действия
+                    game.toggle_action_mode(button.action)
 
                     # Переходим к следующей итерации цикла
                     continue
@@ -176,20 +160,20 @@ def main() -> None:
                     # Если на клетке стоит фигура, выделенная для действия, направленного на неё
                     if isinstance(square_clicked.inner_piece, Piece) and square_clicked.is_activated:
 
-                        # Если выбрано действие атаки
-                        if game.selected_action == "attack":
+                        """Нужно быть осторожнее с добавлением новых действий, требующих другой обработки"""
 
-                            # Очищаем ранее активированные клетки
-                            game.clear_activated_squares()
+                        # Очищаем ранее активированные клетки
+                        game.clear_activated_squares()
+                        game.selected_piece.cell.deselect()
 
-                            # Атакуем выбранную фигуру
-                            game.selected_piece.cast_spell('attack', square_clicked)
+                        # Проводим выбранное ранее действие над выбранной фигуру
+                        game.selected_piece.cast_spell(game.selected_action, square_clicked)
 
-                            # Завершаем игровой такт
-                            game.finish_game_tact()
+                        # Завершаем игровой такт
+                        game.finish_game_tact()
 
-                            # Закрываем интерфейс
-                            interface.close()
+                        # Закрываем интерфейс
+                        interface.close()
 
                     # Если на клетке находится ранее не выбранная фигура
                     elif isinstance(square_clicked.inner_piece, Piece) and (
@@ -238,23 +222,18 @@ def main() -> None:
                     # Если нажатая клетка была выделена для определённого действия (не связанного с другими фигурами)
                     elif square_clicked.is_activated:
 
-                        # Если выбранным действием является движение
-                        if game.selected_action == "move":
+                        # Очищаем ранее активированные клетки
+                        game.clear_activated_squares()
+                        game.selected_piece.cell.deselect()
 
-                            # Очищаем ранее активированные клетки
-                            game.clear_activated_squares()
+                        # Проводим выбранное действие относительно выбранной клетки
+                        game.selected_piece.cast_spell(game.selected_action, square_clicked)
 
-                            # Снимаем выделение с клетки, на которой раньше стояла фигура
-                            game.selected_piece.cell.deselect()
+                        # Завершаем игровой такт
+                        game.finish_game_tact()
 
-                            # Перемещаем фигуру
-                            game.selected_piece.cast_spell('move', square_clicked)
-
-                            # Завершаем игровой такт
-                            game.finish_game_tact()
-
-                            # Закрываем интерфейс
-                            interface.close()
+                        # Закрываем интерфейс
+                        interface.close()
 
                     # Обновляем поле
                     field.update()

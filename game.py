@@ -36,57 +36,35 @@ class Game:
         Функция для очистки клеток, ранее выбранных для того или иного действия.
         """
 
-        # Если ранее было выбрано действие атаки, то убираем для него выделенные клетки
-        if self.selected_action == "attack":
-            square_for_cast = self.selected_piece.prepare_spell('attack')
-            for cell in square_for_cast:
-                if cell.is_activated:
-                    cell.change_regime()
-            self.field.update()
+        # Если ранее выбранного действия нет, то завершаем выполнение функции
+        if self.selected_action is None:
+            return
 
-        # Если ранее было выбрано действие движения, то убираем для него выделенные клетки
-        elif self.selected_action == "move":
-            square_for_cast = self.selected_piece.prepare_spell('move')
-            for cell in square_for_cast:
-                if cell.is_activated:
-                    cell.change_regime()
-            self.field.update()
-
-    def toggle_move_mode(self):
-        """
-        Функция для включения/выключения режима движения.
-        """
-
-        # Меняем режим доступных для движения клеток (снимаем или добавляем выделение)
-        square_for_move = self.selected_piece.prepare_spell('move')
-        for cell in square_for_move:
-            cell.change_regime()
-        self.field.update()
-
-        # Добавляем или убираем движение в качестве выбранного действия
-        # (Движение может быть добавлена как выделенное действие
-        # лишь при наличии хотя бы одной выделенной клетки)
-        if square_for_move and (self.selected_action != "move"):
-            self.selected_action = "move"
-        else:
-            self.selected_action = None
-
-    def toggle_attack_mode(self):
-        """
-        Функция для включения/выключения режима атаки.
-        """
-
-        # Меняем режим доступных для атаки клеток (снимаем или добавляем выделение)
-        square_for_cast = self.selected_piece.prepare_spell('attack')
+        # Очищаем клетки, ранее выбранные для того или иного действия
+        square_for_cast = self.selected_piece.prepare_spell(self.selected_action)
         for cell in square_for_cast:
+            if cell.is_activated:
+                cell.change_regime()
+        self.field.update()
+
+    def toggle_action_mode(self, action: str):
+        """
+        Функция для включения/выключения режима заданного действия.
+
+        :param action: Название действия.
+        """
+
+        # Меняем режим доступных для заданного действия клеток (снимаем или добавляем выделение)
+        square_for_action = self.selected_piece.prepare_spell(action)
+        for cell in square_for_action:
             cell.change_regime()
         self.field.update()
 
-        # Добавляем или убираем атаку в качестве выбранного действия
-        # (Атака может быть добавлена как выделенное действие
+        # Добавляем или убираем заданное действие в качестве выбранного действия
+        # (Заданное действие может быть добавлена как выделенное действие
         # лишь при наличии хотя бы одной выделенной клетки)
-        if square_for_cast and (self.selected_action != "attack"):
-            self.selected_action = "attack"
+        if square_for_action and (self.selected_action != action):
+            self.selected_action = action
         else:
             self.selected_action = None
 
