@@ -81,6 +81,7 @@ class Piece:
         Moving = Spell('move', 1, "Перемещение", "Переместитесь на клетку в зоне движения", None, self.get_moves, self.moving)
         self.spell_list = [Moving]
         self.active_turn = True
+        self.od = 2
 
     def get_moves(self) -> list[tuple[_Square, _Square]]:
         
