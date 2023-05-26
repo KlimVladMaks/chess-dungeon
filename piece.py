@@ -78,7 +78,7 @@ class Piece:
         self.hp = max_hp
         self.accuracy = accuracy
         self.damage = damage
-        Moving = Spell(1, 'move', "Перемещение", "Переместитесь на клетку в зоне движения", None, self.get_moves, self.moving)
+        Moving = Spell('move', 1, "Перемещение", "Переместитесь на клетку в зоне движения", None, self.get_moves, self.moving)
         self.spell_list = [Moving]
         self.active_turn = True
 
@@ -373,8 +373,8 @@ class Pawn(Piece):
         """
 
         #Создаём способность Атака и добавляем её в список способностей
-        Atacke = Spell(1, 'pawn_atacke', "Атака", "Атакуйте выбранную цель", self.attack_spell_zone, self.attack_spell_target, self.attack_spell_cast)
-        self.spell_list.append(Atacke)
+        Attack = Spell('attack', 1, "Атака", "Атакуйте выбранную цель", self.attack_spell_zone, self.attack_spell_target, self.attack_spell_cast)
+        self.spell_list.append(Attack)
 
     #Функции различных способностей
     #ATTACK
@@ -415,7 +415,8 @@ class Pawn(Piece):
             
         #cреди этих клеток можно атаковать только те, на которых стоят фигуры (система свой-чужой не работает хе)
         for cell in potential:
-            if self.field.is_into_map(cell[0], cell[1]) and isinstance(self.field.get_square_by_pos(cell[0], cell[1]).inner_piece, Piece):
+            piece = self.field.get_square_by_pos(cell[0], cell[1]).inner_piece
+            if self.field.is_into_map(cell[0], cell[1]) and isinstance(piece, Piece) and piece.team != self.team:
                  target_list.append(self.field.get_square_by_pos(cell[0], cell[1]))
 
         return target_list

@@ -378,4 +378,4 @@ class EnemyPawn(EnemyPiece, Pawn):
         super().__init__(team, field, cell, max_hp, accuracy, damage, radius_move, radius_fov)
 
 
-a = EnemyPawn(_Field(), _Square(), 10, 0.5, 2, 3, 1)
+a = EnemyPawn('Shodan', _Field(), _Square(), 10, 0.5, 2, 3, 1)

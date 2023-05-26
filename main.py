@@ -90,7 +90,7 @@ def main() -> None:
     first_piece.cell.add_inner_piece(first_piece)
     second_piece.cell.add_inner_piece(second_piece)
 
-    enemy = EnemyPawn('shodan', field, field.get_square_by_pos(15, 17), 10, 0.5, 2, 3, 5)
+    enemy = EnemyPawn('Shodan', field, field.get_square_by_pos(15, 17), 10, 0.5, 2, 3, 5)
     enemy.set_way_patrol(field.get_square_by_pos(7, 6))
     enemy.cell.add_inner_piece(enemy)
 
@@ -216,12 +216,11 @@ def main() -> None:
                         # Очищаем группу со старыми кнопками
                         interface.buttons_group.empty()
 
-                        """
-                        По идее, нужно брать список действий из фигуры, но пока задаём вручную.
-                        """
+                        # Получаем список способностей выбранной фигуры
+                        spell_list = [spell.id for spell in game.selected_piece.spell_list]
 
-                        # Задаём новые кнопки с действиями
-                        interface.add_buttons(["move", "attack"])
+                        # Задаём новые кнопки с действиями, используя список со способностями выбранной фигуры
+                        interface.add_buttons(spell_list)
 
                         # Открываем интерфейс
                         interface.open()
