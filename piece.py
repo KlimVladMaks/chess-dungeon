@@ -314,31 +314,39 @@ class Piece:
 
         self.active_turn = True
 
-    def prepare_spell(self, name_spell: int) -> list[_Square]:
+    def prepare_spell(self, id_spell: str) -> list[_Square]:
         
         """
         Функция вызывается, когда пользователь нажимает на способность.
         Возвращает клетки, на которые можно использовать способность.
-        :name_spell: кодовое слово способности
+        :id_spell: кодовое слово способности
         """
 
-        ind_spell = NAME_TO_IND[name_spell]
+        #Ищём способность в списке по id
+        spell = None
+        for i_spell in self.spell_list:
+            if i_spell.id == id_spell:
+                spell = i_spell
 
-        return self.spell_list[ind_spell].target()
+        return spell.target()
 
-    def cast_spell(self, name_spell: int, cell: _Square) -> None:
+    def cast_spell(self, id_spell: str, cell: _Square) -> None:
 
         """
         Функция вызывается, когда пользователь активирует способность.
         Производит эффект способности
-        :name_spell: кодовое слово способности
+        :id_spell: кодовое слово способности
         :cell: клетка на которую способность использовали
         """
 
-        ind_spell = NAME_TO_IND[name_spell]
+        #Ищём способность в списке по id
+        spell = None
+        for i_spell in self.spell_list:
+            if i_spell.id == id_spell:
+                spell = i_spell
 
-        self.spell_list[ind_spell].cast(cell)
-        self.spell_list[ind_spell].cooldown_now = self.spell_list[ind_spell].cooldown
+        spell.cast(cell)
+        spell.cooldown_now = spell.cooldown
         self.active_turn = False
 
 class Pawn(Piece):
