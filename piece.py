@@ -51,9 +51,10 @@ class Piece:
     Класс для шаблона Фигуры.
     """
 
-    def __init__(self, field: _Field, cell: _Square, max_hp: int, accuracy: float, damage: int, radius_move: int, radius_fov: int):
+    def __init__(self, team: str, field: _Field, cell: _Square, max_hp: int, accuracy: float, damage: int, radius_move: int, radius_fov: int):
 
         """
+        :team: команда фигуры
         :cell: клетка на которой расположена фигура
         :field: поле, на котором расположена фигура
         :radius_fov: радиус обзора в клетках
@@ -68,6 +69,7 @@ class Piece:
         :active_turn: bool параметр хранящий может ли походить клетка в этот ход
         """
 
+        self.team = team
         self.cell = cell
         self.field = field
         self.radius_fov = radius_fov
@@ -76,7 +78,7 @@ class Piece:
         self.hp = max_hp
         self.accuracy = accuracy
         self.damage = damage
-        Moving = Spell('move', 1, "Перемещение", "Переместитесь на клетку в зоне движения", None, self.get_moves, self.moving)
+        Moving = Spell(1, 'move', "Перемещение", "Переместитесь на клетку в зоне движения", None, self.get_moves, self.moving)
         self.spell_list = [Moving]
         self.active_turn = True
 
@@ -327,6 +329,7 @@ class Piece:
         for i_spell in self.spell_list:
             if i_spell.id == id_spell:
                 spell = i_spell
+                break
 
         return spell.target()
 
@@ -344,6 +347,7 @@ class Piece:
         for i_spell in self.spell_list:
             if i_spell.id == id_spell:
                 spell = i_spell
+                break
 
         spell.cast(cell)
         spell.cooldown_now = spell.cooldown
@@ -355,9 +359,9 @@ class Pawn(Piece):
     Класс пешки
     """
 
-    def __init__(self, field: _Field, cell: _Square, max_hp: int, accuracy: float, damage: int, radius_move: int, radius_fov: int):
+    def __init__(self, team: str, field: _Field, cell: _Square, max_hp: int, accuracy: float, damage: int, radius_move: int, radius_fov: int):
         #инициируем фигуру
-        super().__init__(field, cell, max_hp, accuracy, damage, radius_move, radius_fov)
+        super().__init__(team, field, cell, max_hp, accuracy, damage, radius_move, radius_fov)
         #собираем спелы специальной функцией
         self.create_spell_list()
 
@@ -369,7 +373,7 @@ class Pawn(Piece):
         """
 
         #Создаём способность Атака и добавляем её в список способностей
-        Atacke = Spell('attack', 1, "Атака", "Атакуйте выбранную цель", self.attack_spell_zone, self.attack_spell_target, self.attack_spell_cast)
+        Atacke = Spell(1, 'pawn_atacke', "Атака", "Атакуйте выбранную цель", self.attack_spell_zone, self.attack_spell_target, self.attack_spell_cast)
         self.spell_list.append(Atacke)
 
     #Функции различных способностей
@@ -435,7 +439,7 @@ class Pawn(Piece):
 
 if __name__ == '__main__':
     
-    b = Pawn(_Field(), _Square(), 10, 0.5, 2, 3, 1)
-    a = Pawn(_Field(), _Square(), 10, 0.5, 2, 3, 1)
+    b = Pawn('p', _Field(), _Square(), 10, 0.5, 2, 3, 1)
+    a = Pawn('p', _Field(), _Square(), 10, 0.5, 2, 3, 1)
 
     print(isinstance(a, Piece))

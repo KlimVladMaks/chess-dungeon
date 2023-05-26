@@ -22,9 +22,9 @@ class _Field:
 
 class EnemyPiece(Piece):
 
-    def __init__(self, field: _Field, cell: _Square, max_hp: int, accuracy: float, damage: int, radius_move: int,
+    def __init__(self, team: str, field: _Field, cell: _Square, max_hp: int, accuracy: float, damage: int, radius_move: int,
                  radius_fov: int):
-        super().__init__(field, cell, max_hp, accuracy, damage, radius_move, radius_fov)
+        super().__init__(team, field, cell, max_hp, accuracy, damage, radius_move, radius_fov)
         self.action = "patrol"
         self.way_patrol = []
         self.pos_patrol = 0
@@ -373,9 +373,9 @@ class EnemyPiece(Piece):
 
 class EnemyPawn(EnemyPiece, Pawn):
 
-    def __init__(self, field: _Field, cell: _Square, max_hp: int, accuracy: float, damage: int, radius_move: int,
+    def __init__(self, team: str, field: _Field, cell: _Square, max_hp: int, accuracy: float, damage: int, radius_move: int,
                  radius_fov: int):
-        super().__init__(field, cell, max_hp, accuracy, damage, radius_move, radius_fov)
+        super().__init__(team, field, cell, max_hp, accuracy, damage, radius_move, radius_fov)
 
 
 a = EnemyPawn(_Field(), _Square(), 10, 0.5, 2, 3, 1)

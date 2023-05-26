@@ -85,12 +85,12 @@ def main() -> None:
     game = Game(field)
 
     # Тест расположения фигуры
-    first_piece = Pawn(field, field.get_square_by_pos(6, 6), 10, 0.5, 2, 3, 1)
-    second_piece = Pawn(field, field.get_square_by_pos(5, 6), 10, 0.5, 2, 3, 1)
+    first_piece = Pawn('p1', field, field.get_square_by_pos(6, 6), 10, 0.5, 2, 3, 1)
+    second_piece = Pawn('p1', field, field.get_square_by_pos(5, 6), 10, 0.5, 2, 3, 1)
     first_piece.cell.add_inner_piece(first_piece)
     second_piece.cell.add_inner_piece(second_piece)
 
-    enemy = EnemyPawn(field, field.get_square_by_pos(15, 17), 10, 0.5, 2, 3, 5)
+    enemy = EnemyPawn('shodan', field, field.get_square_by_pos(15, 17), 10, 0.5, 2, 3, 5)
     enemy.set_way_patrol(field.get_square_by_pos(7, 6))
     enemy.cell.add_inner_piece(enemy)
 
@@ -216,11 +216,12 @@ def main() -> None:
                         # Очищаем группу со старыми кнопками
                         interface.buttons_group.empty()
 
-                        # Получаем список способностей выбранной фигуры
-                        spell_list = [spell.id for spell in game.selected_piece.spell_list]
+                        """
+                        По идее, нужно брать список действий из фигуры, но пока задаём вручную.
+                        """
 
-                        # Задаём новые кнопки с действиями, используя список со способностями выбранной фигуры
-                        interface.add_buttons(spell_list)
+                        # Задаём новые кнопки с действиями
+                        interface.add_buttons(["move", "attack"])
 
                         # Открываем интерфейс
                         interface.open()
