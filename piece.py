@@ -1,5 +1,6 @@
 import typing as tp
 from spell import *
+from effect import *
 import random
 
 #Списки условных обозначений, являющиеся стеной
@@ -78,8 +79,9 @@ class Piece:
         self.hp = max_hp
         self.accuracy = accuracy
         self.damage = damage
-        Moving = Spell('move', 1, "Перемещение", "Переместитесь на клетку в зоне движения", None, self.get_moves, self.moving)
+        Moving = Spell('move', "Перемещение", "Переместитесь на клетку в зоне движения", 0, lambda: None, self.get_moves, self.moving)
         self.spell_list = [Moving]
+        self.effect_list = []
         self.active_turn = True
         self.od = 2
 
@@ -315,6 +317,12 @@ class Piece:
             if spell.cooldown_now > 0:
                 spell.cooldown_now -= 1
 
+        for effect in self.effect_list:
+            effect.timer -= 1
+            if effect.timer == 0:
+                effect.remove_effect(self, effect.strength)
+                self.effect_list.remove(effect)
+
         self.active_turn = True
 
     def prepare_spell(self, id_spell: str) -> list[_Square]:
@@ -374,11 +382,13 @@ class Pawn(Piece):
         """
 
         #Создаём способность Атака и добавляем её в список способностей
-        Attack = Spell('attack', 1, "Атака", "Атакуйте выбранную цель", self.attack_spell_zone, self.attack_spell_target, self.attack_spell_cast)
+        Attack = Spell('attack', "Атака", "Атакуйте выбранную цель", 1, self.attack_spell_zone, self.attack_spell_target, self.attack_spell_cast)
         self.spell_list.append(Attack)
 
-    #Функции различных способностей
-    #ATTACK
+
+    """
+    Способности фигуры:
+    """
 
     def attack_spell_zone(self, host_cell: _Square = None) -> list[tuple[int, int]]:
 
@@ -432,6 +442,15 @@ class Pawn(Piece):
             print(f"Атакующая фигура попала и нанесла {self.damage} урона!")
             other.hp -= self.damage
             print(f"Оставшиеся хп жертвы: {other.hp}/{other.max_hp}")
+
+            if [effect.id for effect in other.effect_list].count('speed_reduction') == 0:
+                print('Также на фигуру наложен дебафф!')
+                effect = speed_reduction
+                effect.timer = 2
+                effect.strength = 1
+                other.effect_list.append(effect)
+                effect.get_effect(other, effect.strength)
+
             #Если фигуры хп падают до 0 и ниже, удаляем её с поля
             if other.hp <= 0:
                 print("Сильный удар разбивает жертву в каменную крошку!")
