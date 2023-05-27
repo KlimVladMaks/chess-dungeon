@@ -95,7 +95,7 @@ def main() -> None:
     enemy.cell.add_inner_piece(enemy)
 
     # Помещаем все фигуры в список
-    pieces = [first_piece, second_piece, enemy]
+    game.pieces = [first_piece, second_piece, enemy]
 
     # Тест расположения фигуры - КОНЕЦ
 
@@ -123,7 +123,7 @@ def main() -> None:
                 game.finish_game_tact()
 
                 # Делаем новый ход для каждой фигуры
-                for piece in pieces:
+                for piece in game.pieces:
                     piece.new_turn()
 
                 # Обновляем поле
@@ -174,6 +174,9 @@ def main() -> None:
                         # Проводим выбранное ранее действие над выбранной фигуру
                         game.selected_piece.cast_spell(game.selected_action, square_clicked)
 
+                        # Удаляем фигуру из соответствующего списка, если она была уничтожена
+                        game.del_destroyed_pieces()
+
                         # Завершаем игровой такт
                         game.finish_game_tact()
 
@@ -190,6 +193,10 @@ def main() -> None:
 
                         # Если игрок нажал на вражескую фигуру, то пропускаем итерацию
                         if square_clicked.inner_piece.team == "Shodan":
+                            continue
+
+                        # Если фигура не имеет активных ходов, то пропускаем итерацию
+                        if square_clicked.inner_piece.active_turn is False:
                             continue
 
                         # Если существовала ранее выбранная фигура, то завершаем предыдущий игровой такт
