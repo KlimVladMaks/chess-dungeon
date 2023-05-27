@@ -77,7 +77,8 @@ class Game:
         self.clear_activated_squares()
 
         # Указываем, что клетка на которой стоит фигура, теперь не является выделенной
-        self.selected_piece.cell.deselect()
+        if self.selected_piece is not None:
+            self.selected_piece.cell.deselect()
 
         # Очищаем переменные с выделенными фигурой и действием
         self.selected_piece = None

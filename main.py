@@ -119,9 +119,14 @@ def main() -> None:
             # Если нажата кнопка Enter
             elif e.type == pg.KEYDOWN and e.key == pg.K_RETURN:
 
-                # Делаем новый ход для каждой фигуры и обновляем поле
+                # Завершаем текущий игровой такт
+                game.finish_game_tact()
+
+                # Делаем новый ход для каждой фигуры
                 for piece in pieces:
                     piece.new_turn()
+
+                # Обновляем поле
                 field.update()
 
             # Если нажата левая клавиша мыши
