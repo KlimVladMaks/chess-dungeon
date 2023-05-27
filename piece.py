@@ -79,11 +79,11 @@ class Piece:
         self.hp = max_hp
         self.accuracy = accuracy
         self.damage = damage
-        Moving = Spell('move', "Перемещение", "Переместитесь на клетку в зоне движения", 0, lambda: None, self.get_moves, self.moving)
+        Moving = Spell('move', "Перемещение", "Переместитесь на клетку в зоне движения", 0, 1, lambda: None, self.get_moves, self.moving)
         self.spell_list = [Moving]
         self.effect_list = []
         self.active_turn = True
-        self.od = 2
+        self.AP = 2
 
     def get_moves(self) -> list[tuple[_Square, _Square]]:
         
@@ -313,6 +313,8 @@ class Piece:
         Функция восстанавливает значение активности фигуры
         """
         
+        self.AP = 2
+
         for spell in self.spell_list:
             if spell.cooldown_now > 0:
                 spell.cooldown_now -= 1
@@ -360,7 +362,11 @@ class Piece:
 
         spell.cast(cell)
         spell.cooldown_now = spell.cooldown
-        self.active_turn = False
+        self.AP -= spell.cost
+        if self.AP < 0:
+            self.AP = 0
+        if self.AP == 0:
+            self.active_turn = False
 
 class Pawn(Piece):
 
@@ -382,7 +388,7 @@ class Pawn(Piece):
         """
 
         #Создаём способность Атака и добавляем её в список способностей
-        Attack = Spell('attack', "Атака", "Атакуйте выбранную цель", 1, self.attack_spell_zone, self.attack_spell_target, self.attack_spell_cast)
+        Attack = Spell('attack', "Атака", "Атакуйте выбранную цель", 1, 2, self.attack_spell_zone, self.attack_spell_target, self.attack_spell_cast)
         self.spell_list.append(Attack)
 
 
