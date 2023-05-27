@@ -7,7 +7,7 @@ class Spell:
     Этот класс хранит информацию о способности фигуры
     """
 
-    def __init__(self, id: str, cooldown: int, name: str, description: str, zone = None, target = None, cast = None):
+    def __init__(self, id: str, name: str, description: str, cooldown: int, zone = lambda: None, target = lambda: None, cast = lambda: None):
 
         """
         :cooldown: время перезарядки способности в ходах
@@ -20,10 +20,10 @@ class Spell:
         """
 
         self.id = id
-        self.cooldown = cooldown
-        self.cooldown_now = 0
         self.name = name
         self.description = description
+        self.cooldown = cooldown
+        self.cooldown_now = 0
         self.zone = zone
         self.target = target
         self.cast = cast
