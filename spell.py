@@ -207,7 +207,7 @@ class PawnAttack1(Spell):
 class PawnAttack2_Move(Spell):
 
     def __init__(self):
-        super().__init__("lunge_move", "Выпад", "подойдите к противнику, чтобы потом атаковать (ближний бой)", 2, 1)
+        super().__init__("lunge_move", "Выпад", "подойдите к противнику, чтобы потом атаковать (ближний бой)", 2, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
         #Дальность выпада
@@ -277,7 +277,7 @@ class PawnAttack2_Move(Spell):
 class PawnAttack2_Attack(Spell):
 
     def __init__(self):
-        super().__init__("lunge_attack", "Выпад", "Атакуйте противника! (ближний бой)", 0, 1)
+        super().__init__("lunge_attack", "Выпад", "Атакуйте противника! (ближний бой)", 0, 0)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
         #Дальность выпада
@@ -339,3 +339,10 @@ class PawnAttack2_Attack(Spell):
     def cast(spell, self: "Piece", other: "Square"):
         
         PawnAttack1().cast(self, other)
+
+class PawnUtility(Spell):
+
+    def __init__(self):
+        super().__init__("just_pawn", "Всего лишь пешка", "Фигура делает сильную атаку и  наносит себе 50% от нанесенного урона (ближний бой)", 3, 2)
+
+    pass
