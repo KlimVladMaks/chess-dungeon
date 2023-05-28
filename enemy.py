@@ -84,7 +84,7 @@ class EnemyPiece(Piece):
             host_cell = self.cell
 
         # получаем обзор от данной клетки
-        range = spell.target()
+        range = spell.target(self)
         enemies_in_range = []
 
         # просматриваем все клетки в области атаки на наличие фигур игрока
@@ -276,7 +276,7 @@ class EnemyPiece(Piece):
         :target: Цель
         """
 
-        potential = spell.zone(host_cell=target)
+        potential = spell.zone(self, host_cell=target)
         potential_positions = []
 
         for cell in potential:
@@ -296,9 +296,9 @@ class EnemyPiece(Piece):
         way = self.field.get_way(self.cell, pos)
 
         if len(way) <= self.radius_move + 1:
-            self.moving(pos)
+            self.spell_list[0].cast(self, pos)
         else:
-            self.moving(way[self.radius_move])
+            self.spell_list[0].cast(self, pos)
 
     def patrol_step(self) -> None:
 
@@ -376,6 +376,3 @@ class EnemyPawn(EnemyPiece, Pawn):
     def __init__(self, team: str, field: _Field, cell: _Square, max_hp: int, accuracy: float, damage: int, radius_move: int,
                  radius_fov: int):
         super().__init__(team, field, cell, max_hp, accuracy, damage, radius_move, radius_fov)
-
-
-a = EnemyPawn('Shodan', _Field(), _Square(), 10, 0.5, 2, 3, 1)
