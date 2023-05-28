@@ -94,8 +94,9 @@ def main() -> None:
     enemy.set_way_patrol(field.get_square_by_pos(7, 6))
     enemy.cell.add_inner_piece(enemy)
 
-    # Помещаем все фигуры в список
-    game.pieces = [first_piece, second_piece, enemy]
+    # Помещаем все фигуры в соответствующие списки
+    game.player_pieces = [first_piece, second_piece]
+    game.computer_pieces = [enemy]
 
     # Тест расположения фигуры - КОНЕЦ
 
@@ -122,8 +123,12 @@ def main() -> None:
                 # Завершаем текущий игровой такт
                 game.finish_game_tact()
 
-                # Делаем новый ход для каждой фигуры
-                for piece in game.pieces:
+                # Делаем новый ход для каждой фигуры игрока
+                for piece in game.player_pieces:
+                    piece.new_turn()
+
+                # Делаем новый ход для каждой фигуры компьютера
+                for piece in game.computer_pieces:
                     piece.new_turn()
 
                 # Обновляем поле

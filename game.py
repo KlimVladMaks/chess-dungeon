@@ -27,8 +27,9 @@ class Game:
         # Свойство для хранения выбранного действия
         self.selected_action: tp.Union[str, None] = None
 
-        # Список для хранения игровых фигур
-        self.pieces: list[Piece] = []
+        # Списки для хранения фигур игрока и фигур компьютера
+        self.player_pieces: list[Piece] = []
+        self.computer_pieces: list[Piece] = []
 
     def clear_activated_squares(self):
         """
@@ -88,10 +89,15 @@ class Game:
         Функция для удаления всех уничтоженных фигур из соответствующего списка.
         """
 
-        # Перебираем все фигуры и удаляем те, у которых HP меньше нуля
-        for piece in self.pieces:
+        # Перебираем все фигуры игрока и удаляем те, у которых HP меньше нуля
+        for piece in self.player_pieces:
             if piece.hp <= 0:
-                self.pieces.remove(piece)
+                self.player_pieces.remove(piece)
+
+        # Перебираем все фигуры компьютера и удаляем те, у которых HP меньше нуля
+        for piece in self.computer_pieces:
+            if piece.hp <= 0:
+                self.computer_pieces.remove(piece)
 
 
 
