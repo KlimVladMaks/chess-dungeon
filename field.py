@@ -257,35 +257,17 @@ class Square(SquareTemplate):
             # Если на клетке стоит белая пешка
             if type(self.inner_piece).__name__ == "Pawn":
 
-                # Если фигура имеет ОД (может совершать действия)
-                if self.inner_piece.active_turn:
+                # Если клетка выбрана
+                if self.is_selected:
+                    self.image = pg.image.load("design/selected_pawn.png")
 
-                    # Если клетка выбрана
-                    if self.is_selected:
-                        self.image = pg.image.load("design/selected_pawn.png")
+                # Если клетка активирована
+                elif self.is_activated:
+                    self.image = pg.image.load("design/attacked_pawn.png")
 
-                    # Если клетка активирована
-                    elif self.is_activated:
-                        self.image = pg.image.load("design/attacked_pawn.png")
-
-                    # Иначе
-                    else:
-                        self.image = pg.image.load("design/pawn.png")
-
-                # Если клетка не имеет ОД (не может совершать действия)
+                # Иначе
                 else:
-
-                    # Если клетка выбрана
-                    if self.is_selected:
-                        self.image = pg.image.load("design/off_selected_pawn.png")
-
-                    # Если клетка активирована
-                    elif self.is_activated:
-                        self.image = pg.image.load("design/off_attacked_pawn.png")
-
-                    # Иначе
-                    else:
-                        self.image = pg.image.load("design/off_pawn.png")
+                    self.image = pg.image.load("design/pawn.png")
 
             # Если на клетке стоит чёрная пешка
             elif type(self.inner_piece).__name__ == "EnemyPawn":
@@ -759,7 +741,7 @@ class Field:
             preview_cell.append(-1)
 
         # переменная чтобы убедиться, что мы вообще можем дойти
-        way_is_find = True
+        way_is_find = False
 
         while i < len(moves):
 
