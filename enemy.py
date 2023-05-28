@@ -291,14 +291,17 @@ class EnemyPiece(Piece):
 
         """
         Функция передвинет фигуру на нужную клетку или ближайщую возможную к ней
+        Или не сдвинет вовсе
         """
 
         way = self.field.get_way(self.cell, pos)
 
-        if len(way) <= self.radius_move + 1:
-            self.spell_list[0].cast(self, pos)
+        if len(way) == 0:
+            return None
+        elif len(way) <= self.radius_move + 1:
+            self.cast_spell('move', pos)
         else:
-            self.spell_list[0].cast(self, pos)
+            self.cast_spell('move', way[self.radius_move])
 
     def patrol_step(self) -> None:
 
