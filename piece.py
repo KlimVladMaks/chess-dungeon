@@ -1,7 +1,6 @@
 import typing as tp
 from spell import *
 from effect import *
-import random
 
 if tp.TYPE_CHECKING:
     from field import Square
@@ -10,7 +9,6 @@ if tp.TYPE_CHECKING:
 #Списки условных обозначений, являющиеся стеной
 BARRIERS = [False]
 FOGS = [False]
-NAME_TO_IND = {'attack': 1, 'move': 0}
 
 
 class Piece:
@@ -212,7 +210,7 @@ class Piece:
 
         self.active_turn = True
 
-    def prepare_spell(self, id_spell: str) -> list["Square"]:
+    def prepare_spell(self, spell: "Spell") -> list["Square"]:
         
         """
         Функция вызывается, когда пользователь нажимает на способность.
@@ -220,16 +218,9 @@ class Piece:
         :id_spell: кодовое слово способности
         """
 
-        #Ищём способность в списке по id
-        spell = None
-        for i_spell in self.spell_list:
-            if i_spell.id == id_spell:
-                spell = i_spell
-                break
-
         return spell.target(self)
 
-    def cast_spell(self, id_spell: str, cell: "Square") -> None:
+    def cast_spell(self, spell: "Spell", cell: "Square") -> None:
 
         """
         Функция вызывается, когда пользователь активирует способность.
@@ -237,13 +228,6 @@ class Piece:
         :id_spell: кодовое слово способности
         :cell: клетка на которую способность использовали
         """
-
-        #Ищём способность в списке по id
-        spell = None
-        for i_spell in self.spell_list:
-            if i_spell.id == id_spell:
-                spell = i_spell
-                break
         
         spell.cast(self, cell)
         spell.cooldown_now = spell.cooldown
@@ -259,9 +243,9 @@ class Pawn(Piece):
     Класс пешки
     """
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, damage: int, radius_move: int, radius_fov: int):
+    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
         #инициируем фигуру
-        super().__init__(team, field, cell, max_hp, accuracy, damage, radius_move, radius_fov)
+        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         #собираем спелы специальной функцией
         self.create_spell_list()
 
@@ -275,3 +259,4 @@ class Pawn(Piece):
         #Создаём способность Атака и добавляем её в список способностей
         self.spell_list.append(PawnAttack1())
         self.spell_list.append(PawnAttack2_Move())
+        self.spell_list.append(PawnUtility())
