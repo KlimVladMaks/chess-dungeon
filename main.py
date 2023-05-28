@@ -134,6 +134,10 @@ def main() -> None:
                 # Закрываем интерфейс (если он вдруг открыт)
                 interface.close()
 
+                # Обновляем все клетки, на которых стоят фигуры игрока
+                for piece in game.player_pieces:
+                    piece.cell.update()
+
                 # Обновляем поле
                 field.update()
 
