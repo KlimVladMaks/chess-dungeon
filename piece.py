@@ -3,8 +3,7 @@ from spell import *
 from effect import *
 
 if tp.TYPE_CHECKING:
-    from field import Square
-    from field import Field
+    from field import Square, Field
 
 #Списки условных обозначений, являющиеся стеной
 BARRIERS = [False]
@@ -252,11 +251,31 @@ class Pawn(Piece):
     def create_spell_list(self) -> None:
         
         """
-        Функция создаёт объекты класса Spell, прописывая для них специфичные функции выбора цели и эффекта
-        !x и y инверсированны относительно обычной координатной оси
+        Функция добавляет объекты класса Spell в piece.spell_list
         """
 
         #Создаём способность Атака и добавляем её в список способностей
         self.spell_list.append(PawnAttack1())
         self.spell_list.append(PawnAttack2_Move())
         self.spell_list.append(PawnUtility())
+
+class Bishop(Piece):
+
+    """
+    Класс слона
+    """
+
+    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+        self.create_spell_list()
+
+    def create_spell_list(self) -> None:
+        
+        """
+        Функция добавляет объекты класса Spell в piece.spell_list
+        """
+
+        #Создаём способность Атака и добавляем её в список способностей
+        self.spell_list.append(BishopAttack1())
+        self.spell_list.append(BishopAttack2())
+        self.spell_list.append(BishopUtility())

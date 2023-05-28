@@ -85,12 +85,12 @@ def main() -> None:
     game = Game(field)
 
     # Тест расположения фигуры
-    first_piece = Pawn('p1', field, field.get_square_by_pos(6, 6), 10, 0.5, 2, 3, 1, 5)
-    second_piece = Pawn('p1', field, field.get_square_by_pos(5, 6), 10, 0.5, 2, 3, 1, 5)
+    first_piece = Pawn('p1', field, field.get_square_by_pos(6, 6), 10, 0.5, 1, 3, 3, 5)
+    second_piece = Bishop('p1', field, field.get_square_by_pos(5, 6), 10, 0.5, 1, 3, 3, 5)
     first_piece.cell.add_inner_piece(first_piece)
     second_piece.cell.add_inner_piece(second_piece)
 
-    enemy = EnemyPawn('Shodan', field, field.get_square_by_pos(15, 17), 10, 0.5, 2, 3, 5, 5)
+    enemy = EnemyPawn('Shodan', field, field.get_square_by_pos(15, 17), 10, 0.5, 1, 3, 3, 5)
     enemy.set_way_patrol(field.get_square_by_pos(7, 6))
     enemy.cell.add_inner_piece(enemy)
 

@@ -283,9 +283,9 @@ class EnemyPiece(Piece):
         way = self.field.get_way(self.cell, pos)
 
         if len(way) <= self.radius_move + 1:
-            self.cast_spell('move', pos)
+            self.cast_spell(self.spell_list[0], pos)
         else:
-            self.cast_spell('move', way[self.radius_move])
+            self.cast_spell(self.spell_list[0], way[self.radius_move])
 
     def patrol_step(self) -> None:
 
@@ -310,7 +310,7 @@ class EnemyPiece(Piece):
 
         # фактически сдвигаем фигуру, если не хотим остаться на этой же клетке
         if self.way_patrol[self.pos_patrol] != self.cell:
-            self.cast_spell("move", self.way_patrol[self.pos_patrol])
+            self.cast_spell(self.spell_list[0], self.way_patrol[self.pos_patrol])
 
     def alarm(self):
 
@@ -325,7 +325,7 @@ class EnemyPiece(Piece):
             print('Враг обнаружил цель в зоне атаки')
             target = self.choice_enemy(enemies_in_range)
             if not target is None:
-                self.cast_spell('attack', target.cell)
+                self.cast_spell(self.spell_list[1], target.cell)
 
         # если ни одна из способностей не может быть использована
         else:
