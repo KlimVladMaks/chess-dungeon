@@ -411,9 +411,7 @@ class BishopAttack1(Spell):
         target_list = []
 
         #cреди этих клеток можно атаковать только противников
-        for cell_coor in potential:
-            x, y = cell_coor[0], cell_coor[1]
-            cell = self.field.get_square_by_pos(y, x)
+        for cell in potential:
             if not cell is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
                  target_list.append(cell)
 
@@ -477,9 +475,7 @@ class BishopAttack2(Spell):
         target_list = []
 
         #cреди этих клеток можно атаковать только противников
-        for cell_coor in potential:
-            x, y = cell_coor[0], cell_coor[1]
-            cell = self.field.get_square_by_pos(y, x)
+        for cell in potential:
             if not cell is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
                  target_list.append(cell)
 
@@ -554,9 +550,7 @@ class BishopUtility(Spell):
         target_list = []
 
         #хилим только союзиков
-        for cell_coor in potential:
-            x, y = cell_coor[0], cell_coor[1]
-            cell = self.field.get_square_by_pos(y, x)
+        for cell in potential:
             if not cell is None and not cell.inner_piece is None and cell.inner_piece.team == self.team:
                  target_list.append(cell)
 
