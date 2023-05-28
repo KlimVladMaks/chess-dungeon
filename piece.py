@@ -243,13 +243,14 @@ class Piece:
                 spell = i_spell
                 break
 
-        spell.cast(self, cell)
         spell.cooldown_now = spell.cooldown
         self.AP -= spell.cost
         if self.AP < 0:
             self.AP = 0
         if self.AP == 0:
             self.active_turn = False
+
+        return spell.cast(self, cell)
 
 class Pawn(Piece):
 
@@ -273,4 +274,3 @@ class Pawn(Piece):
         #Создаём способность Атака и добавляем её в список способностей
         self.spell_list.append(PawnAttack1())
         self.spell_list.append(PawnAttack2_Move())
-        self.spell_list.append(PawnAttack2_Attack())
