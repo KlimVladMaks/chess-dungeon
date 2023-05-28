@@ -296,9 +296,7 @@ class EnemyPiece(Piece):
 
         way = self.field.get_way(self.cell, pos)
 
-        if len(way) == 0:
-            return None
-        elif len(way) <= self.radius_move + 1:
+        if len(way) <= self.radius_move + 1:
             self.cast_spell('move', pos)
         else:
             self.cast_spell('move', way[self.radius_move])
@@ -324,8 +322,9 @@ class EnemyPiece(Piece):
                 self.action = "attack"
                 break
 
-        # фактически сдвигаем фигуру
-        self.cast_spell("move", self.way_patrol[self.pos_patrol])
+        # фактически сдвигаем фигуру, если не хотим остаться на этой же клетке
+        if self.way_patrol[self.pos_patrol] != self.cell:
+            self.cast_spell("move", self.way_patrol[self.pos_patrol])
 
     def alarm(self):
 
@@ -365,13 +364,15 @@ class EnemyPiece(Piece):
 
         super().new_turn()
 
-        if self.action == 'patrol':
-            print('Новый ход', self.action)
-            self.patrol_step()
+        while self.AP > 0:
 
-        elif self.action == 'attack':
-            print('Новый ход', self.action)
-            self.alarm()
+            if self.action == 'patrol':
+                print('Новый ход', self.action)
+                self.patrol_step()
+
+            elif self.action == 'attack':
+                print('Новый ход', self.action)
+                self.alarm()
 
 
 class EnemyPawn(EnemyPiece, Pawn):
