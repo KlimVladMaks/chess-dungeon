@@ -46,7 +46,8 @@ class Piece_Move(Spell):
         super().__init__('move', "Перемещение", "Переместитесь на клетку в зоне движения", 0, 1)
 
     def target(spell, self: "Piece") -> list[tuple["Square", "Square"]]:
-        
+
+
         """
         Функция возвращает все клетки до которых можно дойти.
         Работает это через обход в ширину со стартовой клетки.
@@ -131,7 +132,7 @@ class Piece_Move(Spell):
 class PawnAttack1(Spell):
   
     def __init__(self):
-        super().__init__("attack", "Атака", "Атакуйте выбранную цель", 1, 2)
+        super().__init__("attack", "Атака", "Обычная атака (ближний бой)", 1, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -161,9 +162,13 @@ class PawnAttack1(Spell):
 
         return potential
 
-    def target(spell, self: "Piece"):
+    def target(spell, self: "Piece", host_cell: "Square" = None):
+
+        #Берём исходныю клетку, если не сказано иначе
+        if host_cell is None:
+            host_cell = self.cell
         
-        potential = spell.zone(self)
+        potential = spell.zone(self, host_cell = host_cell)
 
         target_list = []
             
@@ -198,3 +203,139 @@ class PawnAttack1(Spell):
                 other.cell.del_inner_piece()
         else:
             print(f"Атакующая фигура промахнулась")
+
+class PawnAttack2_Move(Spell):
+
+    def __init__(self):
+        super().__init__("lunge_move", "Выпад", "подойдите к противнику, чтобы потом атаковать (ближний бой)", 2, 1)
+
+    def zone(spell, self: "Piece", host_cell: "Square" = None):
+        #Дальность выпада
+        lunge_range = 1 
+
+        #Хранилище
+        potential = []
+
+        #Берём исходныю клетку, если не сказано иначе
+        if host_cell is None:
+            host_cell = self.cell
+
+        #Переходим в систему координат
+        row_pos, col_pos = host_cell.get_pos()
+        y1, x1 = row_pos, col_pos
+
+
+        #Перебераем радиусы
+        for r in range(1, lunge_range + 1):
+            x = x1
+            y = y1 + r
+
+            #выполняем обход по "ромбу" сетки основа которого - крест с дальностью r
+            for i in range(4 * r):
+                if i < r:
+                    x += 1
+                elif i < 3 * r:
+                    x -= 1
+                else:
+                    x += 1
+
+                if i < 2 * r:
+                    y -= 1
+                else:
+                    y += 1
+
+                potential.append((x, y))
+
+        return potential
+    
+    def target(spell, self: "Piece", host_cell: "Square" = None):
+
+        #Берём исходныю клетку, если не сказано иначе
+        if host_cell is None:
+            host_cell = self.cell
+        
+        potential = spell.zone(self, host_cell = host_cell)
+
+        target_list = []
+        
+        #cреди этих клеток можно шагнуть только в соответсвие с правилом движения и оттуда можно атаковать
+        for cell_coor in potential:
+            x, y = cell_coor[0], cell_coor[1]
+            cell = self.field.get_square_by_pos(y, x)
+            if not cell is None and not self.field.get_way(self.cell, cell) is None:
+                if PawnAttack2_Attack().target(self, host_cell = cell):
+                    target_list.append(cell)
+
+        return target_list
+    
+    def cast(spell, self: "Piece", other: "Square"):
+        
+        self.spell_list[0].cast(self, other)
+
+        return PawnAttack2_Attack()
+
+class PawnAttack2_Attack(Spell):
+
+    def __init__(self):
+        super().__init__("lunge_attack", "Выпад", "Атакуйте противника! (ближний бой)", 0, 1)
+
+    def zone(spell, self: "Piece", host_cell: "Square" = None):
+        #Дальность выпада
+        lunge_range = 1 
+
+        #Хранилище
+        potential = []
+
+        #Берём исходныю клетку, если не сказано иначе
+        if host_cell is None:
+            host_cell = self.cell
+
+        #Переходим в систему координат
+        row_pos, col_pos = host_cell.get_pos()
+        y1, x1 = row_pos, col_pos
+
+        #Перебераем радиусы
+        for r in range(1, lunge_range + 1):
+            x = x1
+            y = y1 + r
+
+            #выполняем обход по "ромбу" сетки основа которого - крест с дальностью r
+            for i in range(4 * r):
+                if i < r:
+                    x += 1
+                elif i < 3 * r:
+                    x -= 1
+                else:
+                    x += 1
+
+                if i < 2 * r:
+                    y -= 1
+                else:
+                    y += 1
+
+                potential.append((x, y))
+
+        return potential
+    
+    def target(spell, self: "Piece", host_cell: "Square" = None):
+
+        #Берём исходныю клетку, если не сказано иначе
+        if host_cell is None:
+            host_cell = self.cell
+        
+        potential = spell.zone(self, host_cell = host_cell)
+
+        target_list = []
+            
+        #cреди этих клеток можно атаковать только противников
+        for cell_coor in potential:
+            x, y = cell_coor[0], cell_coor[1]
+            cell = self.field.get_square_by_pos(y, x)
+            if not cell is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
+                 target_list.append(cell)
+
+        return target_list
+    
+    def cast(spell, self: "Piece", other: "Square"):
+        
+        PawnAttack1().cast(self, other)

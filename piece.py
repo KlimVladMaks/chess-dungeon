@@ -107,7 +107,7 @@ class Piece:
             if i < 2 * r:
                 y -= 1
             else:
-             y += 1
+                y += 1
 
         foving_cell = []
         for pos in list(fovs):
@@ -272,3 +272,5 @@ class Pawn(Piece):
 
         #Создаём способность Атака и добавляем её в список способностей
         self.spell_list.append(PawnAttack1())
+        self.spell_list.append(PawnAttack2_Move())
+        self.spell_list.append(PawnAttack2_Attack())
