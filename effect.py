@@ -1,29 +1,28 @@
 import typing as tp
+if tp.TYPE_CHECKING:
+    from piece import Piece
 
 class Effect:
 
-    def __init__(self, id: str, get_effect, remove_effect, timer: int, strength: int):
+    def __init__(self, id: str, timer: int, strength: int):
 
         self.id = id
-        self.get_effect = get_effect
-        self.remove_effect = remove_effect
         self.timer = timer
         self.strength = strength
 
-#Эффект "speed_reduction"
-def get_speed_reduction(self, strength):
-    """
-    self: Piece
-    """
-    print(type(self))
+    def get_effect(self, piece: "Piece", strength: int):
+        pass
 
-    self.radius_move -= strength
+    def remove_effect(self, piece: "Piece", strength: int):
+        pass
 
-def remove_speed_reduction(self, strength):
-    """
-    self: Piece
-    """
+class Speed_reduction(Effect):
 
-    self.radius_move += strength
+    def __init__(self, timer: int, strength: int):
+        super().__init__('speed_reduction', timer, strength)
 
-speed_reduction = Effect('speed_reduction', get_speed_reduction, remove_speed_reduction, 0, 0)
+    def get_effect(self, piece: "Piece"):
+        piece.radius_move -= self.strength
+
+    def remove_effect(self, piece: "Piece"):
+        piece.radius_move += self.strength

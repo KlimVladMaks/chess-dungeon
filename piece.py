@@ -205,7 +205,7 @@ class Piece:
         for effect in self.effect_list:
             effect.timer -= 1
             if effect.timer == 0:
-                effect.remove_effect(self, effect.strength)
+                effect.remove_effect(self)
                 self.effect_list.remove(effect)
 
         self.active_turn = True

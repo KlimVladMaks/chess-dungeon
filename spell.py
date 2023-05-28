@@ -188,11 +188,9 @@ class PawnAttack1(Spell):
 
             if [effect.id for effect in other.effect_list].count('speed_reduction') == 0:
                 print('Также на фигуру наложен дебафф!')
-                effect = speed_reduction
-                effect.timer = 2
-                effect.strength = 1
+                effect = Speed_reduction(2, 1)
                 other.effect_list.append(effect)
-                effect.get_effect(other, effect.strength)
+                effect.get_effect(other)
 
             #Если фигуры хп падают до 0 и ниже, удаляем её с поля
             if other.hp <= 0:
