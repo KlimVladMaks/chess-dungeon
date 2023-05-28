@@ -3,6 +3,8 @@ import pygame as pg
 
 if tp.TYPE_CHECKING:
     from field import Field
+    from piece import Piece
+    from spell import Spell
 
 # Высота интерфейса
 INTERFACE_HEIGHT = 100
@@ -28,13 +30,17 @@ class Button(pg.sprite.Sprite):
     Класс для реализации кнопки.
     """
 
-    def __init__(self, action: str, coordinates: tuple[int, int], button_size: tuple[int, int]) -> None:
+    def __init__(self, action: str,
+                 coordinates: tuple[int, int],
+                 button_size: tuple[int, int],
+                 is_active: bool) -> None:
         """
         Функция для инициализации кнопки.
 
         :param coordinates: Координаты кнопки.
         :param action: Тип действия, реализуемого кнопкой (move - движение, attack - атака).
         :param button_size: Размеры кнопки в формате (ширина, высота).
+        :param is_active: Флаг, показывающий, активна ли кнопка.
         """
 
         # Инициализируем спрайт
@@ -43,14 +49,29 @@ class Button(pg.sprite.Sprite):
         # Сохраняем тип действия, реализуемого кнопкой
         self.action = action
 
+        # Сохраняем флаг, является ли кнопка активной
+        self.is_active = is_active
+
         # Задаём поверхность кнопки
         self.image = pg.Surface((button_size[0], button_size[1]))
 
-        # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
-        if self.action == "move":
-            self.image = pg.image.load("design/move_button.png")
-        elif self.action == "attack":
-            self.image = pg.image.load("design/attack_button.png")
+        # Если кнопка активна
+        if self.is_active:
+
+            # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
+            if self.action == "move":
+                self.image = pg.image.load("design/move_button.png")
+            elif self.action == "attack":
+                self.image = pg.image.load("design/attack_button.png")
+
+        # Иначе
+        else:
+
+            # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
+            if self.action == "move":
+                self.image = pg.image.load("design/off_move_button.png")
+            elif self.action == "attack":
+                self.image = pg.image.load("design/off_attack_button.png")
 
         # Задаём поверхность кнопки
         self.rect = pg.Rect(coordinates[0], coordinates[1], button_size[0], button_size[1])
@@ -164,11 +185,12 @@ class Interface(pg.sprite.Sprite):
         else:
             return False
 
-    def add_buttons(self, buttons_actions: list[str]) -> None:
+    def add_buttons(self, buttons_spell: list['Spell'], piece: 'Piece') -> None:
         """
         Функция, добавляющая в интерфейс кнопки для заданных действий.
 
-        :param buttons_actions: Список действий, для которых нужно добавить кнопки.
+        :param buttons_spell: Список способностей, для которых нужно добавить кнопки.
+        :param piece: Фигура, для которой нужно добавить кнопки способностей.
         """
 
         # Задаём координаты для первой кнопки
@@ -176,8 +198,16 @@ class Interface(pg.sprite.Sprite):
         y = (self.image.get_height() // 2) - (BUTTON_SIZE[1] // 2)
 
         # Перебираем все переданные действия и формируем для них кнопки, располагая их в области интерфейса
-        for action in buttons_actions:
-            button = Button(action, (x, y), (BUTTON_SIZE[0], BUTTON_SIZE[1]))
+        for spell in buttons_spell:
+
+            # Проверяем, доступна ли способность с учётом доступных ОД фигуры
+            if piece.AP >= spell.cost:
+                is_active_spell = True
+            else:
+                is_active_spell = False
+
+            # Создаём кнопку
+            button = Button(spell.id, (x, y), (BUTTON_SIZE[0], BUTTON_SIZE[1]), is_active_spell)
             self.buttons_group.add(button)
             x += BUTTON_SIZE[0] + BUTTON_SPACING
 
@@ -201,9 +231,16 @@ class Interface(pg.sprite.Sprite):
         # Перебираем все кнопки из соответствующей группы спрайтов
         for button in self.buttons_group:
 
-            # Если координаты кнопки попадают в область интерфейса, возвращаем кнопку
+            # Если координаты кнопки попадают в область интерфейса
             if button.rect.collidepoint(x_interface, y_interface):
-                return button
+
+                # Если кнопка активна, возвращаем её
+                if button.is_active:
+                    return button
+
+                # Иначе возвращаем None (т.к. кнопка не активна)
+                else:
+                    return None
 
         # Иначе возвращаем None
         return None

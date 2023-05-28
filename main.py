@@ -131,6 +131,9 @@ def main() -> None:
                 for piece in game.computer_pieces:
                     piece.new_turn()
 
+                # Закрываем интерфейс (если он вдруг открыт)
+                interface.close()
+
                 # Обновляем поле
                 field.update()
 
@@ -200,10 +203,6 @@ def main() -> None:
                         if square_clicked.inner_piece.team == "Shodan":
                             continue
 
-                        # Если фигура не имеет активных ходов, то пропускаем итерацию
-                        if square_clicked.inner_piece.active_turn is False:
-                            continue
-
                         # Если существовала ранее выбранная фигура, то завершаем предыдущий игровой такт
                         if game.selected_piece is not None:
                             game.finish_game_tact()
@@ -218,10 +217,10 @@ def main() -> None:
                         interface.buttons_group.empty()
 
                         # Получаем список способностей выбранной фигуры
-                        spell_list = [spell.id for spell in game.selected_piece.spell_list]
+                        spell_list = [spell for spell in game.selected_piece.spell_list]
 
                         # Задаём новые кнопки с действиями, используя список со способностями выбранной фигуры
-                        interface.add_buttons(spell_list)
+                        interface.add_buttons(spell_list, game.selected_piece)
 
                         # Открываем интерфейс
                         interface.open()
