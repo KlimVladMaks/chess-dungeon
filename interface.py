@@ -1,6 +1,9 @@
 import typing as tp
 import pygame as pg
 
+if tp.TYPE_CHECKING:
+    from field import Field
+
 # Высота интерфейса
 INTERFACE_HEIGHT = 100
 
@@ -18,13 +21,6 @@ BUTTON_SPACING = 20
 
 # Размеры кнопок интерфейса в формате (ширина, высота)
 BUTTON_SIZE = (70, 70)
-
-
-class _Field:
-    """
-    Фиктивный класс игрового поля.
-    """
-    pass
 
 
 class Button(pg.sprite.Sprite):
@@ -66,7 +62,7 @@ class Interface(pg.sprite.Sprite):
     (Класс реализован на основе спрайта).
     """
 
-    def __init__(self, screen: pg.Surface, field: _Field) -> None:
+    def __init__(self, screen: pg.Surface, field: 'Field') -> None:
         """
         Функция для инициализации интерфейса.
 

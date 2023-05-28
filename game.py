@@ -1,13 +1,9 @@
 import pygame as pg
 import typing as tp
 
-
-class _Piece:
-    pass
-
-
-class _Field:
-    pass
+if tp.TYPE_CHECKING:
+    from piece import Piece
+    from field import Field
 
 
 class Game:
@@ -15,7 +11,7 @@ class Game:
     Класс для управления игровым процессом.
     """
 
-    def __init__(self, field: _Field) -> None:
+    def __init__(self, field: 'Field') -> None:
         """
         Функция для инициализации игрового процесса.
 
@@ -26,13 +22,13 @@ class Game:
         self.field = field
 
         # Свойство для хранения выбранной фигуры
-        self.selected_piece: tp.Union[_Piece, None] = None
+        self.selected_piece: tp.Union[Piece, None] = None
 
         # Свойство для хранения выбранного действия
         self.selected_action: tp.Union[str, None] = None
 
         # Список для хранения игровых фигур
-        self.pieces: list[_Piece] = []
+        self.pieces: list[Piece] = []
 
     def clear_activated_squares(self):
         """

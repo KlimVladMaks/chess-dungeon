@@ -1,6 +1,9 @@
 import pygame as pg
 import typing as tp
 
+if tp.TYPE_CHECKING:
+    from piece import Piece
+
 # Размер стороны шахматной клетки
 SQUARE_SIDE_SIZE = 50
 
@@ -33,13 +36,6 @@ SQUARE_OCCUPIED_COLOR = "#FFFF00"
 
 # Цвет для занятой выбранной клетки
 SQUARE_SELECTED_COLOR = "#8B00FF"
-
-
-class _Piece:
-    """
-    Фиктивный класс шахматной фигуры.
-    """
-    pass
 
 
 class SquareTemplate(pg.sprite.Sprite):
@@ -129,14 +125,14 @@ class SquareTemplate(pg.sprite.Sprite):
         self.image = pg.Surface((self.side_size, self.side_size))
         self.rect = pg.Rect(self.rect.x, self.rect.y, self.side_size, self.side_size)
 
-    def add_inner_piece(self, piece: _Piece) -> None:
+    def add_inner_piece(self, piece: 'Piece') -> None:
         """
         Функция, не используемая для данного класса.
         Всегда возвращает None.
         """
         return None
 
-    def get_inner_piece(self) -> tp.Union[_Piece, None]:
+    def get_inner_piece(self) -> tp.Union['Piece', None]:
         """
         Функция, не используемая для данного класса.
         Всегда возвращает None.
@@ -193,7 +189,7 @@ class Square(SquareTemplate):
 
         # Свойство для хранения фигуры, стоящей на данной клетке
         # (содержит None, если на клетки не стоит фигура)
-        self.inner_piece: tp.Union[_Piece, None] = None
+        self.inner_piece: tp.Union[Piece, None] = None
 
         # Флаг, показывающий занята или свободна клетка
         self.is_occupied = False
@@ -328,7 +324,7 @@ class Square(SquareTemplate):
         if self.is_activated:
             self.change_color(SQUARE_ACTIVATED_COLOR, SQUARE_BORDER_COLOR)
 
-    def add_inner_piece(self, piece: _Piece) -> None:
+    def add_inner_piece(self, piece: 'Piece') -> None:
         """
         Функция для добавления фигуры на клетку.
         (Если на клетке уже стоит фигура, то старая фигура будет удалена).
@@ -342,7 +338,7 @@ class Square(SquareTemplate):
         # Вызываем функцию для переведения клетки в занятый режим
         self.occupy()
 
-    def get_inner_piece(self) -> tp.Union[_Piece, None]:
+    def get_inner_piece(self) -> tp.Union['Piece', None]:
         """
         Функция для получения фигуры, стоящей на клетке.
 
@@ -718,7 +714,7 @@ class Field:
 
     """Совместно с svgarik"""
 
-    def get_way(self, start: Square, end: Square) -> list[tp.Union[SquareTemplate, None]]:
+    def get_way(self, start: Square, end: Square) -> tp.Union[list[SquareTemplate], None]:
         """
         Функция, возвращающая кратчайший маршрут между двумя клетками.
 
