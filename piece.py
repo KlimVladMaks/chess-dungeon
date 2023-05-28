@@ -19,7 +19,7 @@ class Piece:
     Класс для шаблона Фигуры.
     """
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, damage: int, radius_move: int, radius_fov: int):
+    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
 
         """
         :team: команда фигуры
@@ -32,7 +32,8 @@ class Piece:
         :max_hp: максимальные хп персонажа
         :hp: текущие хп персонажа
         :accuracy: базовый шанс попадания при атаке от 0 до 1
-        :damage: базовый урон атаки
+        :min_damage: минимальный базовый урон атаки
+        :max_damage: базовый урон атаки
         :spell_list: лист со скилами
         :active_turn: bool параметр хранящий может ли походить клетка в этот ход
         """
@@ -45,7 +46,8 @@ class Piece:
         self.max_hp = max_hp
         self.hp = max_hp
         self.accuracy = accuracy
-        self.damage = damage
+        self.min_damage = min_damage
+        self.max_damage = max_damage
         self.spell_list = [Piece_Move()]
         self.effect_list = []
         self.active_turn = True
@@ -242,15 +244,14 @@ class Piece:
             if i_spell.id == id_spell:
                 spell = i_spell
                 break
-
+        
+        spell.cast(self, cell)
         spell.cooldown_now = spell.cooldown
         self.AP -= spell.cost
         if self.AP < 0:
             self.AP = 0
         if self.AP == 0:
             self.active_turn = False
-
-        return spell.cast(self, cell)
 
 class Pawn(Piece):
 

@@ -1,35 +1,20 @@
 from piece import *
 import random
 
-
-class _Square:
-    """
-    Фиктивный класс шахматной клетки.
-    (Используется для задания типа данных).
-    """
-
-    pass
-
-
-class _Field:
-    """
-    Фиктивный класс шахматной доски.
-    (Используется для задания типа данных)
-    """
-
-    pass
+import typing as tp
+if tp.TYPE_CHECKING:
+    from field import Field, Square
 
 
 class EnemyPiece(Piece):
 
-    def __init__(self, team: str, field: _Field, cell: _Square, max_hp: int, accuracy: float, damage: int, radius_move: int,
-                 radius_fov: int):
-        super().__init__(team, field, cell, max_hp, accuracy, damage, radius_move, radius_fov)
+    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         self.action = "patrol"
         self.way_patrol = []
         self.pos_patrol = 0
 
-    def set_way_patrol(self, end: _Square) -> None:
+    def set_way_patrol(self, end: "Square") -> None:
 
         """
         Функция определяет путь патрулирования от текущей точки до конечной
@@ -50,7 +35,7 @@ class EnemyPiece(Piece):
             print(c.get_pos(), end=' ')
         print()
 
-    def is_see_player_piece(self, cell: _Square) -> bool:
+    def is_see_player_piece(self, cell: "Square") -> bool:
 
         """
         Функция проверяет видна ли с данной позиции фигура игрока
@@ -69,7 +54,7 @@ class EnemyPiece(Piece):
 
         return False
 
-    def get_enemies_in_range(self, spell: Spell, host_cell: _Square = None) -> list[Piece]:
+    def get_enemies_in_range(self, spell: Spell, host_cell: "Square" = None) -> list[Piece]:
 
         """
         Возвращает клетки с противниками в зоне действия способности
@@ -183,7 +168,7 @@ class EnemyPiece(Piece):
 
         return nearest_enemy
 
-    def get_desirable_position(self, spell: Spell, target: _Square) -> tp.Union[_Square, None]:
+    def get_desirable_position(self, spell: Spell, target: "Square") -> tp.Union["Square", None]:
 
         """
         Вернёт ближайшую клетку на которую надо перейти для возможности активировать способность
@@ -268,7 +253,7 @@ class EnemyPiece(Piece):
 
         return desirable_position
 
-    def get_potential_positions(self, spell: Spell, target: _Square) -> list[_Square]:
+    def get_potential_positions(self, spell: Spell, target: "Square") -> list["Square"]:
 
         """
         Возвращает клетки из которых можно атаковать цель способностью
@@ -277,6 +262,7 @@ class EnemyPiece(Piece):
         """
 
         potential = spell.zone(self, host_cell=target)
+        print(potential)
         potential_positions = []
 
         for cell in potential:
@@ -287,7 +273,7 @@ class EnemyPiece(Piece):
 
         return potential_positions
 
-    def go_to_position(self, pos: _Square) -> None:
+    def go_to_position(self, pos: "Square") -> None:
 
         """
         Функция передвинет фигуру на нужную клетку или ближайщую возможную к ней
@@ -377,6 +363,5 @@ class EnemyPiece(Piece):
 
 class EnemyPawn(EnemyPiece, Pawn):
 
-    def __init__(self, team: str, field: _Field, cell: _Square, max_hp: int, accuracy: float, damage: int, radius_move: int,
-                 radius_fov: int):
-        super().__init__(team, field, cell, max_hp, accuracy, damage, radius_move, radius_fov)
+    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
