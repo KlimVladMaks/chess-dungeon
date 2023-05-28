@@ -4,6 +4,7 @@ import typing as tp
 if tp.TYPE_CHECKING:
     from piece import Piece
     from field import Field
+    from spell import Spell
 
 
 class Game:
@@ -25,7 +26,7 @@ class Game:
         self.selected_piece: tp.Union[Piece, None] = None
 
         # Свойство для хранения выбранного действия
-        self.selected_action: tp.Union[str, None] = None
+        self.selected_spell: tp.Union[Spell, None] = None
 
         # Списки для хранения фигур игрока и фигур компьютера
         self.player_pieces: list[Piece] = []
@@ -37,25 +38,25 @@ class Game:
         """
 
         # Если ранее выбранного действия нет, то завершаем выполнение функции
-        if self.selected_action is None:
+        if self.selected_spell is None:
             return
 
         # Очищаем клетки, ранее выбранные для того или иного действия
-        square_for_cast = self.selected_piece.prepare_spell(self.selected_action)
+        square_for_cast = self.selected_piece.prepare_spell(self.selected_spell)
         for cell in square_for_cast:
             if cell.is_activated:
                 cell.change_regime()
         self.field.update()
 
-    def toggle_action_mode(self, action: str):
+    def toggle_action_mode(self, spell: 'Spell'):
         """
         Функция для включения/выключения режима заданного действия.
 
-        :param action: Название действия.
+        :param spell: Заданное действие.
         """
 
         # Меняем режим доступных для заданного действия клеток (снимаем или добавляем выделение)
-        square_for_action = self.selected_piece.prepare_spell(action)
+        square_for_action = self.selected_piece.prepare_spell(spell)
         for cell in square_for_action:
             cell.change_regime()
         self.field.update()
@@ -63,10 +64,10 @@ class Game:
         # Добавляем или убираем заданное действие в качестве выбранного действия
         # (Заданное действие может быть добавлена как выделенное действие
         # лишь при наличии хотя бы одной выделенной клетки)
-        if square_for_action and (self.selected_action != action):
-            self.selected_action = action
+        if square_for_action and (self.selected_spell != spell):
+            self.selected_spell = spell
         else:
-            self.selected_action = None
+            self.selected_spell = None
 
     def finish_game_tact(self):
         """
@@ -82,7 +83,7 @@ class Game:
 
         # Очищаем переменные с выделенными фигурой и действием
         self.selected_piece = None
-        self.selected_action = None
+        self.selected_spell = None
 
     def del_destroyed_pieces(self):
         """

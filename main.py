@@ -85,12 +85,12 @@ def main() -> None:
     game = Game(field)
 
     # Тест расположения фигуры
-    first_piece = Pawn('p1', field, field.get_square_by_pos(6, 6), 10, 0.5, 2, 3, 1)
-    second_piece = Pawn('p1', field, field.get_square_by_pos(5, 6), 10, 0.5, 2, 3, 1)
+    first_piece = Pawn('p1', field, field.get_square_by_pos(6, 6), 10, 0.5, 2, 3, 1, 5)
+    second_piece = Pawn('p1', field, field.get_square_by_pos(5, 6), 10, 0.5, 2, 3, 1, 5)
     first_piece.cell.add_inner_piece(first_piece)
     second_piece.cell.add_inner_piece(second_piece)
 
-    enemy = EnemyPawn('Shodan', field, field.get_square_by_pos(15, 17), 10, 0.5, 2, 3, 5)
+    enemy = EnemyPawn('Shodan', field, field.get_square_by_pos(15, 17), 10, 0.5, 2, 3, 5, 5)
     enemy.set_way_patrol(field.get_square_by_pos(7, 6))
     enemy.cell.add_inner_piece(enemy)
 
@@ -159,11 +159,11 @@ def main() -> None:
 
                     # Если ранее было какое-либо выбранное действие и оно не равно новому выбранному действию,
                     # то очищаем выделенные для него клетки
-                    if (game.selected_action is not None) and (game.selected_action != button.action):
+                    if (game.selected_spell is not None) and (game.selected_spell != button.spell):
                         game.clear_activated_squares()
 
                     # Изменяем режим для выбранного действия
-                    game.toggle_action_mode(button.action)
+                    game.toggle_action_mode(button.spell)
 
                     # Переходим к следующей итерации цикла
                     continue
@@ -184,7 +184,7 @@ def main() -> None:
                         game.selected_piece.cell.deselect()
 
                         # Проводим выбранное ранее действие над выбранной фигуру
-                        game.selected_piece.cast_spell(game.selected_action, square_clicked)
+                        game.selected_piece.cast_spell(game.selected_spell, square_clicked)
 
                         # Удаляем фигуру из соответствующего списка, если она была уничтожена
                         game.del_destroyed_pieces()
@@ -200,7 +200,7 @@ def main() -> None:
                             square_clicked.inner_piece != game.selected_piece):
 
                         # Если уже есть выбранное действие, то пропускаем итерацию
-                        if game.selected_action is not None:
+                        if game.selected_spell is not None:
                             continue
 
                         # Если игрок нажал на вражескую фигуру, то пропускаем итерацию
@@ -248,14 +248,32 @@ def main() -> None:
                         game.clear_activated_squares()
                         game.selected_piece.cell.deselect()
 
-                        # Проводим выбранное действие относительно выбранной клетки
-                        game.selected_piece.cast_spell(game.selected_action, square_clicked)
+                        # Проводим выбранное действие относительно выбранной клетки и получаем следующее действие
+                        # (если таковое есть)
+                        next_spell = game.selected_piece.cast_spell(game.selected_spell, square_clicked)
 
-                        # Завершаем игровой такт
-                        game.finish_game_tact()
+                        # Если следующего действия нет
+                        if next_spell is None:
 
-                        # Закрываем интерфейс
-                        interface.close()
+                            # Завершаем игровой такт
+                            game.finish_game_tact()
+
+                            # Закрываем интерфейс
+                            interface.close()
+
+                        # Иначе
+                        else:
+
+                            # Обновляем интерфейс с учётом новых способностей
+                            interface.buttons_group.empty()
+                            interface.add_buttons(game.selected_piece.spell_list, game.selected_piece)
+                            interface.open()
+
+                            # Убираем прошлое выбранное действие
+                            game.selected_spell = None
+
+                            # Открываем интерфейс с новой кнопкой
+                            interface.open()
 
                     # Обновляем поле
                     field.update()

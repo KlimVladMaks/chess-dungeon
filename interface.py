@@ -30,7 +30,7 @@ class Button(pg.sprite.Sprite):
     Класс для реализации кнопки.
     """
 
-    def __init__(self, action: str,
+    def __init__(self, spell: 'Spell',
                  coordinates: tuple[int, int],
                  button_size: tuple[int, int],
                  is_active: bool) -> None:
@@ -38,7 +38,7 @@ class Button(pg.sprite.Sprite):
         Функция для инициализации кнопки.
 
         :param coordinates: Координаты кнопки.
-        :param action: Тип действия, реализуемого кнопкой (move - движение, attack - атака).
+        :param spell: Действие, реализуемое кнопкой.
         :param button_size: Размеры кнопки в формате (ширина, высота).
         :param is_active: Флаг, показывающий, активна ли кнопка.
         """
@@ -47,7 +47,7 @@ class Button(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
 
         # Сохраняем тип действия, реализуемого кнопкой
-        self.action = action
+        self.spell = spell
 
         # Сохраняем флаг, является ли кнопка активной
         self.is_active = is_active
@@ -59,22 +59,45 @@ class Button(pg.sprite.Sprite):
         if self.is_active:
 
             # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
-            if self.action == "move":
+            if self.spell.id == "move":
                 self.image = pg.image.load("design/move_button.png")
-            elif self.action == "attack":
+            elif self.spell.id == "attack":
                 self.image = pg.image.load("design/attack_button.png")
 
         # Иначе
         else:
 
             # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
-            if self.action == "move":
+            if self.spell.id == "move":
                 self.image = pg.image.load("design/off_move_button.png")
-            elif self.action == "attack":
+            elif self.spell.id == "attack":
                 self.image = pg.image.load("design/off_attack_button.png")
 
         # Задаём поверхность кнопки
         self.rect = pg.Rect(coordinates[0], coordinates[1], button_size[0], button_size[1])
+
+    def update(self):
+        """
+        Функция для обновления кнопки.
+        """
+
+        # Если кнопка активна
+        if self.is_active:
+
+            # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
+            if self.spell.id == "move":
+                self.image = pg.image.load("design/move_button.png")
+            elif self.spell.id == "attack":
+                self.image = pg.image.load("design/attack_button.png")
+
+        # Иначе
+        else:
+
+            # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
+            if self.spell.id == "move":
+                self.image = pg.image.load("design/off_move_button.png")
+            elif self.spell.id == "attack":
+                self.image = pg.image.load("design/off_attack_button.png")
 
 
 class Interface(pg.sprite.Sprite):
@@ -207,7 +230,7 @@ class Interface(pg.sprite.Sprite):
         for spell in buttons_spell:
 
             # Создаём кнопку
-            button = Button(spell.id, (x, y), (BUTTON_SIZE[0], BUTTON_SIZE[1]), is_active_spell)
+            button = Button(spell, (x, y), (BUTTON_SIZE[0], BUTTON_SIZE[1]), is_active_spell)
             self.buttons_group.add(button)
             x += BUTTON_SIZE[0] + BUTTON_SPACING
 
@@ -244,3 +267,35 @@ class Interface(pg.sprite.Sprite):
 
         # Иначе возвращаем None
         return None
+
+    def del_button_by_action(self, action: str) -> None:
+        """
+        Функция для удаления кнопки из интерфейса по её названию.
+
+        :param action: Название действия, кнопку для которого нужно удалить.
+        """
+
+        # Перебираем все кнопки и удаляем кнопку с заданным названием
+        for button in self.buttons_group:
+            if button.action == action:
+                self.buttons_group.remove(button)
+                return
+
+    def replace_button_by_action(self, del_button_action: str, add_button_action: str) -> None:
+        """
+        Функция для замены кнопки по её названию.
+
+        :param del_button_action: Название действия, кнопку для которого нужно заменить.
+        :param add_button_action: Название действия, кнопку для которого нужно добавить.
+        """
+
+        # Перебираем все кнопки и заменяем действие для соответствующей кнопки
+        for button in self.buttons_group:
+            if button.action == del_button_action:
+                button.action = add_button_action
+
+
+
+
+
+
