@@ -85,19 +85,20 @@ def main() -> None:
     game = Game(field)
 
     # Тест расположения фигуры
-    piece_1 = Pawn('p1', field, field.get_square_by_pos(6, 6), 10, 0.5, 1, 3, 3, 5)
+    piece_1 = Bishop('p1', field, field.get_square_by_pos(4, 6), 10, 0.5, 1, 3, 3, 5)
     piece_2 = Pawn('p1', field, field.get_square_by_pos(5, 6), 10, 0.5, 1, 3, 3, 5)
-    # piece_3 = Bishop('p1', field, field.get_square_by_pos(5, 6), 10, 0.5, 1, 3, 3, 5)
+    piece_3 = Knight('p1', field, field.get_square_by_pos(6, 6), 10, 0.5, 1, 3, 3, 5)
+
     piece_1.cell.add_inner_piece(piece_1)
     piece_2.cell.add_inner_piece(piece_2)
-    # piece_3.cell.add_inner_piece(piece_3)
+    piece_3.cell.add_inner_piece(piece_3)
 
     enemy = EnemyPawn('Shodan', field, field.get_square_by_pos(15, 17), 10, 0.5, 1, 3, 3, 5)
     enemy.set_way_patrol(field.get_square_by_pos(7, 6))
     enemy.cell.add_inner_piece(enemy)
 
     # Помещаем все фигуры в соответствующие списки
-    game.player_pieces = [piece_1, piece_2]
+    game.player_pieces = [piece_1, piece_2, piece_3]
     game.computer_pieces = [enemy]
 
     # Тест расположения фигуры - КОНЕЦ
