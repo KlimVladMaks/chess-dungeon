@@ -266,10 +266,11 @@ class EnemyPiece(Piece):
         potential_positions = []
 
         for cell in potential:
-            if self.field.is_into_map(cell[0], cell[1]):
-                square = self.field.get_square_by_pos(cell[0], cell[1])
-                if square.inner_piece is None and not self.field.is_barrier(cell[0], cell[1]):
-                    potential_positions.append(self.field.get_square_by_pos(cell[0], cell[1]))
+            x, y = cell[0], cell[1]
+            if self.field.is_into_map(y, x):
+                square = self.field.get_square_by_pos(y, x)
+                if square.inner_piece is None and not self.field.is_barrier(y, x):
+                    potential_positions.append(self.field.get_square_by_pos(y, x))
 
         return potential_positions
 
