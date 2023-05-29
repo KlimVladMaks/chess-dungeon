@@ -189,6 +189,18 @@ class Piece:
             
         return way
     
+    def create_spell_list(self) -> None:
+        
+        """
+        Функция добавляет объекты класса Spell в piece.spell_list
+        """
+
+    def update_spell_list(self) -> None:
+
+        self.spell_list = [Piece_Move()]
+        self.create_spell_list()
+        
+
     def new_turn(self) -> None:
 
         """
@@ -196,6 +208,7 @@ class Piece:
         """
         
         self.AP = 2
+        self.update_spell_list()
 
         for spell in self.spell_list:
             if spell.cooldown_now > 0:
@@ -254,7 +267,7 @@ class Pawn(Piece):
         Функция добавляет объекты класса Spell в piece.spell_list
         """
 
-        #Создаём способность Атака и добавляем её в список способностей
+        #Добавляем способности из модуля spell
         self.spell_list.append(PawnAttack1())
         self.spell_list.append(PawnAttack2_Move())
         self.spell_list.append(PawnUtility())
@@ -275,7 +288,7 @@ class Bishop(Piece):
         Функция добавляет объекты класса Spell в piece.spell_list
         """
 
-        #Создаём способность Атака и добавляем её в список способностей
-        self.spell_list.append(BishopAttack1())
-        self.spell_list.append(BishopAttack2())
-        self.spell_list.append(BishopUtility())
+        #Добавляем способности из модуля spell
+        self.spell_list.append(PawnAttack1())
+        self.spell_list.append(PawnAttack2_Move())
+        self.spell_list.append(PawnUtility())
