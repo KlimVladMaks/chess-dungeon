@@ -55,23 +55,8 @@ class Button(pg.sprite.Sprite):
         # Задаём поверхность кнопки
         self.image = pg.Surface((button_size[0], button_size[1]))
 
-        # Если кнопка активна
-        if self.is_active:
-
-            # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
-            if self.spell.id == "move":
-                self.image = pg.image.load("design/move_button.png")
-            elif self.spell.id == "attack":
-                self.image = pg.image.load("design/attack_button.png")
-
-        # Иначе
-        else:
-
-            # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
-            if self.spell.id == "move":
-                self.image = pg.image.load("design/off_move_button.png")
-            elif self.spell.id == "attack":
-                self.image = pg.image.load("design/off_attack_button.png")
+        # Обновляем кнопку, чтобы задать её изображение
+        self.update()
 
         # Задаём поверхность кнопки
         self.rect = pg.Rect(coordinates[0], coordinates[1], button_size[0], button_size[1])
@@ -86,18 +71,26 @@ class Button(pg.sprite.Sprite):
 
             # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
             if self.spell.id == "move":
-                self.image = pg.image.load("design/move_button.png")
+                self.image = pg.image.load("design/interface/move_button.png")
             elif self.spell.id == "attack":
-                self.image = pg.image.load("design/attack_button.png")
+                self.image = pg.image.load("design/interface/attack_button.png")
+            elif self.spell.id == "lunge_move":
+                self.image = pg.image.load("design/interface/lunge_move_button.png")
+            elif self.spell.id == "lunge_attack":
+                self.image = pg.image.load("design/interface/lunge_attack_button.png")
 
         # Иначе
         else:
 
             # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
             if self.spell.id == "move":
-                self.image = pg.image.load("design/off_move_button.png")
+                self.image = pg.image.load("design/interface/off_move_button.png")
             elif self.spell.id == "attack":
-                self.image = pg.image.load("design/off_attack_button.png")
+                self.image = pg.image.load("design/interface/off_attack_button.png")
+            elif self.spell.id == "lunge_move":
+                self.image = pg.image.load("design/interface/lunge_move_button.png")
+            elif self.spell.id == "lunge_attack":
+                self.image = pg.image.load("design/interface/lunge_attack_button.png")
 
 
 class Interface(pg.sprite.Sprite):

@@ -71,7 +71,7 @@ def main() -> None:
     pg.display.set_caption("Chess Dungeon")
 
     # Устанавливаем фон
-    background = pg.image.load("design/background.png")
+    background = pg.image.load("design/field/background.png")
     screen.blit(background, (0, 0))
     pg.display.update()
 
@@ -85,17 +85,19 @@ def main() -> None:
     game = Game(field)
 
     # Тест расположения фигуры
-    first_piece = Pawn('p1', field, field.get_square_by_pos(6, 6), 10, 0.5, 1, 3, 3, 5)
-    second_piece = Bishop('p1', field, field.get_square_by_pos(5, 6), 10, 0.5, 1, 3, 3, 5)
-    first_piece.cell.add_inner_piece(first_piece)
-    second_piece.cell.add_inner_piece(second_piece)
+    piece_1 = Pawn('p1', field, field.get_square_by_pos(6, 6), 10, 0.5, 1, 3, 3, 5)
+    piece_2 = Pawn('p1', field, field.get_square_by_pos(5, 6), 10, 0.5, 1, 3, 3, 5)
+    # piece_3 = Bishop('p1', field, field.get_square_by_pos(5, 6), 10, 0.5, 1, 3, 3, 5)
+    piece_1.cell.add_inner_piece(piece_1)
+    piece_2.cell.add_inner_piece(piece_2)
+    # piece_3.cell.add_inner_piece(piece_3)
 
     enemy = EnemyPawn('Shodan', field, field.get_square_by_pos(15, 17), 10, 0.5, 1, 3, 3, 5)
     enemy.set_way_patrol(field.get_square_by_pos(7, 6))
     enemy.cell.add_inner_piece(enemy)
 
     # Помещаем все фигуры в соответствующие списки
-    game.player_pieces = [first_piece, second_piece]
+    game.player_pieces = [piece_1, piece_2]
     game.computer_pieces = [enemy]
 
     # Тест расположения фигуры - КОНЕЦ
@@ -189,11 +191,16 @@ def main() -> None:
                         # Удаляем фигуру из соответствующего списка, если она была уничтожена
                         game.del_destroyed_pieces()
 
-                        # Завершаем игровой такт
-                        game.finish_game_tact()
+                        # Активируем клетку, на которой теперь стоит фигура
+                        game.selected_piece.cell.select()
 
-                        # Закрываем интерфейс
-                        interface.close()
+                        # Убираем прошлое выбранное действие
+                        game.selected_spell = None
+
+                        # Обновляем интерфейс с учётом новых способностей
+                        interface.buttons_group.empty()
+                        interface.add_buttons(game.selected_piece.spell_list, game.selected_piece)
+                        interface.open()
 
                     # Если на клетке находится ранее не выбранная фигура
                     elif isinstance(square_clicked.inner_piece, Piece) and (
@@ -248,32 +255,19 @@ def main() -> None:
                         game.clear_activated_squares()
                         game.selected_piece.cell.deselect()
 
-                        # Проводим выбранное действие относительно выбранной клетки и получаем следующее действие
-                        # (если таковое есть)
-                        next_spell = game.selected_piece.cast_spell(game.selected_spell, square_clicked)
+                        # Совершаем выбранное действие
+                        game.selected_piece.cast_spell(game.selected_spell, square_clicked)
 
-                        # Если следующего действия нет
-                        if next_spell is None:
+                        # Активируем клетку, на которой теперь стоит фигура
+                        game.selected_piece.cell.select()
 
-                            # Завершаем игровой такт
-                            game.finish_game_tact()
+                        # Убираем прошлое выбранное действие
+                        game.selected_spell = None
 
-                            # Закрываем интерфейс
-                            interface.close()
-
-                        # Иначе
-                        else:
-
-                            # Обновляем интерфейс с учётом новых способностей
-                            interface.buttons_group.empty()
-                            interface.add_buttons(game.selected_piece.spell_list, game.selected_piece)
-                            interface.open()
-
-                            # Убираем прошлое выбранное действие
-                            game.selected_spell = None
-
-                            # Открываем интерфейс с новой кнопкой
-                            interface.open()
+                        # Обновляем интерфейс с учётом новых способностей
+                        interface.buttons_group.empty()
+                        interface.add_buttons(game.selected_piece.spell_list, game.selected_piece)
+                        interface.open()
 
                     # Обновляем поле
                     field.update()

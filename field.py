@@ -179,7 +179,7 @@ class Square(SquareTemplate):
         super().__init__(x, y, field)
 
         # Задаём клетке поверхность с изображением
-        self.image = pg.image.load("design/square.png")
+        self.image = pg.image.load("design/field/square.png")
 
         # Флаг, показывающий активность/неактивность клетки
         self.is_activated = False
@@ -245,11 +245,11 @@ class Square(SquareTemplate):
 
         # Если клетка активирована, то задаём ей активированный дизайн
         if self.is_activated:
-            self.image = pg.image.load("design/activated_square.png")
+            self.image = pg.image.load("design/field/activated_square.png")
 
         # Иначе, задаём ей обычный дизайн
         else:
-            self.image = pg.image.load("design/square.png")
+            self.image = pg.image.load("design/field/square.png")
 
         # Если клетка занята, то рисуем на ней фигуру
         if self.is_occupied:
@@ -257,32 +257,50 @@ class Square(SquareTemplate):
             # Если на клетке стоит белая пешка
             if type(self.inner_piece).__name__ == "Pawn":
 
-                # Если клетка выбрана
-                if self.is_selected:
-                    self.image = pg.image.load("design/selected_pawn.png")
+                # Если фигура имеет ОД (может совершать действия)
+                if self.inner_piece.active_turn:
 
-                # Если клетка активирована
-                elif self.is_activated:
-                    self.image = pg.image.load("design/attacked_pawn.png")
+                    # Если клетка выбрана
+                    if self.is_selected:
+                        self.image = pg.image.load("design/pieces/selected_pawn.png")
 
-                # Иначе
+                    # Если клетка активирована
+                    elif self.is_activated:
+                        self.image = pg.image.load("design/pieces/attacked_pawn.png")
+
+                    # Иначе
+                    else:
+                        self.image = pg.image.load("design/pieces/pawn.png")
+
+                # Если клетка не имеет ОД (не может совершать действия)
                 else:
-                    self.image = pg.image.load("design/pawn.png")
+
+                    # Если клетка выбрана
+                    if self.is_selected:
+                        self.image = pg.image.load("design/pieces/off_selected_pawn.png")
+
+                    # Если клетка активирована
+                    elif self.is_activated:
+                        self.image = pg.image.load("design/pieces/off_attacked_pawn.png")
+
+                    # Иначе
+                    else:
+                        self.image = pg.image.load("design/pieces/off_pawn.png")
 
             # Если на клетке стоит чёрная пешка
             elif type(self.inner_piece).__name__ == "EnemyPawn":
 
                 # Если клетка выбрана
                 if self.is_selected:
-                    self.image = pg.image.load("design/selected_pawn.png")
+                    self.image = pg.image.load("design/pieces/selected_pawn.png")
 
                 # Если клетка активирована
                 elif self.is_activated:
-                    self.image = pg.image.load("design/attacked_black_pawn.png")
+                    self.image = pg.image.load("design/pieces/attacked_black_pawn.png")
 
                 # Иначе
                 else:
-                    self.image = pg.image.load("design/black_pawn.png")
+                    self.image = pg.image.load("design/pieces/black_pawn.png")
 
     def increase_size(self) -> None:
         """
@@ -422,7 +440,7 @@ class NonexistentSquare(SquareTemplate):
         super().__init__(x, y, field)
 
         # Задаём клетке поверхность с изображением
-        self.image = pg.image.load("design/barrier.png")
+        self.image = pg.image.load("design/field/barrier.png")
 
         # Указываем, что клетка не существует
         self.is_exist = False
