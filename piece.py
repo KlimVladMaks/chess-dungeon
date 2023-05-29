@@ -49,6 +49,7 @@ class Piece:
         self.effect_list = []
         self.active_turn = True
         self.AP = 2
+        self.shield = 0
 
     def get_fovs(self, cell = None) -> list[tuple["Square", "Square"]]:
         """
