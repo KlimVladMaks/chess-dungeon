@@ -213,14 +213,15 @@ class Interface(pg.sprite.Sprite):
         x = BUTTON_SPACING
         y = (self.image.get_height() // 2) - (BUTTON_SIZE[1] // 2)
 
-        # Проверяем, доступны ли кнопки с учётом доступных ОД фигуры
-        if piece.AP > 0:
-            is_active_spell = True
-        else:
-            is_active_spell = False
-
         # Перебираем все переданные действия и формируем для них кнопки, располагая их в области интерфейса
         for spell in buttons_spell:
+
+            # Проверяем, является ли данная способность доступной
+            # (Способность доступна, если у фигуры количество ОД больше нуля или если стоимость способности равна нулю)
+            if (piece.AP > 0) or (spell.cost == 0):
+                is_active_spell = True
+            else:
+                is_active_spell = False
 
             # Создаём кнопку
             button = Button(spell, (x, y), (BUTTON_SIZE[0], BUTTON_SIZE[1]), is_active_spell)
