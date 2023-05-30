@@ -5,10 +5,6 @@ from effect import *
 if tp.TYPE_CHECKING:
     from field import Square, Field
 
-#Списки условных обозначений, являющиеся стеной
-BARRIERS = [False]
-FOGS = [False]
-
 
 class Piece:
 
@@ -51,7 +47,7 @@ class Piece:
         self.AP = 2
         self.shield = 0
 
-    def get_fovs(self, cell = None) -> list[tuple["Square", "Square"]]:
+    def get_fovs(self, cell = None, opaque_piece = False) -> list["Square"]:
         """
         Функция возвращает список всех видимых клеток.
         Функция вызывает функцию прорисовки растровой линии от центра до каждой клетки границы (граница беспрерывная спутенькой).
@@ -74,7 +70,7 @@ class Piece:
         for i in range(4 * r):
 
             #рисуется растровая линия от клетки с фигурой до каждой пограничной
-            fovs.update(self.get_view_for_line((start_x, start_y), (start_x + x, start_y + y)))
+            fovs.update(self.get_view_for_line(opaque_piece, (start_x, start_y), (start_x + x, start_y + y)))
 
             if i < r:
                 x += 1
@@ -95,7 +91,7 @@ class Piece:
         for i in range(4 * r):
 
             #рисуется растровая линия от клетки с фигурой до каждой пограничной
-            fovs.update(self.get_view_for_line((start_x, start_y), (start_x + x, start_y + y)))
+            fovs.update(self.get_view_for_line(opaque_piece, (start_x, start_y), (start_x + x, start_y + y)))
 
             if i < r:
                 x += 1
@@ -118,7 +114,7 @@ class Piece:
         return foving_cell
         
 
-    def get_view_for_line(self, start: tuple[int], end: tuple[int])  -> list[tuple[int, int]]:
+    def get_view_for_line(self, opaque_piece: bool, start: tuple[int], end: tuple[int])  -> list[tuple[int, int]]:
         """
         Функция вычисляет через какие точки проходит линия обзора от одной клетки до другой.
         И возвращает путь до первой стены.
@@ -189,6 +185,10 @@ class Piece:
                 way.append((y, x))
                 if self.field.is_fog(y, x):
                     return way
+                #если мы в режиме непрозрачных фигур
+                if opaque_piece:
+                    if not self.field.get_square_by_pos(y, x).inner_piece is None:
+                        return way
             
         return way
     

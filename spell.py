@@ -413,7 +413,7 @@ class BishopAttack1(Spell):
         coordinates_other = self.field.get_pos_by_square(other)
         coordinates_self = self.field.get_pos_by_square(self.cell)
         #и проложим линию обзора
-        range_shot = len(self.get_view_for_line(coordinates_self[::-1], coordinates_other[::-1])) - 1
+        range_shot = len(self.get_view_for_line(False, coordinates_self[::-1], coordinates_other[::-1])) - 1
 
         #забираем фигуру из клетки
         other_piece = other.inner_piece
@@ -483,7 +483,7 @@ class BishopAttack2(Spell):
         coordinates_other = self.field.get_pos_by_square(other)
         coordinates_self = self.field.get_pos_by_square(self.cell)
         #и проложим линию обзора
-        range_shot = len(self.get_view_for_line(coordinates_self[::-1], coordinates_other[::-1])) - 1
+        range_shot = len(self.get_view_for_line(False, coordinates_self[::-1], coordinates_other[::-1])) - 1
 
         #забираем фигуру из клетки
         other_piece = other.inner_piece
@@ -843,7 +843,7 @@ class RookAttack1(Spell):
         self.radius_fov = range_ram
 
         #таранем всё, что видим
-        potential = self.get_fovs()
+        potential = self.get_fovs(opaque_piece = True)
 
         #восстановим обзор
         self.radius_fov = radius_fov
@@ -866,7 +866,7 @@ class RookAttack1(Spell):
         coordinates_other = self.field.get_pos_by_square(other)
         coordinates_self = self.field.get_pos_by_square(self.cell)
         #и проложим линию обзора
-        pos_cell_for_move = self.get_view_for_line(coordinates_self[::-1], coordinates_other[::-1])[-2]
+        pos_cell_for_move = self.get_view_for_line(False, coordinates_self[::-1], coordinates_other[::-1])[-2]
 
         #и вот наша клетка!
         cell_for_move = self.field.get_square_by_pos(pos_cell_for_move[0], pos_cell_for_move[1])
@@ -1089,7 +1089,7 @@ class QueenAttack2(Spell):
         self.radius_fov = range_ram
 
         #таранем всё, что видим
-        potential = self.get_fovs()
+        potential = self.get_fovs(opaque_piece = True)
 
         #восстановим обзор
         self.radius_fov = radius_fov
@@ -1112,7 +1112,7 @@ class QueenAttack2(Spell):
         coordinates_other = self.field.get_pos_by_square(other)
         coordinates_self = self.field.get_pos_by_square(self.cell)
         #и проложим линию обзора
-        pos_cell_for_move = self.get_view_for_line(coordinates_self[::-1], coordinates_other[::-1])[-2]
+        pos_cell_for_move = self.get_view_for_line(False, coordinates_self[::-1], coordinates_other[::-1])[-2]
 
         #и вот наша клетка!
         cell_for_move = self.field.get_square_by_pos(pos_cell_for_move[0], pos_cell_for_move[1])
