@@ -388,3 +388,27 @@ class Rook(Piece):
         self.spell_list.append(RookAttack1())
         self.spell_list.append(RookAttack2())
         self.spell_list.append(RookUtility())
+
+class Queen(Piece):
+
+    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+        self.create_spell_list()
+
+    def create_spell_list(self) -> None:
+        
+        """
+        Функция добавляет объекты класса Spell в piece.spell_list
+        """
+
+        #Добавляем способности из модуля spell
+        self.spell_list.append(QueenAttack1())
+        self.spell_list.append(QueenAttack2())
+
+    def new_turn(self) -> None:
+
+        super().new_turn()
+        
+        #QueenUtility
+        if self.accuracy != 1:
+            self.accuracy = 1
