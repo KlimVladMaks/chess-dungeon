@@ -214,19 +214,13 @@ class PawnAttack1(Spell):
     def cast(spell, self: "Piece", other: "Square"):
         
         #забираем фигуру из клетки
-        other = other.inner_piece
+        other_piece = other.inner_piece
 
-        #Если фигура попала, она наносит урон равный своим хп
+        #Если фигура попала, она наносит урон
         if random() < self.accuracy:
             damage = randrange(self.min_damage, self.max_damage + 1)
-            print(f"Атакующая фигура попала и нанесла {damage} урона!")
-            other.hp -= damage
-            print(f"Оставшиеся хп жертвы: {other.hp}/{other.max_hp}")
-
-            #Если фигуры хп падают до 0 и ниже, удаляем её с поля
-            if other.hp <= 0:
-                print("Сильный удар разбивает жертву в каменную крошку!")
-                other.cell.del_inner_piece()
+            other_piece.give_damage(damage)
+            
         else:
             print(f"Атакующая фигура промахнулась")
 
@@ -352,25 +346,19 @@ class PawnUtility(Spell):
     def cast(spell, self: "Piece", other: "Square"):
         
         #забираем фигуру из клетки
-        other = other.inner_piece
+        other_piece = other.inner_piece
 
         #Фигура попала и она наносит урон*1.5
-        damage = randrange(self.min_damage, self.max_damage + 1)
-        damage *= 2
-        print(f"Атакующая фигура попала и нанесла {damage} урона!")
-        other.hp -= damage
-        self.hp -= damage // 2
-        print(f"Оставшиеся хп жертвы: {other.hp}/{other.max_hp}")
-        print(f"Оставшиеся хп свои: {self.hp}/{self.max_hp}")
-
-        #Если фигуры хп падают до 0 и ниже, удаляем её с поля
-        if other.hp <= 0:
-            print("Сильный удар разбивает жертву в каменную крошку!")
-            other.cell.del_inner_piece()
-
-        if self.hp <= 0:
-            print("Эта жертва не будет напрасной...")
-            self.cell.del_inner_piece()
+        if random() < self.accuracy + 1:
+            damage = randrange(self.min_damage, self.max_damage + 1)
+            damage *= 2
+            print("Урон по врагу:")
+            other_piece.give_damage(damage)
+            print("Урон по себе:")
+            self.give_damage(damage // 2)
+            
+        else:
+            print(f"Атакующая фигура промахнулась")
 
 class BishopAttack1(Spell):
 
@@ -420,26 +408,25 @@ class BishopAttack1(Spell):
     def cast(spell, self: "Piece", other: "Square") -> None:
         
         #определяем дальность выстрела
-        range_shot = len(self.field.get_way(self.cell, other)) - 1
+
+        #для этого возмём координаты клетки с врагом
+        coordinates_other = self.field.get_pos_by_square(other)
+        coordinates_self = self.field.get_pos_by_square(self.cell)
+        #и проложим линию обзора
+        range_shot = len(self.get_view_for_line(coordinates_self[::-1], coordinates_other[::-1])) - 1
 
         #забираем фигуру из клетки
-        other = other.inner_piece
+        other_piece = other.inner_piece
 
         #снижаем меткость за дальность
         accuracy_coefficient = 0.4
-        accuracy = self.accuracy * (1 / range_shot)**(accuracy_coefficient)
+        accuracy = self.accuracy * (1 / range_shot) ** (accuracy_coefficient)
 
-        #Если фигура попала, она наносит урон равный своим хп
+        #Если фигура попала, она наносит урон
         if random() < accuracy:
             damage = randrange(self.min_damage, self.max_damage + 1)
-            print(f"Атакующая фигура попала и нанесла {damage} урона!")
-            other.hp -= damage
-            print(f"Оставшиеся хп жертвы: {other.hp}/{other.max_hp}")
-
-            #Если фигуры хп падают до 0 и ниже, удаляем её с поля
-            if other.hp <= 0:
-                print("Сильный удар разбивает жертву в каменную крошку!")
-                other.cell.del_inner_piece()
+            other_piece.give_damage(damage)
+            
         else:
             print(f"Атакующая фигура промахнулась")
 
@@ -491,35 +478,27 @@ class BishopAttack2(Spell):
     def cast(spell, self: "Piece", other: "Square") -> None:
         
         #определяем дальность выстрела
-        range_shot = len(self.field.get_way(self.cell, other)) - 1
+
+        #для этого возмём координаты клетки с врагом
+        coordinates_other = self.field.get_pos_by_square(other)
+        coordinates_self = self.field.get_pos_by_square(self.cell)
+        #и проложим линию обзора
+        range_shot = len(self.get_view_for_line(coordinates_self[::-1], coordinates_other[::-1])) - 1
 
         #забираем фигуру из клетки
-        other = other.inner_piece
+        other_piece = other.inner_piece
 
         #снижаем меткость за дальность
         accuracy_coefficient = 0.4
-        accuracy = self.accuracy * (1 / range_shot)**(accuracy_coefficient)
+        accuracy = self.accuracy * (1 / range_shot) ** (accuracy_coefficient)
+        print(f"Точность: {accuracy}")
 
-        #Если фигура попала, она наносит урон равный своим хп
+        #Если фигура попала, она наносит урон
         if random() < accuracy:
             damage = randrange(self.min_damage, self.max_damage + 1)
-            print(f"Атакующая фигура попала и нанесла {damage} урона!")
-            other.hp -= damage
-            print(f"Оставшиеся хп жертвы: {other.hp}/{other.max_hp}")
-
-            if [effect.id for effect in other.effect_list].count('speed_reduction') == 0:
-                print('Также на фигуру наложен дебафф!')
-                effect = Speed_reduction(2, 2)
-                other.effect_list.append(effect)
-                effect.get_effect(other)
-            else:
-                i = [effect.id for effect in other.effect_list].index('speed_reduction')
-                other.effect_list[i].timer = 2
-
-            #Если фигуры хп падают до 0 и ниже, удаляем её с поля
-            if other.hp <= 0:
-                print("Сильный удар разбивает жертву в каменную крошку!")
-                other.cell.del_inner_piece()
+            other_piece.give_damage(damage)
+            other_piece.give_effect(Speed_reduction(2, 2))
+            
         else:
             print(f"Атакующая фигура промахнулась")
 
@@ -674,31 +653,17 @@ class KnightAttack1_Attack(Spell):
     def cast(spell, self: "Piece", other: "Square"):
 
         #забираем фигуру из клетки
-        other = other.inner_piece
+        other_piece = other.inner_piece
 
-        #Если фигура попала, она наносит урон равный своим хп
+        #Если фигура попала, она наносит урон
         if random() < self.accuracy:
             damage = randrange(self.min_damage, self.max_damage + 1)
-            print(f"Атакующая фигура попала и нанесла {damage} урона!")
-            other.hp -= damage
-            print(f"Оставшиеся хп жертвы: {other.hp}/{other.max_hp}")
-
-            if [effect.id for effect in other.effect_list].count('accuracy_reduction') == 0:
-                print('Также на фигуру наложен дебафф!')
-                effect = Accuracy_reduction(2, 0.2)
-                other.effect_list.append(effect)
-                effect.get_effect(other)
-            else:
-                i = [effect.id for effect in other.effect_list].index('accuracy_reduction')
-                other.effect_list[i].timer = 2
-
-            #Если фигуры хп падают до 0 и ниже, удаляем её с поля
-            if other.hp <= 0:
-                print("Сильный удар разбивает жертву в каменную крошку!")
-                other.cell.del_inner_piece()
+            other_piece.give_damage(damage)
+            other_piece.give_effect(Accuracy_reduction(2, 0.2))
+            
         else:
             print(f"Атакующая фигура промахнулась")
-        
+
         self.spell_list[self.spell_list.index(spell)] = KnightAttack1_Move()
 
 class KnightAttack2(Spell):
@@ -820,14 +785,13 @@ class KnightUtility(Spell):
             #забираем фигуру из клетки
             enemy = enemy.inner_piece
 
-            print(f"Атакующая фигура нанесла {damage} урона!")
-            enemy.hp -= damage
-            print(f"Оставшиеся хп жертвы: {enemy.hp}/{enemy.max_hp}")
+            #Если фигура попала, она наносит урон
+            if random() < self.accuracy + 1:
+                damage = randrange(self.min_damage, self.max_damage + 1)
+                enemy.give_damage(damage)
 
-            #Если фигуры хп падают до 0 и ниже, удаляем её с поля
-            if enemy.hp <= 0:
-                print("Сильный удар разбивает жертву в каменную крошку!")
-                enemy.cell.del_inner_piece()
+            else:
+                print(f"Атакующая фигура промахнулась")
 
     def give_enemies_in_area(spell, self, host_cell):
 
@@ -918,19 +882,13 @@ class RookAttack1(Spell):
         #и атакуем
 
         #забираем фигуру из клетки
-        other = other.inner_piece
+        other_piece = other.inner_piece
 
-        #Если фигура попала, она наносит урон равный урону
+        #Если фигура попала, она наносит урон
         if random() < self.accuracy:
             damage = randrange(self.min_damage, self.max_damage + 1)
-            print(f"Атакующая фигура попала и нанесла {damage} урона!")
-            other.hp -= damage
-            print(f"Оставшиеся хп жертвы: {other.hp}/{other.max_hp}")
-
-            #Если фигуры хп падают до 0 и ниже, удаляем её с поля
-            if other.hp <= 0:
-                print("Сильный удар разбивает жертву в каменную крошку!")
-                other.cell.del_inner_piece()
+            other_piece.give_damage(damage)
+            
         else:
             print(f"Атакующая фигура промахнулась")
 
@@ -972,20 +930,13 @@ class RookAttack2(Spell):
     def cast(spell, self: "Piece", other: "Square"):
         
         #забираем фигуру из клетки
-        other = other.inner_piece
+        other_piece = other.inner_piece
 
-        #Если фигура попала, она наносит урон равный своим хп
+        #Если фигура попала, она наносит урон
         if random() < self.accuracy:
             damage = randrange(self.min_damage, self.max_damage + 1) + self.shield
-            print(f"Атакующая фигура попала и нанесла {damage} урона! В том числе благодаря щиту {self.shield}")
-            self.shield = 0
-            other.hp -= damage
-            print(f"Оставшиеся хп жертвы: {other.hp}/{other.max_hp}")
-
-            #Если фигуры хп падают до 0 и ниже, удаляем её с поля
-            if other.hp <= 0:
-                print("Сильный удар разбивает жертву в каменную крошку!")
-                other.cell.del_inner_piece()
+            other_piece.give_damage(damage)
+            
         else:
             print(f"Атакующая фигура промахнулась")
 

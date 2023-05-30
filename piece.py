@@ -200,9 +200,67 @@ class Piece:
 
     def update_spell_list(self) -> None:
 
+        """
+        Функция заного создаёт список способностей
+        """
+
         self.spell_list = [Piece_Move()]
         self.create_spell_list()
         
+    def give_damage(self, damage: int) -> None:
+
+        """
+        Фигура получает урон
+        """
+
+        print(f"Входящий урон {damage}.")
+
+        if self.shield >= damage:
+            self.shield -= damage
+            print(f"Весь урон ушёл в щит! Оставщаяся прочность щита {self.shield}.")
+
+        else:
+            if self.shield > 0:
+                print(f"Щит поглатил {self.shield} урона и разрушился.")
+                damage -= self.shield
+                self.shield = 0
+
+            print(f"Фигура получила {damage} урона.")
+            self.hp -= damage
+            if self.hp > 0:
+                print(f"Осталось хп: {self.hp}/{self.max_hp}")
+
+            else:
+                self.destroy()
+
+    def give_effect(self, effect: "Effect")  -> None:
+
+        """
+        Фигура получает эффект
+        """
+
+        if [effect.id for effect in self.effect_list].count(effect.id) == 0:
+            self.effect_list.append(effect)
+            effect.get_effect(self)
+            print(f"Также на фигуру наложен дебафф! {effect.name} на {effect.strength}")
+
+        else:
+            i = [old_effect.id for old_effect in self.effect_list].index(effect.id)
+
+            #Берём больший таймер из уже существующего и накладываемого эффекта
+            if effect.timer > self.effect_list[i].timer:
+                self.effect_list[i].timer = effect.timer
+                print(f"{effect.name} продлено до {effect.timer}")
+
+            #Берём большую силу из уже существующего и накладываемого эффекта
+            if effect.strength > self.effect_list[i].strength:
+                self.effect_list[i].strength = effect.strength
+                print(f"{effect.name} усилено до {effect.strength}")
+
+
+    def destroy(self):
+        self.cell.del_inner_piece()
+        print("Фигура рассыпалась в каменную крошку!")
 
     def new_turn(self) -> None:
 

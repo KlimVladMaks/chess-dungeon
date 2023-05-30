@@ -1,6 +1,10 @@
 import pygame as pg
 import typing as tp
-from square import *
+from field import *
+from piece import *
+from enemy import *
+from interface import *
+from game import *
 
 # Ширина и высота экрана
 SCREEN_WIDTH = 800
@@ -11,6 +15,28 @@ BACKGROUND_COLOR = "#000000"
 
 # Частота кадров
 FPS = 60
+
+# Стартовая структура игрового поля (1 - есть шахматная клетка, 0 - нет)
+START_FIELD_MAP = [[0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+                   [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+                   [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+                   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                   [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+                   [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+                   [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0]]
 
 """
 Примечание:
@@ -26,46 +52,11 @@ def main() -> None:
     Main-функция.
     """
 
-    # Координаты экрана относительно карты уровня
-    x_screen = 0
-    y_screen = 0
-
-    # Карта уровня (1 - есть шахматная клетка, 0 - нет)
-    level_map = [[0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-                 [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-                 [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                 [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-                 [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-                 [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0]]
-
-    # Двухмерный список для хранения спрайтов шахматных клеток
-    squares_list: list[list[SquareObject]] = []
-
-    # Группа для хранения спрайтов шахматных клеток
-    squares_group = pg.sprite.Group()
+    # Абсолютные координаты экрана относительно карты уровня
+    screen_absolute_coordinates = [0, 0]
 
     # Часы для регулировки FPS
     clock = pg.time.Clock()
-
-    # Флаг, показывающий, что пользователь двигает карту
-    is_map_moving = False
-
-    # Переменная для хранения позиции курсора
-    mouse_pos: tuple[int, int] = (0, 0)
 
     # Инициализируем игру
     pg.init()
@@ -73,41 +64,49 @@ def main() -> None:
     # Создаём экран игры
     screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+    # Создаём поверхность, предназначенную для отображения игрового поля
+    screen_field = pg.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+
     # Задаём заголовок игры
     pg.display.set_caption("Chess Dungeon")
 
     # Устанавливаем фон
-    background = pg.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
-    background.fill(BACKGROUND_COLOR)
+    background = pg.image.load("design/field/background.png")
     screen.blit(background, (0, 0))
-
-    # Координаты начала экрана
-    x = 0
-    y = 0
-
-    # Создаём шахматные клетки, задаём им стартовые координаты и помещаем в спрайт-группу.
-    # Заполняем двухмерный список с шахматными клетками
-    for row in level_map:
-        inner_list = []
-        for col in row:
-            if col == 1:
-                square = Square(x, y)
-                squares_group.add(square)
-                inner_list.append(square)
-            else:
-                nonexistent_square = NonexistentSquare(x, y)
-                squares_group.add(nonexistent_square)
-                inner_list.append(nonexistent_square)
-            x += SQUARE_SIDE_SIZE
-        y += SQUARE_SIDE_SIZE
-        x = 0
-        squares_list.append(inner_list)
-
-    # Отрисовываем шахматные клетки
-    squares_group.draw(screen)
-
-    # Обновляем экран
     pg.display.update()
+
+    # Создаём игровое поле
+    field = Field(screen, screen_field, background, screen_absolute_coordinates, START_FIELD_MAP)
+
+    # Создаём интерфейс для управления фигурами
+    interface = Interface(screen, field)
+
+    # Создаём экземпляр класса для управления процессом игры
+    game = Game(field)
+
+    # Тест расположения фигуры
+    piece_1 = Bishop('p1', field, field.get_square_by_pos(4, 6), 10, 0.9, 1, 3, 3, 5)
+    piece_2 = Pawn('p1', field, field.get_square_by_pos(5, 6), 10, 0.5, 1, 3, 3, 5)
+    piece_3 = Knight('p1', field, field.get_square_by_pos(6, 6), 10, 0.5, 1, 3, 3, 5)
+    piece_4 = Rook('p1', field, field.get_square_by_pos(7, 6), 10, 0.5, 1, 3, 3, 5)
+
+    piece_1.cell.add_inner_piece(piece_1)
+    piece_2.cell.add_inner_piece(piece_2)
+    piece_3.cell.add_inner_piece(piece_3)
+    piece_4.cell.add_inner_piece(piece_4)
+
+    enemy = EnemyPawn('Shodan', field, field.get_square_by_pos(15, 17), 10, 0.5, 1, 3, 3, 5)
+    enemy.set_way_patrol(field.get_square_by_pos(8, 6))
+    enemy.cell.add_inner_piece(enemy)
+
+    # Помещаем все фигуры в соответствующие списки
+    game.player_pieces = [piece_1, piece_2, piece_3, piece_4]
+    game.computer_pieces = [enemy]
+
+    # Тест расположения фигуры - КОНЕЦ
+
+    # Отрисовываем игровое поле
+    field.update()
 
     # Запускаем игровой цикл
     while True:
@@ -123,301 +122,185 @@ def main() -> None:
                 pg.quit()
                 return
 
+            # Если нажата кнопка Enter
+            elif e.type == pg.KEYDOWN and e.key == pg.K_RETURN:
+
+                # Завершаем текущий игровой такт
+                game.finish_game_tact()
+
+                # Делаем новый ход для каждой фигуры игрока
+                for piece in game.player_pieces:
+                    piece.new_turn()
+
+                # Делаем новый ход для каждой фигуры компьютера
+                for piece in game.computer_pieces:
+                    piece.new_turn()
+
+                # Закрываем интерфейс (если он вдруг открыт)
+                interface.close()
+
+                # Обновляем все клетки, на которых стоят фигуры игрока
+                for piece in game.player_pieces:
+                    piece.cell.update()
+
+                # Обновляем поле
+                field.update()
+
             # Если нажата левая клавиша мыши
             elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
 
+                # Получаем относительные координаты клика
+                click_coordinates = pg.mouse.get_pos()
+
+                # Если координаты клика попадают в область интерфейса
+                if interface.are_interface_coordinates(click_coordinates[0], click_coordinates[1]):
+
+                    # Получаем нажатую кнопку интерфейса
+                    button = interface.get_button_by_coordinates(click_coordinates[0], click_coordinates[1])
+
+                    # Если кнопка не нажата (т.е. было возвращено значение None), то пропускаем итерацию
+                    if button is None:
+                        continue
+
+                    # Если ранее было какое-либо выбранное действие и оно не равно новому выбранному действию,
+                    # то очищаем выделенные для него клетки
+                    if (game.selected_spell is not None) and (game.selected_spell != button.spell):
+                        game.clear_activated_squares()
+
+                    # Изменяем режим для выбранного действия
+                    game.toggle_action_mode(button.spell)
+
+                    # Переходим к следующей итерации цикла
+                    continue
+
                 # Получаем нажатую клетку
-                square_clicked = get_square_by_coordinates(squares_list, pg.mouse.get_pos(), (x_screen, y_screen))
+                square_clicked = field.get_square_by_coordinates(click_coordinates[0], click_coordinates[1])
 
-                # Если полученная клетка не равна None, то меняем её цвет и обновляем экран
-                if (square_clicked is not None) and square_clicked.is_exist:
-                    square_clicked.change_regime()
-                    screen.blit(background, (0, 0))
-                    squares_group.draw(screen)
-                    pg.display.update()
+                # Если клетка относится к классу Square (т.е. существует)
+                if isinstance(square_clicked, Square):
 
-            # Если нажата правая клавиша мыши, то ставим флаг движения карты и сохраняем позицию курсора
+                    # Если на клетке стоит фигура, выделенная для действия, направленного на неё
+                    if isinstance(square_clicked.inner_piece, Piece) and square_clicked.is_activated:
+
+                        """Нужно быть осторожнее с добавлением новых действий, требующих другой обработки"""
+
+                        # Очищаем ранее активированные клетки
+                        game.clear_activated_squares()
+                        game.selected_piece.cell.deselect()
+
+                        # Проводим выбранное ранее действие над выбранной фигуру
+                        game.selected_piece.cast_spell(game.selected_spell, square_clicked)
+
+                        # Удаляем фигуру из соответствующего списка, если она была уничтожена
+                        game.del_destroyed_pieces()
+
+                        # Активируем клетку, на которой теперь стоит фигура
+                        game.selected_piece.cell.select()
+
+                        # Убираем прошлое выбранное действие
+                        game.selected_spell = None
+
+                        # Обновляем интерфейс с учётом новых способностей
+                        interface.buttons_group.empty()
+                        interface.add_buttons(game.selected_piece.spell_list, game.selected_piece)
+                        interface.open()
+
+                    # Если на клетке находится ранее не выбранная фигура
+                    elif isinstance(square_clicked.inner_piece, Piece) and (
+                            square_clicked.inner_piece != game.selected_piece):
+
+                        # Если уже есть выбранное действие, то пропускаем итерацию
+                        if game.selected_spell is not None:
+                            continue
+
+                        # Если игрок нажал на вражескую фигуру, то пропускаем итерацию
+                        if square_clicked.inner_piece.team == "Shodan":
+                            continue
+
+                        # Если существовала ранее выбранная фигура, то завершаем предыдущий игровой такт
+                        if game.selected_piece is not None:
+                            game.finish_game_tact()
+
+                        # Сохраняем выбранную фигуру
+                        game.selected_piece = square_clicked.inner_piece
+
+                        # Выделяем клетку, на которой стоит выбранная фигура
+                        game.selected_piece.cell.select()
+
+                        # Очищаем группу со старыми кнопками
+                        interface.buttons_group.empty()
+
+                        # Получаем список способностей выбранной фигуры
+                        spell_list = [spell for spell in game.selected_piece.spell_list]
+
+                        # Задаём новые кнопки с действиями, используя список со способностями выбранной фигуры
+                        interface.add_buttons(spell_list, game.selected_piece)
+
+                        # Открываем интерфейс
+                        interface.open()
+
+                    # Если на клетке находится ранее выбранная фигура
+                    elif isinstance(square_clicked.inner_piece, Piece) \
+                            and square_clicked.inner_piece == game.selected_piece:
+
+                        # Завершаем игровой такт
+                        game.finish_game_tact()
+
+                        # Закрываем интерфейс
+                        interface.close()
+
+                    # Если нажатая клетка была выделена для определённого действия (не связанного с другими фигурами)
+                    elif square_clicked.is_activated:
+
+                        """Нужно быть осторожнее с добавлением новых действий, требующих другой обработки"""
+
+                        # Очищаем ранее активированные клетки
+                        game.clear_activated_squares()
+                        game.selected_piece.cell.deselect()
+
+                        # Совершаем выбранное действие
+                        game.selected_piece.cast_spell(game.selected_spell, square_clicked)
+
+                        # Активируем клетку, на которой теперь стоит фигура
+                        game.selected_piece.cell.select()
+
+                        # Убираем прошлое выбранное действие
+                        game.selected_spell = None
+
+                        # Обновляем интерфейс с учётом новых способностей
+                        interface.buttons_group.empty()
+                        interface.add_buttons(game.selected_piece.spell_list, game.selected_piece)
+                        interface.open()
+
+                    # Обновляем поле
+                    field.update()
+
+            # Если нажата правая клавиша мыши, то ставим флаг движения карты и флаг для пропуска первого сдвига
             elif e.type == pg.MOUSEBUTTONDOWN and e.button == 3:
-                is_map_moving = True
-                mouse_pos = pg.mouse.get_pos()
+                field.is_moving = True
+                field.skip_first_move = True
 
             # Если мышь движется с установленным флагом движения карты
-            elif e.type == pg.MOUSEMOTION and is_map_moving:
+            elif e.type == pg.MOUSEMOTION and field.is_moving:
 
-                # Находим сдвиг по x и y
-                new_mouse_pos = pg.mouse.get_pos()
-                x_shift = new_mouse_pos[0] - mouse_pos[0]
-                y_shift = new_mouse_pos[1] - mouse_pos[1]
+                # Находим сдвиг курсора по x и y
+                mouse_shift = pg.mouse.get_rel()
+                x_shift = mouse_shift[0]
+                y_shift = mouse_shift[1]
 
-                # Рассчитываем потенциальные новые абсолютные координаты экрана
-                x_screen_test = x_screen - x_shift
-                y_screen_test = y_screen - y_shift
+                # Если у поля стоит флаг пропуска первого сдвига, то снимаем данный флаг и пропускаем итерацию
+                if field.skip_first_move:
+                    field.skip_first_move = False
+                    continue
 
-                # Рассчитываем размеры поля
-                field_width = len(squares_list[0]) * get_square_side_size(squares_list)
-                field_height = len(squares_list) * get_square_side_size(squares_list)
+                # Сдвигаем игровое поле и обновляем его
+                field.move(x_shift, y_shift)
+                field.update()
 
-                # Если координата x выходит за пределы поля больше чем наполовину размера экрана, то обнуляем сдвиг по x
-                if (x_screen_test < -(SCREEN_WIDTH / 2)) or (x_screen_test + (SCREEN_WIDTH / 2) > field_width):
-                    x_shift = 0
-
-                # Если координата y выходит за пределы поля больше чем наполовину размера экрана, то обнуляем сдвиг по y
-                if (y_screen_test < -(SCREEN_HEIGHT / 2)) or (y_screen_test + (SCREEN_HEIGHT / 2) > field_height):
-                    y_shift = 0
-
-                # Обновляем координаты экрана относительно карты уровня
-                x_screen -= x_shift
-                y_screen -= y_shift
-
-                # Обновляем координаты спрайтов шахматных клеток
-                for s in squares_group:
-                    s.move(x_shift, y_shift)
-
-                # Сохраняем новую позицию курсора
-                mouse_pos = new_mouse_pos
-
-                # Перерисовываем шахматные клетки
-                screen.blit(background, (0, 0))
-                squares_group.draw(screen)
-                pg.display.update()
-
-            # Если отпущена правая клавиша мыши, то снимаем флаг движения карты
+            # Если отпущена правая клавиша мыши, то снимаем флаг движения карты и флаг пропуска первого сдвига
             elif e.type == pg.MOUSEBUTTONUP and e.button == 3:
-                is_map_moving = False
-
-            # Если колёсико мышки прокручено вперёд
-            elif e.type == pg.MOUSEBUTTONDOWN and e.button == 4:
-
-                # Если размер клетки уже превосходит допустимое значение, то пропускаем итерацию
-                if squares_list[0][0].side_size > min(SCREEN_WIDTH, SCREEN_HEIGHT) * MAX_SQUARE_SIDE_SIZE:
-                    continue
-
-                # Увеличиваем масштаб поля
-                zoom_in_field(squares_list)
-
-                # Проверяем и при наличии исправляем выход за пределы поля
-                x_screen, y_screen = fix_out_of_field(x_screen,
-                                                      y_screen,
-                                                      screen,
-                                                      squares_group,
-                                                      squares_list,
-                                                      background)
-
-                # Перерисовываем шахматные клетки
-                screen.blit(background, (0, 0))
-                squares_group.draw(screen)
-                pg.display.update()
-
-            # Если колёсико мышки прокручено назад
-            elif e.type == pg.MOUSEBUTTONDOWN and e.button == 5:
-
-                # Если размер клетки уже меньше допустимого значения, то пропускаем итерацию
-                if squares_list[0][0].side_size < max(SCREEN_WIDTH, SCREEN_HEIGHT) * MIN_SQUARE_SIDE_SIZE:
-                    continue
-
-                # Уменьшаем масштаб поля
-                zoom_out_field(squares_list)
-
-                # Проверяем и при наличии исправляем выход за пределы поля
-                x_screen, y_screen = fix_out_of_field(x_screen,
-                                                      y_screen,
-                                                      screen,
-                                                      squares_group,
-                                                      squares_list,
-                                                      background)
-
-                # Перерисовываем шахматные клетки
-                screen.blit(background, (0, 0))
-                squares_group.draw(screen)
-                pg.display.update()
-
-
-def get_square_side_size(squares_list: list[list[SquareObject]]) -> int:
-    """
-    Функция для получения текущего размера стороны шахматной клетки.
-
-    :param squares_list: Двухмерный список с шахматными клетками игрового поля.
-    :return: Текущий размер стороны шахматной клетки.
-    """
-
-    # Перебираем элементы списка и возвращаем размер стороны первой попавшейся шахматной клетки
-    # т.к. у всех клеток должен быть одинаковый размер стороны
-    for i in range(len(squares_list)):
-        for j in range(len(squares_list[i])):
-            if squares_list[i][j] is not None:
-                return squares_list[i][j].side_size
-
-
-def get_square_by_coordinates(squares_list: list[list[SquareObject]],
-                              square_pos: tuple[int, int],
-                              screen_pos: tuple[int, int]) -> tp.Union[SquareObject, None]:
-    """
-    Функция для нахождения клетки по её координатам.
-
-    :param squares_list: Двухмерный список с шахматными клетками игрового поля.
-    :param square_pos: Координаты клетки.
-    :param screen_pos: Координаты экрана.
-    :return: Найденная клетка или None (если клетка не найдена).
-    """
-
-    # Рассчитываем абсолютные координаты клетки
-    x_absolute = square_pos[0] + screen_pos[0]
-    y_absolute = square_pos[1] + screen_pos[1]
-
-    # Если абсолютные x или y меньше 0, то возвращаем None
-    if x_absolute < 0 or y_absolute < 0:
-        return None
-
-    # Отлавливаем ошибки для избежания выхода из диапазона
-    try:
-
-        # Рассчитываем позицию клетки и извлекаем её из двухмерного списка
-        square_col = x_absolute // get_square_side_size(squares_list)
-        square_row = y_absolute // get_square_side_size(squares_list)
-        found_square = squares_list[square_row][square_col]
-
-    # При выходе из диапазона возвращаем None
-    except IndexError:
-        return None
-
-    # Возвращаем найденную клетку
-    return found_square
-
-
-def zoom_in_field(squares_list: list[list[SquareObject]]) -> None:
-    """
-    Функция для увеличения масштаба поля.
-
-    :param squares_list: Двухмерный список с шахматными клетками игрового поля.
-    """
-
-    # Увеличиваем размер каждой клетки поля
-    for i in range(len(squares_list)):
-        for j in range(len(squares_list[i])):
-            if squares_list[i][j] is not None:
-                squares_list[i][j].increase_size()
-
-    # Выравниваем поле
-    level_field(squares_list)
-
-
-def zoom_out_field(squares_list: list[list[SquareObject]]) -> None:
-    """
-    Функция для уменьшения масштаба поля.
-
-    :param squares_list: Двухмерный список с шахматными клетками игрового поля.
-    """
-
-    # Уменьшаем размер каждой клетки поля
-    for i in range(len(squares_list)):
-        for j in range(len(squares_list[i])):
-            if squares_list[i][j] is not None:
-                squares_list[i][j].decrease_size()
-
-    # Выравниваем поле
-    level_field(squares_list)
-
-
-def level_field(squares_list: list[list[SquareObject]]) -> None:
-    """
-    Функция для выравнивания шахматного поля (можно использовать при изменении размеров шахматных клеток).
-
-    :param squares_list: Двухмерный список с шахматными клетками игрового поля.
-    """
-
-    # Если поле пусто, то завершаем выполнение функции
-    if len(squares_list) == 0:
-        return
-
-    # Обновляем координаты всех клеток в соответствии с их размерами
-    x = squares_list[0][0].rect.x
-    y = squares_list[0][0].rect.y
-    for i in range(len(squares_list)):
-        for j in range(len(squares_list[i])):
-            squares_list[i][j].rect.x = x
-            squares_list[i][j].rect.y = y
-            x += get_square_side_size(squares_list)
-        y += get_square_side_size(squares_list)
-        x = squares_list[0][0].rect.x
-
-
-def fix_out_of_field(x_screen: int,
-                     y_screen: int,
-                     screen: pg.Surface,
-                     squares_group: pg.sprite.Group,
-                     squares_list: list[list[SquareObject]],
-                     background: pg.Surface) -> tuple[int, int]:
-    """
-    Функция для проверки и при наличии исправления выхода за пределы поля.
-
-    :param x_screen: Абсолютная координата x экрана.
-    :param y_screen: Абсолютная координата y экрана.
-    :param screen: Поверхность экрана.
-    :param squares_group: Группа клеток-спрайтов.
-    :param squares_list: Двухмерный список клеток-спрайтов.
-    :param background: Поверхность фона.
-    :return: Новые координаты (x, y) экрана.
-    """
-
-    # Рассчитываем размеры поля
-    field_width = len(squares_list[0]) * get_square_side_size(squares_list)
-    field_height = len(squares_list) * get_square_side_size(squares_list)
-
-    # По-умолчанию ставим флаг, что экран выходит за поле
-    is_out_of_field = True
-
-    # Цикл длится, пока выход за пределы поле не будет исправлен
-    while is_out_of_field:
-
-        # Указываем, что пока выхода за пределы поля не обнаружено
-        is_out_of_field = False
-
-        # Проверяем выход за пределы поля по X влево.
-        # При наличии исправляем на один пиксель и указываем, что выход за поле обнаружен
-        if x_screen < -(SCREEN_WIDTH / 2):
-            is_out_of_field = True
-            for s in squares_group:
-                s.move(-1, 0)
-            x_screen += 1
-            screen.blit(background, (0, 0))
-            squares_group.draw(screen)
-            pg.display.update()
-
-        # Проверяем выход за пределы поля по X вправо.
-        # При наличии исправляем на один пиксель и указываем, что выход за поле обнаружен
-        if x_screen + (SCREEN_WIDTH / 2) > field_width:
-            is_out_of_field = True
-            for s in squares_group:
-                s.move(1, 0)
-            x_screen -= 1
-            screen.blit(background, (0, 0))
-            squares_group.draw(screen)
-            pg.display.update()
-
-        # Проверяем выход за пределы поля по Y влево.
-        # При наличии исправляем на один пиксель и указываем, что выход за поле обнаружен
-        if y_screen < -(SCREEN_HEIGHT / 2):
-            is_out_of_field = True
-            for s in squares_group:
-                s.move(0, -1)
-            y_screen += 1
-            screen.blit(background, (0, 0))
-            squares_group.draw(screen)
-            pg.display.update()
-
-        # Проверяем выход за пределы поля по Y вправо.
-        # При наличии исправляем на один пиксель и указываем, что выход за поле обнаружен
-        if y_screen + (SCREEN_HEIGHT / 2) > field_height:
-            is_out_of_field = True
-            for s in squares_group:
-                s.move(0, 1)
-            y_screen -= 1
-            screen.blit(background, (0, 0))
-            squares_group.draw(screen)
-            pg.display.update()
-
-    # Возвращаем координаты экрана
-    return x_screen, y_screen
+                field.is_moving = False
+                field.skip_first_move = False
 
 
 # Запускаем Main-функцию
