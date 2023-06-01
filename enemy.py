@@ -335,7 +335,10 @@ class EnemyPiece(Piece):
             print('Враг обнаружил цель в зоне атаки')
             target = self.choice_enemy(enemies_in_range)
             if not target is None:
-                self.cast_spell(self.spell_list[1], target.cell)
+                if self.hp > 3:
+                    self.cast_spell(self.spell_list[1], target.cell)
+                else:
+                    self.cast_spell(self.spell_list[3], target.cell)
             else:
                 #не делаем ничего
                 self.AP = 0
