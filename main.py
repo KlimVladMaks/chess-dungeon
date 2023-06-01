@@ -85,22 +85,32 @@ def main() -> None:
     game = Game(field)
 
     # Тест расположения фигуры
-    piece_1 = Pawn('p1', field, field.get_square_by_pos(5, 6), 10, 0.5, 1, 3, 3, 5)
-    piece_2 = Pawn('p1', field, field.get_square_by_pos(6, 6), 10, 0.5, 1, 3, 3, 5)
+    piece_1 = Pawn('p1', field, field.get_square_by_pos(5, 6), 10, 0.7, 1, 3, 3, 4)
+    piece_2 = Pawn('p1', field, field.get_square_by_pos(6, 6), 10, 0.7, 1, 3, 3, 4)
+    piece_3 = Pawn('p1', field, field.get_square_by_pos(5, 5), 10, 0.7, 1, 3, 3, 4)
+    piece_4 = Pawn('p1', field, field.get_square_by_pos(6, 5), 10, 0.7, 1, 3, 3, 4)
 
     piece_1.cell.add_inner_piece(piece_1)
     piece_2.cell.add_inner_piece(piece_2)
+    piece_3.cell.add_inner_piece(piece_3)
+    piece_4.cell.add_inner_piece(piece_4)
 
-    enemy_1 = EnemyPawn('Shodan', field, field.get_square_by_pos(15, 17), 10, 0.5, 1, 3, 3, 5)
+    enemy_1 = EnemyPawn('Shodan', field, field.get_square_by_pos(15, 17), 10, 0.7, 1, 3, 3, 4)
     enemy_1.set_way_patrol(field.get_square_by_pos(8, 6))
-    enemy_2 = EnemyKing('Shodan', field, field.get_square_by_pos(15, 18), 10, 0.5, 1, 3, 3, 5)
+    enemy_2 = EnemyPawn('Shodan', field, field.get_square_by_pos(18, 19), 10, 0.7, 1, 3, 3, 4)
+    enemy_2.set_way_patrol(field.get_square_by_pos(6, 19))
+    enemy_3 = EnemyPawn('Shodan', field, field.get_square_by_pos(18, 17), 10, 0.7, 1, 3, 3, 4)
+    enemy_3.set_way_patrol(field.get_square_by_pos(5, 17))
+    enemy_4 = EnemyKing('Shodan', field, field.get_square_by_pos(18, 18), 10, 0.7, 1, 3, 3, 4)
 
     enemy_1.cell.add_inner_piece(enemy_1)
     enemy_2.cell.add_inner_piece(enemy_2)
+    enemy_3.cell.add_inner_piece(enemy_3)
+    enemy_4.cell.add_inner_piece(enemy_4)
 
     # Помещаем все фигуры в соответствующие списки
-    game.player_pieces = [piece_1, piece_2]
-    game.computer_pieces = [enemy_1, enemy_2]
+    game.player_pieces = [piece_1, piece_2, piece_3, piece_4]
+    game.computer_pieces = [enemy_1, enemy_2, enemy_3, enemy_4]
 
     # Тест расположения фигуры - КОНЕЦ
 
