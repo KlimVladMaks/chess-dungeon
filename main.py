@@ -178,8 +178,8 @@ def main() -> None:
                 # Если клетка относится к классу Square (т.е. существует)
                 if isinstance(square_clicked, Square):
 
-                    # Если на клетке стоит фигура, выделенная для действия, направленного на неё
-                    if isinstance(square_clicked.inner_piece, Piece) and square_clicked.is_activated:
+                    # Если нажатая клетка была выделена для определённого действия
+                    if square_clicked.is_activated:
 
                         """Нужно быть осторожнее с добавлением новых действий, требующих другой обработки"""
 
@@ -203,6 +203,14 @@ def main() -> None:
                         interface.buttons_group.empty()
                         interface.add_buttons(game.selected_piece.spell_list, game.selected_piece)
                         interface.open()
+
+                        # Если HP выбранной фигуры упало до нуля
+                        if game.selected_piece.hp <= 0:
+
+                            # Закрываем интерфейс, убираем выделение с клетки, убираем выделенную фигуру
+                            interface.close()
+                            game.selected_piece.cell.deselect()
+                            game.selected_piece = None
 
                     # Если на клетке находится ранее не выбранная фигура
                     elif isinstance(square_clicked.inner_piece, Piece) and (
@@ -247,32 +255,6 @@ def main() -> None:
 
                         # Закрываем интерфейс
                         interface.close()
-
-                    # Если нажатая клетка была выделена для определённого действия (не связанного с другими фигурами)
-                    elif square_clicked.is_activated:
-
-                        """Нужно быть осторожнее с добавлением новых действий, требующих другой обработки"""
-
-                        # Очищаем ранее активированные клетки
-                        game.clear_activated_squares()
-                        game.selected_piece.cell.deselect()
-
-                        # Совершаем выбранное действие
-                        game.selected_piece.cast_spell(game.selected_spell, square_clicked)
-
-                        # Удаляем фигуру из соответствующего списка, если она была уничтожена
-                        game.del_destroyed_pieces()
-
-                        # Активируем клетку, на которой теперь стоит фигура
-                        game.selected_piece.cell.select()
-
-                        # Убираем прошлое выбранное действие
-                        game.selected_spell = None
-
-                        # Обновляем интерфейс с учётом новых способностей
-                        interface.buttons_group.empty()
-                        interface.add_buttons(game.selected_piece.spell_list, game.selected_piece)
-                        interface.open()
 
                     # Обновляем поле
                     field.update()
