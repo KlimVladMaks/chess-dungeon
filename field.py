@@ -732,7 +732,7 @@ class Field:
 
     """Совместно с svgarik"""
 
-    def get_way(self, start: Square, end: Square) -> tp.Union[list[SquareTemplate], None]:
+    def get_way(self, start: Square, end: Square, piece_is_barrier: bool = False) -> tp.Union[list[SquareTemplate], None]:
         """
         Функция, возвращающая кратчайший маршрут между двумя клетками.
 
@@ -773,28 +773,32 @@ class Field:
 
             if (not (moves[i][0] + 1, moves[i][1]) in moves  # ещё не посетили
                     and self.is_into_map(moves[i][0] + 1, moves[i][1])  # в пределах поля
-                    and not self.is_barrier(moves[i][0] + 1, moves[i][1])):  # можно пройти
+                    and not self.is_barrier(moves[i][0] + 1, moves[i][1])  # можно пройти
+                    and (self.get_square_by_pos(moves[i][0] + 1, moves[i][1]).inner_piece is None or not piece_is_barrier)):  # нет фигуры (если фигура = стена)
                 moves.append((moves[i][0] + 1, moves[i][1]))
                 len_way.append(len_way[i] + 1)
                 preview_cell.append(i)
 
             if (not (moves[i][0] - 1, moves[i][1]) in moves
                     and self.is_into_map(moves[i][0] - 1, moves[i][1])
-                    and not self.is_barrier(moves[i][0] - 1, moves[i][1])):
+                    and not self.is_barrier(moves[i][0] - 1, moves[i][1])
+                    and (self.get_square_by_pos(moves[i][0] + 1, moves[i][1]).inner_piece is None or not piece_is_barrier)):
                 moves.append((moves[i][0] - 1, moves[i][1]))
                 len_way.append(len_way[i] + 1)
                 preview_cell.append(i)
 
             if (not (moves[i][0], moves[i][1] + 1) in moves
                     and self.is_into_map(moves[i][0], moves[i][1] + 1)
-                    and not self.is_barrier(moves[i][0], moves[i][1] + 1)):
+                    and not self.is_barrier(moves[i][0], moves[i][1] + 1)
+                    and (self.get_square_by_pos(moves[i][0] + 1, moves[i][1]).inner_piece is None or not piece_is_barrier)):
                 moves.append((moves[i][0], moves[i][1] + 1))
                 len_way.append(len_way[i] + 1)
                 preview_cell.append(i)
 
             if (not (moves[i][0], moves[i][1] - 1) in moves
                     and self.is_into_map(moves[i][0], moves[i][1] - 1)
-                    and not self.is_barrier(moves[i][0], moves[i][1] - 1)):
+                    and not self.is_barrier(moves[i][0], moves[i][1] - 1)
+                    and (self.get_square_by_pos(moves[i][0] + 1, moves[i][1]).inner_piece is None or not piece_is_barrier)):
                 moves.append((moves[i][0], moves[i][1] - 1))
                 len_way.append(len_way[i] + 1)
                 preview_cell.append(i)
