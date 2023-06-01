@@ -2,6 +2,7 @@ from piece import *
 import random
 
 import typing as tp
+
 if tp.TYPE_CHECKING:
     from field import Field, Square
 
@@ -46,9 +47,9 @@ class EnemyPiece(Piece):
         # получаем обзор от данной клетки
         fov = self.get_fovs(cell=cell)
 
-        # проходим по всем видимым клеткам и узнаём есть ли там фигура игрока
+        # проходим по всем видимым клеткам и узнаём нет ли фигур другой команды
         for c in fov:
-            if isinstance(c.inner_piece, Piece) and not isinstance(c.inner_piece, EnemyPiece):
+            if isinstance(c.inner_piece, Piece) and c.inner_piece.team != self.team:
                 print('Враг увидел игрока!')
                 return True
 
@@ -74,7 +75,7 @@ class EnemyPiece(Piece):
 
         # просматриваем все клетки в области атаки на наличие фигур игрока
         for cell in range:
-            if isinstance(cell.inner_piece, Piece) and not isinstance(cell.inner_piece, EnemyPiece):
+            if isinstance(cell.inner_piece, Piece) and cell.inner_piece.team != self.team:
                 enemies_in_range.append(cell.inner_piece)
 
         return enemies_in_range
@@ -129,7 +130,7 @@ class EnemyPiece(Piece):
                 if this_cell.inner_piece is None:
                     moves.append((moves[i][0] + 1, moves[i][1]))
                 # если видим фигуру игрока, то отмечаем как ближающую
-                elif isinstance(this_cell.inner_piece, Piece) and not isinstance(this_cell.inner_piece, EnemyPiece):
+                elif isinstance(this_cell.inner_piece, Piece) and this_cell.inner_piece.team != self.team:
                     nearest_enemy = this_cell.inner_piece
                     break
 
@@ -139,7 +140,7 @@ class EnemyPiece(Piece):
                 this_cell = self.field.get_square_by_pos(moves[i][0] - 1, moves[i][1])
                 if this_cell.inner_piece is None:
                     moves.append((moves[i][0] - 1, moves[i][1]))
-                elif isinstance(this_cell.inner_piece, Piece) and not isinstance(this_cell.inner_piece, EnemyPiece):
+                elif isinstance(this_cell.inner_piece, Piece) and this_cell.inner_piece.team != self.team:
                     nearest_enemy = this_cell.inner_piece
                     break
 
@@ -149,7 +150,7 @@ class EnemyPiece(Piece):
                 this_cell = self.field.get_square_by_pos(moves[i][0], moves[i][1] + 1)
                 if this_cell.inner_piece is None:
                     moves.append((moves[i][0], moves[i][1] + 1))
-                elif isinstance(this_cell.inner_piece, Piece) and not isinstance(this_cell.inner_piece, EnemyPiece):
+                elif isinstance(this_cell.inner_piece, Piece) and this_cell.inner_piece.team != self.team:
                     nearest_enemy = this_cell.inner_piece
                     break
 
@@ -159,7 +160,7 @@ class EnemyPiece(Piece):
                 this_cell = self.field.get_square_by_pos(moves[i][0], moves[i][1] - 1)
                 if this_cell.inner_piece is None:
                     moves.append((moves[i][0], moves[i][1] - 1))
-                elif isinstance(this_cell.inner_piece, Piece) and not isinstance(this_cell.inner_piece, EnemyPiece):
+                elif isinstance(this_cell.inner_piece, Piece) and this_cell.inner_piece.team != self.team:
                     nearest_enemy = this_cell.inner_piece
                     break
 
@@ -383,5 +384,9 @@ class EnemyPiece(Piece):
 
 class EnemyPawn(EnemyPiece, Pawn):
 
+    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+
+class EnemyKing(King):
     def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
         super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
