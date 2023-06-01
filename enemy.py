@@ -295,19 +295,27 @@ class EnemyPiece(Piece):
         """
 
         # проверяем не видно ли на маршруте фигуру игрока
-        for i in range(self.radius_move):
+        for i in range(self.radius_move + 1):
+
+            #проверяем не загородил ли кто дорогу
 
             # идём по маршруту
             pos = (i + self.pos_patrol) % len(self.way_patrol)
 
-            # сменяем метку
-            self.pos_patrol = pos
+            #Если дорога загорожена, то ждём (если мы не на исходной клекте)
+            if not self.way_patrol[pos].inner_piece is None and i != 0:
+                self.AP = 0
+                break
+
             print(f'Враг передвинулся на {self.way_patrol[pos].get_pos()}')
 
             # если увидили фигуру игрока, то сменяем поведение и переходим на ту клетку, на которой увидели
             if self.is_see_player_piece(self.way_patrol[pos]):
                 self.action = "attack"
                 break
+        
+        # сменяем метку
+        self.pos_patrol = pos
 
         # фактически сдвигаем фигуру, если не хотим остаться на этой же клетке
         if self.way_patrol[self.pos_patrol] != self.cell:
@@ -327,6 +335,10 @@ class EnemyPiece(Piece):
             target = self.choice_enemy(enemies_in_range)
             if not target is None:
                 self.cast_spell(self.spell_list[1], target.cell)
+            else:
+                #не делаем ничего
+                self.AP = 0
+                pass
 
         # если ни одна из способностей не может быть использована
         else:
@@ -338,8 +350,15 @@ class EnemyPiece(Piece):
                 desirable_position = self.get_desirable_position(self.spell_list[1], target.cell)
                 if not desirable_position is None:
                     print('Враг движется к цели')
-                    self.go_to_position(
-                        desirable_position)  # передвигает фигуру на позицию или максимально близко к ней
+                    self.go_to_position(desirable_position)  # передвигает фигуру на позицию или максимально близко к ней
+                else:
+                    #не делаем ничего
+                    self.AP = 0
+                    pass
+            else:
+                #не делаем ничего
+                self.AP = 0
+                pass
 
     def new_turn(self) -> None:
 

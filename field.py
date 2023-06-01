@@ -741,7 +741,7 @@ class Field:
         :return: Список клеток, составляющих кратчайший маршрут между начальной и конечной клетками.
         """
 
-        # храним индекс рассматриваемого элемента, симулируя очередьf
+        # храним индекс рассматриваемого элемента, симулируя очередь
         # и саму очередь, в которой храним клетку от которой параллельно идём
         # и ещё один массив, чтобы узнавать длину и при этом спокойно узнавать, были ли мы уже в этой клетке
         # и массив со ссылкой на обратную клетку пришли для восстановления пути
@@ -782,7 +782,7 @@ class Field:
             if (not (moves[i][0] - 1, moves[i][1]) in moves
                     and self.is_into_map(moves[i][0] - 1, moves[i][1])
                     and not self.is_barrier(moves[i][0] - 1, moves[i][1])
-                    and (self.get_square_by_pos(moves[i][0] + 1, moves[i][1]).inner_piece is None or not piece_is_barrier)):
+                    and (self.get_square_by_pos(moves[i][0] - 1, moves[i][1]).inner_piece is None or not piece_is_barrier)):
                 moves.append((moves[i][0] - 1, moves[i][1]))
                 len_way.append(len_way[i] + 1)
                 preview_cell.append(i)
@@ -790,7 +790,7 @@ class Field:
             if (not (moves[i][0], moves[i][1] + 1) in moves
                     and self.is_into_map(moves[i][0], moves[i][1] + 1)
                     and not self.is_barrier(moves[i][0], moves[i][1] + 1)
-                    and (self.get_square_by_pos(moves[i][0] + 1, moves[i][1]).inner_piece is None or not piece_is_barrier)):
+                    and (self.get_square_by_pos(moves[i][0], moves[i][1] + 1).inner_piece is None or not piece_is_barrier)):
                 moves.append((moves[i][0], moves[i][1] + 1))
                 len_way.append(len_way[i] + 1)
                 preview_cell.append(i)
@@ -798,7 +798,7 @@ class Field:
             if (not (moves[i][0], moves[i][1] - 1) in moves
                     and self.is_into_map(moves[i][0], moves[i][1] - 1)
                     and not self.is_barrier(moves[i][0], moves[i][1] - 1)
-                    and (self.get_square_by_pos(moves[i][0] + 1, moves[i][1]).inner_piece is None or not piece_is_barrier)):
+                    and (self.get_square_by_pos(moves[i][0], moves[i][1] - 1).inner_piece is None or not piece_is_barrier)):
                 moves.append((moves[i][0], moves[i][1] - 1))
                 len_way.append(len_way[i] + 1)
                 preview_cell.append(i)
