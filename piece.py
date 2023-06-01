@@ -307,7 +307,7 @@ class Piece:
         self.AP -= spell.cost
         if self.AP < 0:
             self.AP = 0
-        if self.AP == 0:
+        if self.AP == 0 and not 0 in [spell.cost for spell in self.spell_list]:
             self.active_turn = False
 
 class Pawn(Piece):
@@ -412,3 +412,30 @@ class Queen(Piece):
         #QueenUtility
         if self.accuracy != 1:
             self.accuracy = 1
+
+
+class King(Piece):
+
+    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+        self.create_spell_list()
+
+    def create_spell_list(self) -> None:
+        
+        """
+        Функция добавляет объекты класса Spell в piece.spell_list
+        """
+
+        #Отнимаем движение
+        self.spell_list = []
+
+        #У короля пока пусто
+
+    def update_spell_list(self) -> None:
+
+        """
+        Функция заного создаёт список способностей
+        У короля отличается обработака
+        """
+
+        self.create_spell_list()
