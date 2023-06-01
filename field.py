@@ -773,32 +773,28 @@ class Field:
 
             if (not (moves[i][0] + 1, moves[i][1]) in moves  # ещё не посетили
                     and self.is_into_map(moves[i][0] + 1, moves[i][1])  # в пределах поля
-                    and not self.is_barrier(moves[i][0] + 1, moves[i][1])  # можно пройти
-                    and self.get_square_by_pos(moves[i][0] + 1, moves[i][1]).inner_piece is None):  # нет фигуры
+                    and not self.is_barrier(moves[i][0] + 1, moves[i][1])):  # можно пройти
                 moves.append((moves[i][0] + 1, moves[i][1]))
                 len_way.append(len_way[i] + 1)
                 preview_cell.append(i)
 
             if (not (moves[i][0] - 1, moves[i][1]) in moves
                     and self.is_into_map(moves[i][0] - 1, moves[i][1])
-                    and not self.is_barrier(moves[i][0] - 1, moves[i][1])
-                    and self.get_square_by_pos(moves[i][0] - 1, moves[i][1]).inner_piece is None):
+                    and not self.is_barrier(moves[i][0] - 1, moves[i][1])):
                 moves.append((moves[i][0] - 1, moves[i][1]))
                 len_way.append(len_way[i] + 1)
                 preview_cell.append(i)
 
             if (not (moves[i][0], moves[i][1] + 1) in moves
                     and self.is_into_map(moves[i][0], moves[i][1] + 1)
-                    and not self.is_barrier(moves[i][0], moves[i][1] + 1)
-                    and self.get_square_by_pos(moves[i][0], moves[i][1] + 1).inner_piece is None):
+                    and not self.is_barrier(moves[i][0], moves[i][1] + 1)):
                 moves.append((moves[i][0], moves[i][1] + 1))
                 len_way.append(len_way[i] + 1)
                 preview_cell.append(i)
 
             if (not (moves[i][0], moves[i][1] - 1) in moves
                     and self.is_into_map(moves[i][0], moves[i][1] - 1)
-                    and not self.is_barrier(moves[i][0], moves[i][1] - 1)
-                    and self.get_square_by_pos(moves[i][0], moves[i][1] - 1).inner_piece is None):
+                    and not self.is_barrier(moves[i][0], moves[i][1] - 1)):
                 moves.append((moves[i][0], moves[i][1] - 1))
                 len_way.append(len_way[i] + 1)
                 preview_cell.append(i)
