@@ -32,6 +32,9 @@ class Game:
         self.player_pieces: list[Piece] = []
         self.computer_pieces: list[Piece] = []
 
+        # Свойство для хранения вражеского короля
+        self.computer_king: tp.Union[Piece, None] = None
+
     def clear_activated_squares(self):
         """
         Функция для очистки клеток, ранее выбранных для того или иного действия.
@@ -100,7 +103,29 @@ class Game:
             if piece.hp <= 0:
                 self.computer_pieces.remove(piece)
 
+    def get_game_status(self) -> str:
+        """
+        Функция для выведения состояния игры.
 
+        :return: Строка с текущим статусом игры:
+        win - победа игрока, lose - поражение игрока, continue - игра всё ещё идёт.
+        """
+
+        # Если у игрока не осталось фигур, возвращаем "lose"
+        if len(self.player_pieces) == 0:
+            return "lose"
+
+        # Если у компьютера не осталось фигур, возвращаем "win"
+        if len(self.computer_pieces) == 0:
+            return "win"
+
+        # Если у противника есть король и он уничтожен, возвращаем "win"
+        if self.computer_king is not None:
+            if self.computer_king.hp <= 0:
+                return "win"
+
+        # Иначе возвращаем "continue"
+        return "continue"
 
 
 

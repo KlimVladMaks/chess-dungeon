@@ -290,12 +290,8 @@ class Square(SquareTemplate):
             # Если на клетке стоит чёрная пешка
             elif type(self.inner_piece).__name__ == "EnemyPawn":
 
-                # Если клетка выбрана
-                if self.is_selected:
-                    self.image = pg.image.load("design/pieces/selected_pawn.png")
-
                 # Если клетка активирована
-                elif self.is_activated:
+                if self.is_activated:
                     self.image = pg.image.load("design/pieces/attacked_black_pawn.png")
 
                 # Иначе
@@ -307,7 +303,7 @@ class Square(SquareTemplate):
 
                 # Если клетка активирована
                 if self.is_activated:
-                    self.image = pg.image.load("design/pieces/black_king.png")
+                    self.image = pg.image.load("design/pieces/attacked_black_king.png")
 
                 # Иначе
                 else:

@@ -112,6 +112,9 @@ def main() -> None:
     game.player_pieces = [piece_1, piece_2, piece_3, piece_4]
     game.computer_pieces = [enemy_1, enemy_2, enemy_3, enemy_4]
 
+    # Сохраняем вражеского короля
+    game.computer_king = enemy_4
+
     # Тест расположения фигуры - КОНЕЦ
 
     # Отрисовываем игровое поле
@@ -145,6 +148,9 @@ def main() -> None:
                 for piece in game.computer_pieces:
                     piece.new_turn()
 
+                # Удаляем уничтоженные фигуры из соответсвующий списков
+                game.del_destroyed_pieces()
+
                 # Закрываем интерфейс (если он вдруг открыт)
                 interface.close()
 
@@ -154,6 +160,15 @@ def main() -> None:
 
                 # Обновляем поле
                 field.update()
+
+                # Проверяем игру на завершение и при необходимости выводим финальную заставку
+                match game.get_game_status():
+                    case "lose":
+                        set_final_screensaver(screen, False)
+                        return
+                    case "win":
+                        set_final_screensaver(screen, True)
+                        return
 
             # Если нажата левая клавиша мыши
             elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
@@ -202,6 +217,15 @@ def main() -> None:
 
                         # Удаляем фигуру из соответствующего списка, если она была уничтожена
                         game.del_destroyed_pieces()
+
+                        # Проверяем игру на завершение и при необходимости выводим финальную заставку
+                        match game.get_game_status():
+                            case "lose":
+                                set_final_screensaver(screen, False)
+                                return
+                            case "win":
+                                set_final_screensaver(screen, True)
+                                return
 
                         # Активируем клетку, на которой теперь стоит фигура
                         game.selected_piece.cell.select()
@@ -295,6 +319,42 @@ def main() -> None:
             elif e.type == pg.MOUSEBUTTONUP and e.button == 3:
                 field.is_moving = False
                 field.skip_first_move = False
+
+
+def set_final_screensaver(screen: pg.Surface, is_player_win: bool) -> None:
+    """
+    Функция для установки финальной заставки игры.
+
+    :param screen: Экран игры.
+    :param is_player_win: Флаг, показывающий, выиграл ли игрок.
+    """
+
+    # Часы для регулировки FPS
+    clock = pg.time.Clock()
+
+    # Выбираем заставку экрана в зависимости от результата игры
+    if is_player_win:
+        screensaver = pg.image.load("design/screensaver/win_screen.png")
+    else:
+        screensaver = pg.image.load("design/screensaver/lose_screen.png")
+
+    # Устанавливаем финальную заставку на экран игры
+    screen.blit(screensaver, (0, 0))
+    pg.display.update()
+
+    # Запускаем бесконечный цикл
+    while True:
+
+        # Регулируем FPS
+        clock.tick(FPS)
+
+        # Перебираем возникшие игровые события
+        for e in pg.event.get():
+
+            # При закрытии игрового окна завершаем программу
+            if e.type == pg.QUIT:
+                pg.quit()
+                return
 
 
 # Запускаем Main-функцию
