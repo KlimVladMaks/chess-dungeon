@@ -254,7 +254,7 @@ class PawnAttack2_Move(Spell):
         for cell_coor in potential:
             x, y = cell_coor[0], cell_coor[1]
             cell = self.field.get_square_by_pos(y, x)
-            if not cell is None and not self.field.get_way(self.cell, cell) is None:
+            if not cell is None and not self.field.get_way(self.cell, cell, piece_is_barrier=True) is None:
                 if PawnAttack2_Attack().target(self, host_cell = cell):
                     target_list.append(cell)
 
@@ -602,7 +602,7 @@ class KnightAttack1_Move(Spell):
 
         #только клетки откуда можно использовать вторую часть способности
         for cell in potential:
-            if not cell is None and not self.field.get_way(self.cell, cell) is None:
+            if not cell is None and not self.field.get_way(self.cell, cell, piece_is_barrier=True) is None:
                 if KnightAttack1_Attack().target(self, host_cell = cell):
                     target_list.append(cell)
 
@@ -706,7 +706,7 @@ class KnightAttack2(Spell):
 
         #ступать можно куда угодно
         for cell in potential:
-            if not cell is None and not self.field.get_way(self.cell, cell) is None:
+            if not cell is None and not self.field.get_way(self.cell, cell, piece_is_barrier=True) is None:
                 target_list.append(cell)
 
         return target_list
@@ -763,7 +763,7 @@ class KnightUtility(Spell):
 
         #только клетки, рядом с коими есть враг
         for cell in potential:
-            if not cell is None and not self.field.get_way(self.cell, cell) is None:
+            if not cell is None and not self.field.get_way(self.cell, cell, piece_is_barrier=True) is None:
                 if spell.give_enemies_in_area(self, cell):
                     target_list.append(cell)
 
