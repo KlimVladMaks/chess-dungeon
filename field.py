@@ -302,6 +302,17 @@ class Square(SquareTemplate):
                 else:
                     self.image = pg.image.load("design/pieces/black_pawn.png")
 
+            # Если на клетке стоит чёрный король
+            elif type(self.inner_piece).__name__ == "EnemyKing":
+
+                # Если клетка активирована
+                if self.is_activated:
+                    self.image = pg.image.load("design/pieces/black_king.png")
+
+                # Иначе
+                else:
+                    self.image = pg.image.load("design/pieces/black_king.png")
+
     def increase_size(self) -> None:
         """
         Функция для увеличения размера шахматной клетки на стандартную величину.

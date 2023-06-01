@@ -78,6 +78,8 @@ class Button(pg.sprite.Sprite):
                 self.image = pg.image.load("design/interface/lunge_move_button.png")
             elif self.spell.id == "lunge_attack":
                 self.image = pg.image.load("design/interface/lunge_attack_button.png")
+            elif self.spell.id == "just_pawn":
+                self.image = pg.image.load("design/interface/just_pawn_button.png")
 
         # Иначе
         else:
@@ -88,9 +90,11 @@ class Button(pg.sprite.Sprite):
             elif self.spell.id == "attack":
                 self.image = pg.image.load("design/interface/off_attack_button.png")
             elif self.spell.id == "lunge_move":
-                self.image = pg.image.load("design/interface/lunge_move_button.png")
+                self.image = pg.image.load("design/interface/off_lunge_move_button.png")
             elif self.spell.id == "lunge_attack":
-                self.image = pg.image.load("design/interface/lunge_attack_button.png")
+                self.image = pg.image.load("design/interface/off_lunge_attack_button.png")
+            elif self.spell.id == "just_pawn":
+                self.image = pg.image.load("design/interface/off_just_pawn_button.png")
 
 
 class Interface(pg.sprite.Sprite):
