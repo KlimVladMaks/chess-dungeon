@@ -93,7 +93,7 @@ def main() -> None:
 
     enemy_1 = EnemyPawn('Shodan', field, field.get_square_by_pos(15, 17), 10, 0.5, 1, 3, 3, 5)
     enemy_1.set_way_patrol(field.get_square_by_pos(8, 6))
-    enemy_2 = King('Shodan', field, field.get_square_by_pos(15, 18), 10, 0.5, 1, 3, 3, 5)
+    enemy_2 = EnemyKing('Shodan', field, field.get_square_by_pos(15, 18), 10, 0.5, 1, 3, 3, 5)
 
     enemy_1.cell.add_inner_piece(enemy_1)
     enemy_2.cell.add_inner_piece(enemy_2)
