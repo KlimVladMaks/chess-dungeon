@@ -263,6 +263,9 @@ def main() -> None:
                         # Совершаем выбранное действие
                         game.selected_piece.cast_spell(game.selected_spell, square_clicked)
 
+                        # Удаляем фигуру из соответствующего списка, если она была уничтожена
+                        game.del_destroyed_pieces()
+
                         # Активируем клетку, на которой теперь стоит фигура
                         game.selected_piece.cell.select()
 
