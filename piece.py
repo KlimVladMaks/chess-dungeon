@@ -41,11 +41,12 @@ class Piece:
         self.accuracy = accuracy
         self.min_damage = min_damage
         self.max_damage = max_damage
-        self.spell_list = [Piece_Move()]
-        self.effect_list = []
-        self.active_turn = True
-        self.AP = 2
-        self.shield = 0
+
+        self.spell_list: list[Spell] = [Piece_Move()]
+        self.effect_list: list[Effect] = []
+        self.active_turn: bool = True
+        self.AP: int = 2
+        self.shield: int = 0
 
     def get_fovs(self, cell = None, opaque_piece = False) -> list["Square"]:
         """
@@ -261,6 +262,7 @@ class Piece:
     def destroy(self):
         self.cell.del_inner_piece()
         print("Фигура рассыпалась в каменную крошку!")
+        print(f"ХП фигуры = {self.hp} | положение = {self.field.get_pos_by_square(self.cell)}, пешка {self}")
 
     def new_turn(self) -> None:
 

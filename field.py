@@ -255,7 +255,7 @@ class Square(SquareTemplate):
         if self.is_occupied:
 
             # Если на клетке стоит белая пешка
-            if type(self.inner_piece).__name__ == "Pawn":
+            if self.inner_piece.team == "Glados":
 
                 # Если фигура имеет ОД (может совершать действия)
                 if self.inner_piece.active_turn:
@@ -288,7 +288,7 @@ class Square(SquareTemplate):
                         self.image = pg.image.load("design/pieces/off_pawn.png")
 
             # Если на клетке стоит чёрная пешка
-            elif type(self.inner_piece).__name__ == "EnemyPawn":
+            elif self.inner_piece.team == "Shodan" and type(self.inner_piece).__name__ == "EnemyPawn":
 
                 # Если клетка активирована
                 if self.is_activated:

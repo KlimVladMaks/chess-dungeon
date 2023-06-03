@@ -112,7 +112,7 @@ class Game:
         """
 
         # Если у игрока не осталось фигур, возвращаем "lose"
-        if len(self.player_pieces) == 0:
+        if len(self.player_pieces) == 0 and False:
             return "lose"
 
         # Если у компьютера не осталось фигур, возвращаем "win"
