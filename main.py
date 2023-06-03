@@ -140,9 +140,17 @@ def main() -> None:
                 # Завершаем текущий игровой такт
                 game.finish_game_tact()
 
+                # TODO: Перенести механизм удаления уничтоженных фигур в класс Piece
+
+                # Удаляем уничтоженные фигуры из соответсвующий списков
+                game.del_destroyed_pieces()
+
                 # Делаем новый ход для каждой фигуры игрока
                 for piece in game.player_pieces:
                     piece.new_turn()
+
+                # Удаляем уничтоженные фигуры из соответсвующий списков
+                game.del_destroyed_pieces()
 
                 # Делаем новый ход для каждой фигуры компьютера
                 for piece in game.computer_pieces:
