@@ -1,4 +1,10 @@
+"""
+fix me
+get_potential_positions должна быть изменена вместе с spell.zone
+"""
+
 from piece import *
+from time import sleep
 import random
 
 import typing as tp
@@ -32,9 +38,6 @@ class EnemyPiece(Piece):
 
         self.way_patrol = way
 
-        for c in way:
-            print(c.get_pos(), end=' ')
-        print()
 
     def is_see_player_piece(self, cell: "Square") -> bool:
 
@@ -54,47 +57,22 @@ class EnemyPiece(Piece):
                 return True
 
         return False
-
-    def get_enemies_in_range(self, spell: Spell, host_cell: "Square" = None) -> list[Piece]:
-
-        """
-        Возвращает клетки с противниками в зоне действия способности
-        :spell: заклинание для которого определяются враги в зоне
-        :host_cell: исходная клетка, по умолчанию - собственная клетка фигуры
-        :return: лист потенциальных целей (может быть пуст)
-        """
-
-        print('Враг определяет, может ли он кого атаковать')
-
-        if host_cell is None:
-            host_cell = self.cell
-
-        # получаем обзор от данной клетки
-        range = spell.target(self)
-        enemies_in_range = []
-
-        # просматриваем все клетки в области атаки на наличие фигур игрока
-        for cell in range:
-            if isinstance(cell.inner_piece, Piece) and cell.inner_piece.team != self.team:
-                enemies_in_range.append(cell.inner_piece)
-
-        return enemies_in_range
-
-    def choice_enemy(self, enemies: list[Piece]) -> tp.Union[Piece, None]:
+    
+    def choice_square(self, squares: list[Piece], spell: Spell) -> tp.Union[Piece, None]:
 
         """
-        Функция выбирает предпочитаемого противника исходя из системы приоритетов, учитывающей несколько параметров
+        Функция выбирает предпочитаемую клетку для использования способности
         На данном этапе выбор делается рандомно
         """
 
-        print('Враг определяет, кого он может атаковать')
+        print(f'Враг определяет, на кого он может использовать {spell.name}')
 
-        if not enemies:
+        if not squares:
             return None
 
-        return random.choice(enemies)
+        return random.choice(squares)
 
-    def get_nearest_enemy(self) -> tp.Union[Piece, None]:
+    def get_nearest_enemy(self) -> tp.Union["Square", None]:
 
         """
         Функция использует тот же алгоритм, что и функции field.get_way() и piece.get_movies()
@@ -131,7 +109,7 @@ class EnemyPiece(Piece):
                     moves.append((moves[i][0] + 1, moves[i][1]))
                 # если видим фигуру игрока, то отмечаем как ближающую
                 elif isinstance(this_cell.inner_piece, Piece) and this_cell.inner_piece.team != self.team:
-                    nearest_enemy = this_cell.inner_piece
+                    nearest_enemy = this_cell
                     break
 
             if (not (moves[i][0] - 1, moves[i][1]) in moves
@@ -141,7 +119,7 @@ class EnemyPiece(Piece):
                 if this_cell.inner_piece is None:
                     moves.append((moves[i][0] - 1, moves[i][1]))
                 elif isinstance(this_cell.inner_piece, Piece) and this_cell.inner_piece.team != self.team:
-                    nearest_enemy = this_cell.inner_piece
+                    nearest_enemy = this_cell
                     break
 
             if (not (moves[i][0], moves[i][1] + 1) in moves
@@ -151,7 +129,7 @@ class EnemyPiece(Piece):
                 if this_cell.inner_piece is None:
                     moves.append((moves[i][0], moves[i][1] + 1))
                 elif isinstance(this_cell.inner_piece, Piece) and this_cell.inner_piece.team != self.team:
-                    nearest_enemy = this_cell.inner_piece
+                    nearest_enemy = this_cell
                     break
 
             if (not (moves[i][0], moves[i][1] - 1) in moves
@@ -161,7 +139,7 @@ class EnemyPiece(Piece):
                 if this_cell.inner_piece is None:
                     moves.append((moves[i][0], moves[i][1] - 1))
                 elif isinstance(this_cell.inner_piece, Piece) and this_cell.inner_piece.team != self.team:
-                    nearest_enemy = this_cell.inner_piece
+                    nearest_enemy = this_cell
                     break
 
             # переходим к следующему элементу
@@ -180,11 +158,7 @@ class EnemyPiece(Piece):
         if not potential_positions:
             return None
 
-        print('Враг думает, куда идти для атаки')
-        print('Потенциальные позиции:')
-        for c in potential_positions:
-            print(c.get_pos(), end=' ')
-        print()
+        print(f'Враг думает, куда идти для использования способности {spell.name}')
 
         # опять обход в ширину со своими условиями
 
@@ -263,7 +237,6 @@ class EnemyPiece(Piece):
         """
 
         potential = spell.zone(self, host_cell=target)
-        print(potential)
         potential_positions = []
 
         for cell in potential:
@@ -282,12 +255,35 @@ class EnemyPiece(Piece):
         Или не сдвинет вовсе
         """
 
-        way = self.field.get_way(self.cell, pos)
+        way = self.field.get_way(self.cell, pos, piece_is_barrier=True)
 
         if len(way) <= self.radius_move + 1:
             self.cast_spell(self.spell_list[0], pos)
         else:
             self.cast_spell(self.spell_list[0], way[self.radius_move])
+
+    def try_cast_spell(self, spell: Spell) -> bool:
+
+        """
+        Функция пытается использовать способность и
+        :return: В случае успеха - True, провала - False
+        """
+
+        square_for_cast = spell.target(self)
+
+        if square_for_cast:
+            print(f'Враг обнаружил цель в зоне способности {spell.name}')
+            target = self.choice_square(square_for_cast, spell)
+            if not target is None:
+                self.cast_spell(spell, target)
+                return True
+            else:
+                #не делаем ничего
+                print(f'Вражеская фигура неопределилась с выбором цели и пропустила ход')
+                self.AP = 0
+        
+        return False
+
 
     def patrol_step(self) -> None:
 
@@ -305,6 +301,11 @@ class EnemyPiece(Piece):
 
             #Если дорога загорожена, то ждём (если мы не на исходной клекте)
             if not self.way_patrol[pos].inner_piece is None and i != 0:
+                print('!')
+                #И откатываем позицию
+                pos -= 1
+                if pos < 0:
+                    pos = len(self.way_patrol) - 1
                 self.AP = 0
                 break
 
@@ -326,43 +327,10 @@ class EnemyPiece(Piece):
 
         """
         Поведение при обнаружении фигур игрока
-        Реализовано только для одной способности
+        Определяется отдельно для каждой фигуры
         """
 
-        # опеределяется по очереди в приоритете способностей
-        enemies_in_range = self.get_enemies_in_range(self.spell_list[1])
-        if enemies_in_range:
-            print('Враг обнаружил цель в зоне атаки')
-            target = self.choice_enemy(enemies_in_range)
-            if not target is None:
-                if self.hp > 3:
-                    self.cast_spell(self.spell_list[1], target.cell)
-                else:
-                    self.cast_spell(self.spell_list[3], target.cell)
-            else:
-                #не делаем ничего
-                self.AP = 0
-                pass
-
-        # если ни одна из способностей не может быть использована
-        else:
-            # определяет потенциальную цель
-            target = self.get_nearest_enemy()
-            print('Враг определил ближайшую цель')
-            if not target is None:
-                # далее блок для каждой способности
-                desirable_position = self.get_desirable_position(self.spell_list[1], target.cell)
-                if not desirable_position is None:
-                    print('Враг движется к цели')
-                    self.go_to_position(desirable_position)  # передвигает фигуру на позицию или максимально близко к ней
-                else:
-                    #не делаем ничего
-                    self.AP = 0
-                    pass
-            else:
-                #не делаем ничего
-                self.AP = 0
-                pass
+        pass
 
     def new_turn(self) -> None:
 
@@ -370,25 +338,135 @@ class EnemyPiece(Piece):
         Функция дополняет действия фигуры при начале нового хода
         """
 
-        print('Новый ход')
+        print()
+        print('Новый ход', f"ХП фигуры = {self.hp} | положение = {self.field.get_pos_by_square(self.cell)}, пешка {self}")
 
         super().new_turn()
 
         while self.AP > 0:
 
             if self.action == 'patrol':
-                print('Новый ход', self.action)
+                print('Поведение:', self.action)
                 self.patrol_step()
 
             elif self.action == 'attack':
-                print('Новый ход', self.action)
+                print('Поведение:', self.action)
                 self.alarm()
+
+            #Пока нет анимации
+            sleep(0.2)
+            self.field.update()
 
 
 class EnemyPawn(EnemyPiece, Pawn):
 
     def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
         super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+
+    def alarm(self):
+
+        """
+        Поведение при обнаружении фигур игрока пешкой
+        self.spell_list[0] - PieceMove()
+        self.spell_list[1] - PawnAttack1()
+        self.spell_list[2] - PawnAttack2_Attack() / PawnAttack2_Move()
+        self.spell_list[3] - PawnUtility()
+        """
+
+        #Переменная для отследивания было ли совершено действие
+        is_cast = False
+
+        #Пытаемся использовать ульту!
+        spell = self.spell_list[3]
+
+        if spell.cooldown_now == 0 and self.hp <= 3:   
+            is_cast = self.try_cast_spell(spell)
+
+        #Завершаем действие, если способность использована
+        if is_cast:
+            return
+
+
+        #Если способность не использовали, то пробуем обычную атаку
+        spell = self.spell_list[1]
+
+        if spell.cooldown_now == 0:   
+            is_cast = self.try_cast_spell(spell)
+
+        #Завершаем действие, если способность использована
+        if is_cast:
+            return
+
+
+        #Если мы всё ещё в функции, то пробуем атаку с рывка
+        spell = self.spell_list[2]
+        if spell.cooldown_now == 0:   
+            is_cast = self.try_cast_spell(spell)
+        
+        #После рывка атакуем
+        if is_cast:
+            spell = self.spell_list[2]
+            is_cast = self.try_cast_spell(spell)
+            if is_cast:
+                return
+
+        #если ни одна из способностей не может быть использована
+
+        #то пробуем подойти для использования рывка
+
+        #Идём к ближнему противнику
+        target = self.get_nearest_enemy()
+        print('Враг определил ближайшую цель')
+
+        #Коль он найден, то
+        if not target is None:
+            
+            if (self.spell_list[2].cooldown_now == 1 and self.AP <= 1) or (self.spell_list[2].cooldown_now == 0):
+                #Пытаемся идти для рывка
+                #Для обработки рывков немного инверсируем
+                #Сначала ищем клетку из которой можно атаковать
+                spell = PawnAttack2_Move()
+                desirable_position = self.get_desirable_position(spell, target)
+                if not desirable_position is None:
+                    #Потом откуда к ней можно перейти
+                    spell = PawnAttack2_Attack()
+                    desirable_position = self.get_desirable_position(spell, desirable_position)
+
+                if not desirable_position is None:
+                    print('Враг движется к цели')
+                    #передвигает фигуру на позицию или максимально близко к ней
+                    self.go_to_position(desirable_position)
+                    return
+            
+                else:
+                    #не делаем ничего
+                    print(f"Враг не может найти позицию для использования {spell.name}")
+                    self.AP = 0
+                    pass
+            
+            #Теперь ищем позицию для Атаки (или ульты, так как у них одинаковые зоны)
+            spell = self.spell_list[1]
+            if spell.cooldown_now <= 1:
+                desirable_position = self.get_desirable_position(spell, target)
+
+                if not desirable_position is None:
+                    print('Враг движется к цели')
+                    #передвигает фигуру на позицию или максимально близко к ней
+                    self.go_to_position(desirable_position)
+                    return
+            
+                else:
+                    #не делаем ничего
+                    print(f"Враг не может найти позицию для использования {spell.name}")
+                    self.AP = 0
+                    pass
+
+
+        else:
+            #не делаем ничего
+            print(f"Ближайщей цели нет, враг бездействует")
+            self.AP = 0
+            pass
 
 class EnemyKing(King):
     def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
