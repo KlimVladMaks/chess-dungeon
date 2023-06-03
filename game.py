@@ -29,6 +29,9 @@ class Game:
         # Свойство для хранения выбранного действия
         self.selected_spell: tp.Union[Spell, None] = None
 
+        # Словарь для хранения команд фигур
+        self.pieces_teams: dict[str, list[Piece]] = {}
+
         # Списки для хранения фигур игрока и фигур компьютера
         self.player_pieces: list[Piece] = []
         self.computer_pieces: list[Piece] = []

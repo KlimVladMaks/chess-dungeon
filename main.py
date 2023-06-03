@@ -112,6 +112,10 @@ def main() -> None:
     game.player_pieces = [piece_1, piece_2, piece_3, piece_4]
     game.computer_pieces = [enemy_1, enemy_2, enemy_3, enemy_4]
 
+    # Формируем словарь с командами фигур
+    game.pieces_teams[game.player_pieces[0].team] = game.player_pieces
+    game.pieces_teams[game.computer_pieces[0].team] = game.computer_pieces
+
     # Сохраняем вражеского короля
     game.computer_king = enemy_4
 
