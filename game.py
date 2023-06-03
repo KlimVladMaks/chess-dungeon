@@ -36,7 +36,7 @@ class Game:
         # Свойство для хранения вражеского короля
         self.computer_king: tp.Union[Piece, None] = None
 
-    def clear_activated_squares(self):
+    def clear_activated_squares(self) -> None:
         """
         Функция для очистки клеток, ранее выбранных для того или иного действия.
         """
@@ -52,7 +52,7 @@ class Game:
                 cell.change_regime()
         self.field.update()
 
-    def toggle_action_mode(self, spell: 'Spell'):
+    def toggle_action_mode(self, spell: 'Spell') -> None:
         """
         Функция для включения/выключения режима заданного действия.
 
@@ -73,7 +73,7 @@ class Game:
         else:
             self.selected_spell = None
 
-    def finish_game_tact(self):
+    def finish_game_tact(self) -> None:
         """
         Функция для завершения игрового такта (очистка активированных клеток, снятие выбранных действий и фигур и т.д.).
         """
@@ -89,7 +89,7 @@ class Game:
         self.selected_piece = None
         self.selected_spell = None
 
-    def del_destroyed_pieces(self):
+    def del_destroyed_pieces(self) -> None:
         """
         Функция для удаления всех уничтоженных фигур из соответствующего списка.
         """
@@ -103,6 +103,25 @@ class Game:
         for piece in self.computer_pieces:
             if piece.hp <= 0:
                 self.computer_pieces.remove(piece)
+
+    def del_piece(self, piece: 'Piece') -> None:
+        """
+        Функция для удаления фигуры из соответствующего списка.
+
+        :param piece: Фигура, которую нужно удалить.
+        """
+
+        # Перебираем все фигуры игрока и если там есть совпадающая с заданной, то удаляем её
+        for player_piece in self.player_pieces:
+            if player_piece == piece:
+                self.player_pieces.remove(player_piece)
+                return
+
+        # Перебираем все фигуры компьютера и если там есть совпадающая с заданной, то удаляем её
+        for computer_piece in self.computer_pieces:
+            if computer_piece == piece:
+                self.computer_pieces.remove(computer_piece)
+                return
 
     def get_game_status(self) -> str:
         """
