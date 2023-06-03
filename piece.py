@@ -1,9 +1,9 @@
 import typing as tp
 from spell import *
-from effect import *
 
 if tp.TYPE_CHECKING:
     from field import Square, Field
+    from game import Game
 
 
 class Piece:
@@ -12,7 +12,7 @@ class Piece:
     Класс для шаблона Фигуры.
     """
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
 
         """
         :team: команда фигуры
@@ -33,6 +33,7 @@ class Piece:
 
         self.team = team
         self.cell = cell
+        self.game = game
         self.field = field
         self.radius_fov = radius_fov
         self.radius_move = radius_move
@@ -105,7 +106,7 @@ class Piece:
             else:
                 y += 1
 
-        foving_cell = []
+        foving_cell = [self.cell]
         for pos in list(fovs):
             cell = self.field.get_square_by_pos(pos[0], pos[1])
             if cell != self.cell:
@@ -260,6 +261,7 @@ class Piece:
 
     def destroy(self):
         self.cell.del_inner_piece()
+        self.game.del_piece(self)
         print("Фигура рассыпалась в каменную крошку!")
 
     def new_turn(self) -> None:
@@ -316,9 +318,9 @@ class Pawn(Piece):
     Класс пешки
     """
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
         #инициируем фигуру
-        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         #собираем спелы специальной функцией
         self.create_spell_list()
 
@@ -339,8 +341,8 @@ class Bishop(Piece):
     Класс слона
     """
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         self.create_spell_list()
 
     def create_spell_list(self) -> None:
@@ -356,8 +358,8 @@ class Bishop(Piece):
 
 class Knight(Piece):
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         self.create_spell_list()
 
     def create_spell_list(self) -> None:
@@ -371,11 +373,14 @@ class Knight(Piece):
         self.spell_list.append(KnightAttack2())
         self.spell_list.append(KnightUtility())
 
+    def get_fovs_all(self):
+        print(self.game.get_overview_for_player_pieces())
+
 
 class Rook(Piece):
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         self.create_spell_list()
 
     def create_spell_list(self) -> None:
@@ -391,8 +396,8 @@ class Rook(Piece):
 
 class Queen(Piece):
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         self.create_spell_list()
 
     def create_spell_list(self) -> None:
@@ -408,16 +413,14 @@ class Queen(Piece):
     def new_turn(self) -> None:
 
         super().new_turn()
-        
-        #QueenUtility
-        if self.accuracy != 1:
-            self.accuracy = 1
+
+        self.cast_spell(QueenUtility(), self.cell)
 
 
 class King(Piece):
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         self.create_spell_list()
 
     def create_spell_list(self) -> None:
@@ -428,6 +431,8 @@ class King(Piece):
 
         #Отнимаем движение
         self.spell_list = []
+        self.spell_list.append(KingAttack1())
+        self.spell_list.append(KingAttack2())
 
         #У короля пока пусто
 

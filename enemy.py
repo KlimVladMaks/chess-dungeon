@@ -15,8 +15,8 @@ if tp.TYPE_CHECKING:
 
 class EnemyPiece(Piece):
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         self.action = "patrol"
         self.way_patrol = []
         self.pos_patrol = 0
@@ -236,15 +236,7 @@ class EnemyPiece(Piece):
         :target: Цель
         """
 
-        potential = spell.zone(self, host_cell=target)
-        potential_positions = []
-
-        for cell in potential:
-            x, y = cell[0], cell[1]
-            if self.field.is_into_map(y, x):
-                square = self.field.get_square_by_pos(y, x)
-                if square.inner_piece is None and not self.field.is_barrier(y, x):
-                    potential_positions.append(self.field.get_square_by_pos(y, x))
+        potential_positions = spell.zone(self, host_cell=target)
 
         return potential_positions
 
@@ -360,8 +352,8 @@ class EnemyPiece(Piece):
 
 class EnemyPawn(EnemyPiece, Pawn):
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
 
     def alarm(self):
 
@@ -469,5 +461,5 @@ class EnemyPawn(EnemyPiece, Pawn):
             pass
 
 class EnemyKing(King):
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)

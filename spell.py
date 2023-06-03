@@ -2,6 +2,7 @@ import typing as tp
 from random import random, randrange
 from effect import *
 
+
 if tp.TYPE_CHECKING:
     from piece import Piece
     from field import Square
@@ -31,7 +32,7 @@ class Spell:
         self.cooldown_now = 0
         self.cost = cost
 
-    def zone(spell, self: "Piece", host_cell: "Square" = None) -> list[tuple[int, int]]:
+    def zone(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
 
         """
         Воспомогательная функция, возвращающая набор координат потенциальных клеток.
@@ -93,7 +94,6 @@ class Piece_Move(Spell):
         super().__init__('move', "Перемещение", "Переместитесь на клетку в зоне движения", 0, 1)
 
     def target(spell, self: "Piece") -> list[tuple["Square", "Square"]]:
-
 
         """
         Функция возвращает все клетки до которых можно дойти.
@@ -189,8 +189,15 @@ class PawnAttack1(Spell):
 
         y0, x0 = host_cell.get_pos()
         potential = spell.draw_rhomb(1, 1, x0, y0)
+        potential_square = []
 
-        return potential
+        for cell_coor in potential:
+            x, y = cell_coor[0], cell_coor[1]
+            cell = self.field.get_square_by_pos(y, x)
+            if not cell is None:
+                potential_square.append(cell)
+
+        return potential_square
     
     def target(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -203,10 +210,8 @@ class PawnAttack1(Spell):
         target_list = []
             
         #cреди этих клеток можно атаковать только противников
-        for cell_coor in potential:
-            x, y = cell_coor[0], cell_coor[1]
-            cell = self.field.get_square_by_pos(y, x)
-            if not cell is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
+        for cell in potential:
+            if not cell.inner_piece is None and cell.inner_piece.team != self.team:
                  target_list.append(cell)
 
         return target_list
@@ -237,8 +242,15 @@ class PawnAttack2_Move(Spell):
 
         y0, x0 = host_cell.get_pos()
         potential = spell.draw_rhomb(1, 1, x0, y0)
+        potential_square = []
 
-        return potential
+        for cell_coor in potential:
+            x, y = cell_coor[0], cell_coor[1]
+            cell = self.field.get_square_by_pos(y, x)
+            if not cell is None:
+                potential_square.append(cell)
+
+        return potential_square
     
     def target(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -251,10 +263,8 @@ class PawnAttack2_Move(Spell):
         target_list = []
         
         #cреди этих клеток можно шагнуть только в соответсвие с правилом движения и оттуда можно атаковать
-        for cell_coor in potential:
-            x, y = cell_coor[0], cell_coor[1]
-            cell = self.field.get_square_by_pos(y, x)
-            if not cell is None and not self.field.get_way(self.cell, cell, piece_is_barrier=True) is None:
+        for cell in potential:
+            if not self.field.get_way(self.cell, cell, piece_is_barrier=True) is None:
                 if PawnAttack2_Attack().target(self, host_cell = cell):
                     target_list.append(cell)
 
@@ -280,8 +290,15 @@ class PawnAttack2_Attack(Spell):
 
         y0, x0 = host_cell.get_pos()
         potential = spell.draw_rhomb(1, lunge_range, x0, y0)
+        potential_square = []
 
-        return potential
+        for cell_coor in potential:
+            x, y = cell_coor[0], cell_coor[1]
+            cell = self.field.get_square_by_pos(y, x)
+            if not cell is None:
+                potential_square.append(cell)
+
+        return potential_square
     
     def target(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -294,10 +311,8 @@ class PawnAttack2_Attack(Spell):
         target_list = []
             
         #cреди этих клеток можно атаковать только противников
-        for cell_coor in potential:
-            x, y = cell_coor[0], cell_coor[1]
-            cell = self.field.get_square_by_pos(y, x)
-            if not cell is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
+        for cell in potential:
+            if not cell.inner_piece is None and cell.inner_piece.team != self.team:
                  target_list.append(cell)
 
         return target_list
@@ -321,8 +336,15 @@ class PawnUtility(Spell):
 
         y0, x0 = host_cell.get_pos()
         potential = spell.draw_rhomb(1, 1, x0, y0)
+        potential_square = []
 
-        return potential
+        for cell_coor in potential:
+            x, y = cell_coor[0], cell_coor[1]
+            cell = self.field.get_square_by_pos(y, x)
+            if not cell is None:
+                potential_square.append(cell)
+
+        return potential_square
     
     def target(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -335,10 +357,8 @@ class PawnUtility(Spell):
         target_list = []
             
         #cреди этих клеток можно атаковать только противников
-        for cell_coor in potential:
-            x, y = cell_coor[0], cell_coor[1]
-            cell = self.field.get_square_by_pos(y, x)
-            if not cell is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
+        for cell in potential:
+            if not cell.inner_piece is None and cell.inner_piece.team != self.team:
                  target_list.append(cell)
 
         return target_list
@@ -371,17 +391,6 @@ class BishopAttack1(Spell):
         if host_cell is None:
             host_cell = self.cell
 
-        range_shot = 6
-        y0, x0 = host_cell.get_pos()
-        potential = spell.draw_rhomb(1, range_shot, x0, y0)
-
-        return potential
-    
-    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
-
-        if host_cell is None:
-            host_cell = self.cell
-        
         #сохраняем обзор
         radius_fov = self.radius_fov
 
@@ -394,6 +403,15 @@ class BishopAttack1(Spell):
 
         #восстановим обзор
         self.radius_fov = radius_fov
+
+        return potential
+    
+    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+
+        if host_cell is None:
+            host_cell = self.cell
+        
+        potential = spell.zone(self, host_cell = host_cell)
 
         #фильтруем
         target_list = []
@@ -441,17 +459,6 @@ class BishopAttack2(Spell):
         if host_cell is None:
             host_cell = self.cell
 
-        range_shot = 5
-        y0, x0 = host_cell.get_pos()
-        potential = spell.draw_rhomb(1, range_shot, x0, y0)
-
-        return potential
-    
-    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
-
-        if host_cell is None:
-            host_cell = self.cell
-        
         #сохраняем обзор
         radius_fov = self.radius_fov
 
@@ -464,6 +471,15 @@ class BishopAttack2(Spell):
 
         #восстановим обзор
         self.radius_fov = radius_fov
+
+        return potential
+    
+    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+
+        if host_cell is None:
+            host_cell = self.cell
+
+        potential = spell.zone(self, host_cell = host_cell)
 
         #фильтруем
         target_list = []
@@ -513,18 +529,6 @@ class BishopUtility(Spell):
         if host_cell is None:
             host_cell = self.cell
 
-        range_shot = 4
-        y0, x0 = host_cell.get_pos()
-        potential = spell.draw_rhomb(1, range_shot, x0, y0)
-        potential.append(x0, y0)
-
-        return potential
-    
-    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
-
-        if host_cell is None:
-            host_cell = self.cell
-        
         #сохраняем обзор
         radius_fov = self.radius_fov
 
@@ -538,6 +542,12 @@ class BishopUtility(Spell):
 
         #восстановим обзор
         self.radius_fov = radius_fov
+
+        return potential
+    
+    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+
+        potential = spell.zone(self, host_cell = host_cell)
 
         #фильтруем
         target_list = []
@@ -573,17 +583,6 @@ class KnightAttack1_Move(Spell):
         if host_cell is None:
             host_cell = self.cell
 
-        range_move = 5
-        y0, x0 = host_cell.get_pos()
-        potential = spell.draw_rhomb(1, range_move, x0, y0)
-
-        return potential
-    
-    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
-
-        if host_cell is None:
-            host_cell = self.cell
-        
         #сохраняем движение
         radius_move = self.radius_move
 
@@ -596,6 +595,15 @@ class KnightAttack1_Move(Spell):
 
         #восстановим движение
         self.radius_move = radius_move
+
+        return potential
+    
+    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+
+        if host_cell is None:
+            host_cell = self.cell
+        
+        potential = spell.zone(self, host_cell = host_cell)
 
         #фильтруем
         target_list = []
@@ -628,6 +636,15 @@ class KnightAttack1_Attack(Spell):
 
         y0, x0 = host_cell.get_pos()
         potential = spell.draw_rhomb(1, lunge_range, x0, y0)
+        potential_square = []
+
+        for cell_coor in potential:
+            x, y = cell_coor[0], cell_coor[1]
+            cell = self.field.get_square_by_pos(y, x)
+            if not cell is None:
+                potential_square.append(cell)
+
+        return potential_square
 
         return potential
     
@@ -642,9 +659,7 @@ class KnightAttack1_Attack(Spell):
         target_list = []
             
         #cреди этих клеток можно атаковать только противников
-        for cell_coor in potential:
-            x, y = cell_coor[0], cell_coor[1]
-            cell = self.field.get_square_by_pos(y, x)
+        for cell in potential:
             if not cell is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
                  target_list.append(cell)
 
@@ -677,17 +692,6 @@ class KnightAttack2(Spell):
         if host_cell is None:
             host_cell = self.cell
 
-        range_move = 5
-        y0, x0 = host_cell.get_pos()
-        potential = spell.draw_rhomb(1, range_move, x0, y0)
-
-        return potential
-    
-    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
-
-        if host_cell is None:
-            host_cell = self.cell
-        
         #сохраняем движение
         radius_move = self.radius_move
 
@@ -700,6 +704,15 @@ class KnightAttack2(Spell):
 
         #восстановим движение
         self.radius_move = radius_move
+
+        return potential
+    
+    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+
+        if host_cell is None:
+            host_cell = self.cell
+        
+        potential = spell.zone(self, host_cell = host_cell)
 
         #фильтруем
         target_list = []
@@ -734,17 +747,6 @@ class KnightUtility(Spell):
         if host_cell is None:
             host_cell = self.cell
 
-        range_move = 5
-        y0, x0 = host_cell.get_pos()
-        potential = spell.draw_rhomb(1, range_move, x0, y0)
-
-        return potential
-    
-    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
-
-        if host_cell is None:
-            host_cell = self.cell
-        
         #сохраняем движение
         radius_move = self.radius_move
 
@@ -757,6 +759,15 @@ class KnightUtility(Spell):
 
         #восстановим движение
         self.radius_move = radius_move
+
+        return potential
+    
+    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+
+        if host_cell is None:
+            host_cell = self.cell
+        
+        potential = spell.zone(self, host_cell = host_cell)
 
         #фильтруем
         target_list = []
@@ -824,17 +835,6 @@ class RookAttack1(Spell):
         if host_cell is None:
             host_cell = self.cell
 
-        range_ram = 4
-        y0, x0 = host_cell.get_pos()
-        potential = spell.draw_rhomb(1, range_ram, x0, y0)
-
-        return potential
-    
-    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
-
-        if host_cell is None:
-            host_cell = self.cell
-        
         #сохраняем обзор
         radius_fov = self.radius_fov
 
@@ -847,6 +847,15 @@ class RookAttack1(Spell):
 
         #восстановим обзор
         self.radius_fov = radius_fov
+
+        return potential
+    
+    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+
+        if host_cell is None:
+            host_cell = self.cell
+        
+        potential = spell.zone(self, host_cell = host_cell)
 
         #фильтруем
         target_list = []
@@ -905,6 +914,15 @@ class RookAttack2(Spell):
 
         y0, x0 = host_cell.get_pos()
         potential = spell.draw_rhomb(1, 1, x0, y0)
+        potential_square = []
+
+        for cell_coor in potential:
+            x, y = cell_coor[0], cell_coor[1]
+            cell = self.field.get_square_by_pos(y, x)
+            if not cell is None:
+                potential_square.append(cell)
+
+        return potential_square
 
         return potential
     
@@ -951,18 +969,6 @@ class RookUtility(Spell):
         if host_cell is None:
             host_cell = self.cell
 
-        range_shot = 6
-        y0, x0 = host_cell.get_pos()
-        potential = spell.draw_rhomb(1, range_shot, x0, y0)
-        potential.append(x0, y0)
-
-        return potential
-    
-    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
-
-        if host_cell is None:
-            host_cell = self.cell
-        
         #сохраняем обзор
         radius_fov = self.radius_fov
 
@@ -976,6 +982,15 @@ class RookUtility(Spell):
 
         #восстановим обзор
         self.radius_fov = radius_fov
+
+        return potential
+    
+    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+
+        if host_cell is None:
+            host_cell = self.cell
+        
+        potential = spell.zone(self, host_cell = host_cell)
 
         #фильтруем
         target_list = []
@@ -1009,17 +1024,6 @@ class QueenAttack1(Spell):
         if host_cell is None:
             host_cell = self.cell
 
-        range_shot = 6
-        y0, x0 = host_cell.get_pos()
-        potential = spell.draw_rhomb(1, range_shot, x0, y0)
-
-        return potential
-    
-    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
-
-        if host_cell is None:
-            host_cell = self.cell
-        
         #сохраняем обзор
         radius_fov = self.radius_fov
 
@@ -1032,6 +1036,15 @@ class QueenAttack1(Spell):
 
         #восстановим обзор
         self.radius_fov = radius_fov
+
+        return potential
+    
+    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+
+        if host_cell is None:
+            host_cell = self.cell
+        
+        potential = spell.zone(self, host_cell = host_cell)
 
         #фильтруем
         target_list = []
@@ -1070,17 +1083,6 @@ class QueenAttack2(Spell):
         if host_cell is None:
             host_cell = self.cell
 
-        range_ram = 7
-        y0, x0 = host_cell.get_pos()
-        potential = spell.draw_rhomb(1, range_ram, x0, y0)
-
-        return potential
-    
-    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
-
-        if host_cell is None:
-            host_cell = self.cell
-        
         #сохраняем обзор
         radius_fov = self.radius_fov
 
@@ -1093,6 +1095,15 @@ class QueenAttack2(Spell):
 
         #восстановим обзор
         self.radius_fov = radius_fov
+
+        return potential
+    
+    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+
+        if host_cell is None:
+            host_cell = self.cell
+        
+        potential = spell.zone(self, host_cell = host_cell)
 
         #фильтруем
         target_list = []
@@ -1136,3 +1147,126 @@ class QueenAttack2(Spell):
             
         else:
             print(f"Атакующая фигура промахнулась")
+
+class QueenUtility(Spell):
+
+    def __init__(self):
+        super().__init__("courtesy_of_kings", "Вежливость королей", "Пассивно всегда имеет 100% точность", 0, 0)
+        
+    def zone(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+
+        if host_cell is None:
+            host_cell = self.cell
+
+        return []
+    
+    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+        
+        if host_cell is None:
+            host_cell = self.cell
+
+        return []
+    
+    def cast(spell, self: "Piece", other: "Square") -> None:
+        self.accuracy = 1
+
+class KingAttack1(Spell):
+
+    def __init__(self):
+        super().__init__("royal_grace", "Королевская милость", "Снимает с союзной фигуры все негативные эффекты", 3, 2)
+
+    def zone(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+
+        if host_cell is None:
+            host_cell = self.cell
+        
+        return self.game.get_overview_for_player_pieces()
+
+    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+        
+        if host_cell is None:
+            host_cell = self.cell
+
+        potential = spell.zone(self, host_cell = host_cell)
+
+        target_list = []
+        
+        for cell in potential:
+            if not cell.is_exist is None and not cell.inner_piece is None and cell.inner_piece.team == self.team:
+                target_list.append(cell)
+
+        return target_list
+
+    def cast(spell, self: "Piece", other: "Square") -> None:
+        
+        other = other.inner_piece
+
+        other.effect_list = []
+
+        print("Все негативные эффекты сняты!")
+
+class KingAttack2(Spell):
+
+    def __init__(self):
+        super().__init__("a_volley_of_arrows", "Залп стрел", "Наносит небольшой урон по области", 3, 2)
+
+    def zone(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+
+        if host_cell is None:
+            host_cell = self.cell
+        
+        return self.game.get_overview_for_player_pieces()
+
+    def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
+        
+        if host_cell is None:
+            host_cell = self.cell
+        
+        potential = spell.zone(self, host_cell = host_cell)
+
+        #фильтруем
+        target_list = []
+
+        #только клетки, рядом с коими есть враг
+        for cell in potential:
+            if not cell.is_exist is None and not self.field.get_way(self.cell, cell, piece_is_barrier=True) is None:
+                if spell.give_enemies_in_area(self, cell):
+                    target_list.append(cell)
+
+        return target_list
+
+    def cast(spell, self: "Piece", other: "Square") -> None:
+        
+        enemies = spell.give_enemies_in_area(self, other)
+
+        
+        damage = randrange(self.min_damage, self.max_damage + 1)
+
+        for enemy in enemies:
+
+            #забираем фигуру из клетки
+            enemy = enemy.inner_piece
+
+            #Если фигура попала, она наносит урон
+            if random() < self.accuracy + 1:
+                damage = randrange(self.min_damage, self.max_damage + 1)
+                enemy.give_damage(damage)
+
+    def give_enemies_in_area(spell, self, host_cell):
+
+        """
+        Воспомогательная функция для target
+        """
+
+        area = 2
+        y0, x0 = host_cell.get_pos()
+        potential = spell.draw_rhomb(1, area, x0, y0)
+
+        enemies_list = []
+        for cell_coor in potential:
+            x, y = cell_coor[0], cell_coor[1]
+            cell = self.field.get_square_by_pos(y, x)
+            if not cell is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
+                enemies_list.append(cell)
+
+        return enemies_list

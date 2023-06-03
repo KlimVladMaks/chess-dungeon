@@ -162,7 +162,7 @@ class Game:
 
         # Перебираем все фигуры и собираем клетки из их области обзора
         for piece in self.player_pieces:
-            pieces_overview_set.add(*piece.get_fovs())
+            pieces_overview_set.update(piece.get_fovs())
 
         # Возвращаем полученное множество
         return pieces_overview_set
