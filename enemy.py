@@ -1,16 +1,14 @@
-"""
-fix me
-get_potential_positions должна быть изменена вместе с spell.zone
-"""
-
+from field import Field, Square
 from piece import *
 from time import sleep
 import random
 
 import typing as tp
 
+
 if tp.TYPE_CHECKING:
     from field import Field, Square
+    from game import Game
 
 
 class EnemyPiece(Piece):
@@ -236,7 +234,7 @@ class EnemyPiece(Piece):
         :target: Цель
         """
 
-        potential_positions = spell.zone(self, host_cell=target)
+        potential_positions = spell.zone(self, host_cell = target)
 
         return potential_positions
 
@@ -264,7 +262,6 @@ class EnemyPiece(Piece):
         square_for_cast = spell.target(self)
 
         if square_for_cast:
-            print(f'Враг обнаружил цель в зоне способности {spell.name}')
             target = self.choice_square(square_for_cast, spell)
             if not target is None:
                 self.cast_spell(spell, target)
@@ -293,7 +290,6 @@ class EnemyPiece(Piece):
 
             #Если дорога загорожена, то ждём (если мы не на исходной клекте)
             if not self.way_patrol[pos].inner_piece is None and i != 0:
-                print('!')
                 #И откатываем позицию
                 pos -= 1
                 if pos < 0:
@@ -301,7 +297,6 @@ class EnemyPiece(Piece):
                 self.AP = 0
                 break
 
-            print(f'Враг передвинулся на {self.way_patrol[pos].get_pos()}')
 
             # если увидили фигуру игрока, то сменяем поведение и переходим на ту клетку, на которой увидели
             if self.is_see_player_piece(self.way_patrol[pos]):
@@ -331,7 +326,7 @@ class EnemyPiece(Piece):
         """
 
         print()
-        print('Новый ход', f"ХП фигуры = {self.hp} | положение = {self.field.get_pos_by_square(self.cell)}, пешка {self}")
+        print('Новый ход', f"ХП фигуры = {self.hp} | положение = {self.field.get_pos_by_square(self.cell)}, {type(self).__name__} {self}")
 
         super().new_turn()
 
@@ -408,7 +403,6 @@ class EnemyPawn(EnemyPiece, Pawn):
 
         #Идём к ближнему противнику
         target = self.get_nearest_enemy()
-        print('Враг определил ближайшую цель')
 
         #Коль он найден, то
         if not target is None:
@@ -460,6 +454,135 @@ class EnemyPawn(EnemyPiece, Pawn):
             self.AP = 0
             pass
 
-class EnemyKing(King):
+class EnemyKing(EnemyPiece, King):
     def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
         super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+        self.action = "attack"
+
+    def alarm(self):
+
+        """
+        self.spell_list[0] - KingAttack1()
+        self.spell_list[1] - KingAttack2()
+        """
+        
+        #Переменная для отследивания было ли совершено действие
+        is_cast = False
+
+        #Сперва хилл
+        spell = self.spell_list[0]
+
+        if spell.cooldown_now == 0:   
+            is_cast = self.try_cast_spell(spell)
+
+        #Завершаем действие, если способность использована
+        if is_cast:
+            return
+        
+        #Потом атака
+        spell = self.spell_list[1]
+
+        if spell.cooldown_now == 0:
+            print(spell.cooldown_now)
+            is_cast = self.try_cast_spell(spell)
+            print(spell.cooldown_now)
+
+        #Завершаем действие, если способность использована
+        if is_cast:
+            return
+        
+        #Пропускаем ход, коль ничего не сделали
+        self.AP = 0
+
+class EnemyBishop(EnemyPiece, Bishop):
+
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+
+    def alarm(self):
+
+
+        """
+        Поведение при обнаружении фигур игрока слоном
+        self.spell_list[0] - PieceMove()
+        self.spell_list[1] - BishopAttack1()
+        self.spell_list[2] - BishopAttack2()
+        self.spell_list[3] - BishopUtility()
+        """
+        
+        #Переменная для отследивания было ли совершено действие
+        is_cast = False
+
+        #Сперва хилл
+        spell = self.spell_list[3]
+
+        if spell.cooldown_now == 0:
+
+            #смотрим на всех    
+            for cell in spell.target(self):
+                piece = cell.inner_piece
+                #если у кого мало хп
+                if piece.max_hp - piece.hp >= self.max_damage * 2:
+                    self.cast_spell(spell, cell)
+                    is_cast = True
+
+        #Завершаем действие, если способность использована
+        if is_cast:
+            return
+        
+        #Если ребята и так держатся, то время атаки! Сперва, конечно, дебафф
+        spell = self.spell_list[2]
+
+        if spell.cooldown_now == 0:   
+            is_cast = self.try_cast_spell(spell)
+
+        #Завершаем действие, если способность использована
+        if is_cast:
+            return
+        
+        #Если ничего не выходит, то хоть обычную атаку...
+        spell = self.spell_list[1]
+
+        if spell.cooldown_now == 0:   
+            is_cast = self.try_cast_spell(spell)
+
+        #Завершаем действие, если способность использована
+        if is_cast:
+            return
+        
+        #Ну коль врага нет, то собираемся идти для атаки
+
+        #Идём к ближнему противнику
+        target = self.get_nearest_enemy()
+
+        #Коль он найден, то
+        if not target is None:
+            
+            #Ищем позицию для Атаки (или Ядовитой стрелы)
+            spell = self.spell_list[1]
+            if spell.cooldown_now <= 1:
+                desirable_position = self.get_desirable_position(spell, target)
+
+                if not desirable_position is None:
+                    print('Враг движется к цели')
+                    #передвигает фигуру на позицию или максимально близко к ней
+                    self.go_to_position(desirable_position)
+                    return
+            
+                else:
+                    #не делаем ничего
+                    print(f"Враг не может найти позицию для использования {spell.name}")
+                    self.AP = 0
+                    pass
+            
+            else:
+                self.AP = 0
+                pass
+
+            #Не идём за ультой, ибо итак на врага набегут союзники)
+
+        else:
+            #не делаем ничего
+            print(f"Ближайщей цели нет, враг бездействует")
+            self.AP = 0
+            pass
