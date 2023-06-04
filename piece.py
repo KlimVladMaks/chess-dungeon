@@ -198,15 +198,6 @@ class Piece:
         """
         Функция добавляет объекты класса Spell в piece.spell_list
         """
-
-    def update_spell_list(self) -> None:
-
-        """
-        Функция заного создаёт список способностей
-        """
-
-        self.spell_list = [Piece_Move()]
-        self.create_spell_list()
         
     def give_damage(self, damage: int) -> None:
 
@@ -271,7 +262,6 @@ class Piece:
         """
         
         self.AP = 2
-        self.update_spell_list()
 
         for spell in self.spell_list:
             if spell.cooldown_now > 0:
@@ -335,6 +325,15 @@ class Pawn(Piece):
         self.spell_list.append(PawnAttack2_Move())
         self.spell_list.append(PawnUtility())
 
+    def new_turn(self) -> None:
+
+        print(type(self.spell_list[2]).__name__, "!!!")
+        if type(self.spell_list[2]).__name__ == "PawnAttack2_Attack":
+            self.spell_list[2] = PawnAttack2_Move()
+            self.spell_list[2].cooldown_now = self.spell_list[2].cooldown
+
+        super().new_turn()
+
 class Bishop(Piece):
 
     """
@@ -373,9 +372,13 @@ class Knight(Piece):
         self.spell_list.append(KnightAttack2())
         self.spell_list.append(KnightUtility())
 
-    def get_fovs_all(self):
-        print(self.game.get_overview_for_player_pieces())
+    def new_turn(self) -> None:
 
+        if type(self.spell_list[1]).__name__ == "KnightAttack1_Attack":
+            self.spell_list[1] = KnightAttack1_Move()
+            self.spell_list[1].cooldown_now = self.spell_list[1].cooldown
+
+        super().new_turn()
 
 class Rook(Piece):
 
@@ -435,12 +438,3 @@ class King(Piece):
         self.spell_list.append(KingAttack2())
 
         #У короля пока пусто
-
-    def update_spell_list(self) -> None:
-
-        """
-        Функция заного создаёт список способностей
-        У короля отличается обработака
-        """
-
-        self.create_spell_list()
