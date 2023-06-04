@@ -550,6 +550,20 @@ class EnemyBishop(EnemyPiece, Bishop):
         if is_cast:
             return
         
+        #Опять потыпка хила
+        spell = self.spell_list[3]
+
+        if spell.cooldown_now == 0:
+
+            #смотрим на всех    
+            for cell in spell.target(self):
+                piece = cell.inner_piece
+                #если у кого мало хп
+                if piece.max_hp - piece.hp >= self.min_damage * 2:
+                    self.cast_spell(spell, cell)
+                    is_cast = True
+
+
         #Ну коль врага нет, то собираемся идти для атаки
 
         #Идём к ближнему противнику
