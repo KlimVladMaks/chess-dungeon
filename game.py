@@ -167,4 +167,19 @@ class Game:
         # Возвращаем полученное множество
         return pieces_overview_set
 
+    def get_overview_for_computer_pieces(self) -> set['Square']:
+        """
+        Функция для получения клеток в области обзора всех фигур компьютера.
 
+        :return: Множество, содержащее клетки из области обзора.
+        """
+
+        # Множество для хранения клеток из области обзора
+        pieces_overview_set = set()
+
+        # Перебираем все фигуры и собираем клетки из их области обзора
+        for piece in self.computer_pieces:
+            pieces_overview_set.add(*piece.get_fovs())
+
+        # Возвращаем полученное множество
+        return pieces_overview_set
