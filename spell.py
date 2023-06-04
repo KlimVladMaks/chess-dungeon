@@ -93,12 +93,15 @@ class Piece_Move(Spell):
     def __init__(self):
         super().__init__('move', "Перемещение", "Переместитесь на клетку в зоне движения", 0, 1)
 
-    def target(spell, self: "Piece") -> list[tuple["Square", "Square"]]:
+    def target(spell, self: "Piece", host_cell = None) -> list["Square"]:
 
         """
         Функция возвращает все клетки до которых можно дойти.
         Работает это через обход в ширину со стартовой клетки.
         """
+
+        if host_cell is None:
+            host_cell = self.cell
 
         #храним индекс рассматриваемого элемента, симмулируя очередь
         # и саму очередь, в которой храним клетку от которой параллельно идём
@@ -108,7 +111,7 @@ class Piece_Move(Spell):
         len_way = []
 
         #проверим о выходе за пределы массива (зачем?)
-        row_pos, col_pos = self.cell.get_pos()
+        row_pos, col_pos = host_cell.get_pos()
         if self.field.is_into_map(row_pos, col_pos):
             moves.append((row_pos, col_pos))
             len_way.append(0)
@@ -159,7 +162,7 @@ class Piece_Move(Spell):
         moving_cell = []
         for pos in moves:
             cell = self.field.get_square_by_pos(pos[0], pos[1])
-            if cell != self.cell:
+            if cell != host_cell:
                 moving_cell.append(cell)
 
         return moving_cell
@@ -399,7 +402,7 @@ class BishopAttack1(Spell):
         self.radius_fov = range_shot
 
         #стреляем во всё, что видим
-        potential = self.get_fovs()
+        potential = self.get_fovs(cell = host_cell)
 
         #восстановим обзор
         self.radius_fov = radius_fov
@@ -467,7 +470,7 @@ class BishopAttack2(Spell):
         self.radius_fov = range_shot
 
         #стреляем во всё, что видим
-        potential = self.get_fovs()
+        potential = self.get_fovs(cell = host_cell)
 
         #восстановим обзор
         self.radius_fov = radius_fov
@@ -537,7 +540,7 @@ class BishopUtility(Spell):
         self.radius_fov = range_shot
 
         #хилим, всё что видим
-        potential = self.get_fovs()
+        potential = self.get_fovs(cell = host_cell)
         potential.append(self.cell)
 
         #восстановим обзор
@@ -591,7 +594,7 @@ class KnightAttack1_Move(Spell):
         self.radius_move = range_move
 
         #идём куда дойдём
-        potential = self.spell_list[0].target(self)
+        potential = self.spell_list[0].target(self, host_cell = host_cell)
 
         #восстановим движение
         self.radius_move = radius_move
@@ -646,7 +649,6 @@ class KnightAttack1_Attack(Spell):
 
         return potential_square
 
-        return potential
     
     def target(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -700,7 +702,7 @@ class KnightAttack2(Spell):
         self.radius_move = range_move
 
         #идём куда дойдём
-        potential = self.spell_list[0].target(self)
+        potential = self.spell_list[0].target(self, host_cell = host_cell)
 
         #восстановим движение
         self.radius_move = radius_move
@@ -755,7 +757,7 @@ class KnightUtility(Spell):
         self.radius_move = range_move
 
         #идём куда дойдём
-        potential = self.spell_list[0].target(self)
+        potential = self.spell_list[0].target(self, host_cell = host_cell)
 
         #восстановим движение
         self.radius_move = radius_move
@@ -843,7 +845,7 @@ class RookAttack1(Spell):
         self.radius_fov = range_ram
 
         #таранем всё, что видим
-        potential = self.get_fovs(opaque_piece = True)
+        potential = self.get_fovs(opaque_piece = True, cell = host_cell)
 
         #восстановим обзор
         self.radius_fov = radius_fov
@@ -923,8 +925,6 @@ class RookAttack2(Spell):
                 potential_square.append(cell)
 
         return potential_square
-
-        return potential
     
     def target(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -977,7 +977,7 @@ class RookUtility(Spell):
         self.radius_fov = range_shot
 
         #щитуем, всё что видим
-        potential = self.get_fovs()
+        potential = self.get_fovs(cell = host_cell)
         potential.append(self.cell)
 
         #восстановим обзор
@@ -1032,7 +1032,7 @@ class QueenAttack1(Spell):
         self.radius_fov = range_shot
 
         #стреляем во всё, что видим
-        potential = self.get_fovs()
+        potential = self.get_fovs(cell = host_cell)
 
         #восстановим обзор
         self.radius_fov = radius_fov
@@ -1091,7 +1091,7 @@ class QueenAttack2(Spell):
         self.radius_fov = range_ram
 
         #таранем всё, что видим
-        potential = self.get_fovs(opaque_piece = True)
+        potential = self.get_fovs(opaque_piece = True, cell = host_cell)
 
         #восстановим обзор
         self.radius_fov = radius_fov
@@ -1192,7 +1192,7 @@ class KingAttack1(Spell):
         target_list = []
         
         for cell in potential:
-            if not cell.is_exist is None and not cell.inner_piece is None and cell.inner_piece.team == self.team:
+            if not cell.is_exist is None and not cell.inner_piece is None and cell.inner_piece.team == self.team and cell.inner_piece.effect_list:
                 target_list.append(cell)
 
         return target_list
@@ -1238,7 +1238,6 @@ class KingAttack2(Spell):
     def cast(spell, self: "Piece", other: "Square") -> None:
         
         enemies = spell.give_enemies_in_area(self, other)
-
         
         damage = randrange(self.min_damage, self.max_damage + 1)
 

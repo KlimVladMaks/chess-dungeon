@@ -85,17 +85,17 @@ def main() -> None:
     game = Game(field)
 
     # Тест расположения фигуры
-    piece_1 = Pawn('p1', game, field, field.get_square_by_pos(5, 6), 10, 0.7, 1, 3, 3, 4)
+    piece_1 = Bishop('p1', game, field, field.get_square_by_pos(5, 6), 10, 0.7, 1, 3, 3, 4)
     piece_2 = Pawn('p1', game, field, field.get_square_by_pos(6, 6), 10, 0.7, 1, 3, 3, 4)
     piece_3 = Pawn('p1', game, field, field.get_square_by_pos(5, 5), 10, 0.7, 1, 3, 3, 4)
-    piece_4 = King('p1', game, field, field.get_square_by_pos(6, 5), 10, 0.7, 1, 3, 3, 4)
+    piece_4 = Knight('p1', game, field, field.get_square_by_pos(6, 5), 10, 0.7, 1, 3, 3, 4)
 
     piece_1.cell.add_inner_piece(piece_1)
     piece_2.cell.add_inner_piece(piece_2)
     piece_3.cell.add_inner_piece(piece_3)
     piece_4.cell.add_inner_piece(piece_4)
 
-    enemy_1 = EnemyPawn('Shodan', game, field, field.get_square_by_pos(15, 17), 10, 0.7, 1, 3, 3, 4)
+    enemy_1 = EnemyBishop('Shodan', game, field, field.get_square_by_pos(15, 17), 10, 0.7, 1, 3, 3, 4)
     enemy_1.set_way_patrol(field.get_square_by_pos(8, 6))
     enemy_2 = EnemyPawn('Shodan', game, field, field.get_square_by_pos(18, 19), 10, 0.7, 1, 3, 3, 4)
     enemy_2.set_way_patrol(field.get_square_by_pos(6, 19))
