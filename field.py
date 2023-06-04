@@ -288,7 +288,7 @@ class Square(SquareTemplate):
                         self.image = pg.image.load("design/pieces/off_pawn.png")
 
             # Если на клетке стоит чёрная пешка
-            elif type(self.inner_piece).__name__ == "EnemyPawn" or type(self.inner_piece).__name__ == "EnemyBishop":
+            elif type(self.inner_piece).__name__ == "EnemyPawn":
 
                 # Если клетка активирована
                 if self.is_activated:
