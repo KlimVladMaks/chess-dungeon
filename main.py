@@ -5,6 +5,7 @@ from piece import *
 from enemy import *
 from interface import *
 from game import *
+from menu import *
 
 # Ширина и высота экрана
 SCREEN_WIDTH = 800
@@ -63,6 +64,13 @@ def main() -> None:
 
     # Создаём экран игры
     screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+    # Запускаем главное меню
+    # main_menu = MainMenu(screen)
+    # main_menu.add_buttons(["demo", "quit"])
+    # main_menu.open()
+
+    # ИГРОВОЙ ПРОЦЕСС
 
     # Создаём поверхность, предназначенную для отображения игрового поля
     screen_field = pg.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -136,7 +144,7 @@ def main() -> None:
             # При закрытии игрового окна завершаем программу
             if e.type == pg.QUIT:
                 pg.quit()
-                return
+                raise SystemExit
 
             # Если нажата кнопка Enter
             elif e.type == pg.KEYDOWN and e.key == pg.K_RETURN:
@@ -177,10 +185,8 @@ def main() -> None:
                 match game.get_game_status():
                     case "lose":
                         set_final_screensaver(screen, False)
-                        return
                     case "win":
                         set_final_screensaver(screen, True)
-                        return
 
             # Если нажата левая клавиша мыши
             elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
@@ -234,10 +240,8 @@ def main() -> None:
                         match game.get_game_status():
                             case "lose":
                                 set_final_screensaver(screen, False)
-                                return
                             case "win":
                                 set_final_screensaver(screen, True)
-                                return
 
                         # Активируем клетку, на которой теперь стоит фигура
                         game.selected_piece.cell.select()
@@ -366,7 +370,7 @@ def set_final_screensaver(screen: pg.Surface, is_player_win: bool) -> None:
             # При закрытии игрового окна завершаем программу
             if e.type == pg.QUIT:
                 pg.quit()
-                return
+                raise SystemExit
 
 
 # Запускаем Main-функцию

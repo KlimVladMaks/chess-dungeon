@@ -58,7 +58,7 @@ class Button(pg.sprite.Sprite):
         # Обновляем кнопку, чтобы задать её изображение
         self.update()
 
-        # Задаём поверхность кнопки
+        # Задаём область кнопки
         self.rect = pg.Rect(coordinates[0], coordinates[1], button_size[0], button_size[1])
 
     def update(self):
@@ -137,6 +137,9 @@ class Interface(pg.sprite.Sprite):
         """
         Функция для вывода интерфейса на экран.
         """
+
+        # Полностью закрашиваем интерфейс
+        self.image.fill(INTERFACE_BACKGROUND_COLOR)
 
         # Отрисовываем кнопки интерфейса
         self.buttons_group.draw(self.image)
