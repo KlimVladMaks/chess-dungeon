@@ -66,9 +66,9 @@ def main() -> None:
     screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
     # Запускаем главное меню
-    # main_menu = MainMenu(screen)
-    # main_menu.add_buttons(["demo", "quit"])
-    # main_menu.open()
+    main_menu = MainMenu(screen)
+    main_menu.add_buttons(["demo", "quit"])
+    main_menu.open()
 
     # ИГРОВОЙ ПРОЦЕСС
 

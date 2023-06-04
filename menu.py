@@ -1,4 +1,5 @@
 import pygame as pg
+import typing as tp
 
 # Размер кнопки в формате (ширина, высота)
 BUTTON_SIZE = (400, 50)
@@ -33,11 +34,22 @@ class MenuButton(pg.sprite.Sprite):
         # Задаём поверхность кнопки
         self.image = pg.Surface((button_size[0], button_size[1]))
 
-        # Задаем цвет кнопки
-        self.image.fill("#0000FF")
-
         # Задаём область кнопки
         self.rect = pg.Rect(coordinates[0], coordinates[1], button_size[0], button_size[1])
+
+        # Задаём изображение кнопке
+        self.update()
+
+    def update(self) -> None:
+        """
+        Функция для заполнения кнопки меню соответствующим изображением.
+        """
+
+        # Устанавливаем изображение в зависимости от значения кнопки
+        if self.value == "demo":
+            self.image = pg.image.load("design/main_menu/demo_button.png")
+        elif self.value == "quit":
+            self.image = pg.image.load("design/main_menu/quit_button.png")
 
 
 class MainMenu:
@@ -75,9 +87,11 @@ class MainMenu:
             self.buttons_group.add(button)
             y += BUTTON_SIZE[1] + SPACE_BETWEEN_BUTTONS
 
-    def open(self) -> None:
+    def open(self) -> str:
         """
         Функция для запуска главного меню.
+
+        :return: Значение выбранной кнопки.
         """
 
         # Устанавливаем фон
@@ -100,3 +114,42 @@ class MainMenu:
                     pg.quit()
                     raise SystemExit
 
+                # Если нажата левая клавиша мыши
+                elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
+
+                    # Получаем относительные координаты клика
+                    click_coordinates = pg.mouse.get_pos()
+
+                    # Получаем нажатую кнопку
+                    click_button = self.get_button_by_coordinates(click_coordinates[0], click_coordinates[1])
+
+                    # Если нажатая кнопка равна None (т.е. никакая кнопка не нажата), то переходим к следующей итерации
+                    if click_button is None:
+                        continue
+
+                    # Если нажата кнопка выхода, то завершаем игру
+                    if click_button.value == "quit":
+                        pg.quit()
+                        raise SystemExit
+
+                    # Иначе возвращаем значение нажатой кнопки
+                    return click_button.value
+
+    def get_button_by_coordinates(self, x: int, y: int) -> tp.Union[MenuButton, None]:
+        """
+        Функция для получения кнопки, расположенной по заданным координатам.
+
+        :param x: Координата x кнопки на экране.
+        :param y: Координата y кнопки на экране.
+        :return: Кнопка или None, если по заданным координатам кнопка не найдена.
+        """
+
+        # Перебираем все кнопки из соответствующей группы спрайтов
+        for button in self.buttons_group:
+
+            # Если координаты кнопки попадают в область интерфейса, то возвращаем кнопку
+            if button.rect.collidepoint(x, y):
+                return button
+
+        # Иначе возвращаем None
+        return None
