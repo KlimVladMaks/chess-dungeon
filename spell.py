@@ -1215,7 +1215,11 @@ class KingAttack2(Spell):
         if host_cell is None:
             host_cell = self.cell
         
-        return self.game.get_overview_for_player_pieces()
+        if type(self).__name__ == "EnemyKing":
+            return self.game.get_overview_for_computer_pieces()
+        
+        elif type(self).__name__ == "King":
+            return self.game.get_overview_for_player_pieces()
 
     def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
         
