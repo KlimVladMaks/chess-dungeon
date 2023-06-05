@@ -65,6 +65,8 @@ class MenuButton(pg.sprite.Sprite):
             self.image = pg.image.load("design/menu/open_game_menu_button.png")
         elif self.value == "continue_game":
             self.image = pg.image.load("design/menu/continue_game_button.png")
+        elif self.value == "restart":
+            self.image = pg.image.load("design/menu/restart_button.png")
 
 
 class MainMenu:

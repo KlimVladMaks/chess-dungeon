@@ -194,13 +194,18 @@ class GameProcess:
                     if game_menu.is_open_button_clicked(click_coordinates):
 
                         # Запускаем игровое меню и получаем значение нажатой кнопки
-                        game_menu.add_buttons(["continue_game", "main_menu"])
+                        game_menu.add_buttons(["continue_game", "restart", "main_menu"])
                         result = game_menu.start()
 
                         # Если нажата кнопка продолжения игры, то обновляем поле и переходим к следующей итерации
                         if result == "continue_game":
                             field.update()
                             continue
+
+                        # Если нажата кнопка перезапуска игры, то возвращаем значение "demo"
+                        # (Для повторного запуска игры)
+                        if result == "restart":
+                            return "demo"
 
                         # Если нажата кнопка выхода в главном меню, то возвращаем значение "main_menu"
                         if result == "main_menu":
