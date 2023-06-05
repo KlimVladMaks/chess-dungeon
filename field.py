@@ -3,6 +3,7 @@ import typing as tp
 
 if tp.TYPE_CHECKING:
     from piece import Piece
+    from menu import GameMenu
 
 # Размер стороны шахматной клетки
 SQUARE_SIDE_SIZE = 50
@@ -463,7 +464,8 @@ class Field:
                  screen_field: pg.Surface,
                  background: pg.Surface,
                  screen_absolute_coordinates: list[int],
-                 field_map: list[list[int]]) -> None:
+                 field_map: list[list[int]],
+                 game_menu: 'GameMenu') -> None:
         """
         Функция для инициализации игрового поля.
 
@@ -472,6 +474,7 @@ class Field:
         :param background: Фон игры.
         :param screen_absolute_coordinates: Абсолютные координаты экрана игры.
         :param field_map: Карта игрового поля.
+        :param game_menu: Игровое меню.
         """
 
         # Сохраняем экран игры
@@ -488,6 +491,9 @@ class Field:
 
         # Сохраняем карту игрового поля
         self.field_map = field_map
+
+        # Сохраняем игровое меню
+        self.game_menu = game_menu
 
         # Двухмерный список для хранения спрайтов шахматных клеток
         self.squares_list: list[list[SquareTemplate]] = []
@@ -631,6 +637,11 @@ class Field:
         self.screen_field.blit(self.background, (0, 0))
         self.squares_group.draw(self.screen_field)
         self.screen.blit(self.screen_field, (0, 0))
+
+        # Отрисовываем кнопку открытия игрового меню
+        self.screen.blit(self.game_menu.open_menu_button.image, self.game_menu.open_menu_button.rect)
+
+        # Обновляем экран
         pg.display.update()
 
     def move(self, x_shift: int, y_shift: int) -> None:

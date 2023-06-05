@@ -76,8 +76,11 @@ class GameProcess:
         screen.blit(background, (0, 0))
         pg.display.update()
 
+        # Создаём игровое меню
+        game_menu = GameMenu(screen)
+
         # Создаём игровое поле
-        field = Field(screen, screen_field, background, screen_absolute_coordinates, START_FIELD_MAP)
+        field = Field(screen, screen_field, background, screen_absolute_coordinates, START_FIELD_MAP, game_menu)
 
         # Создаём интерфейс для управления фигурами
         interface = Interface(screen, field)
@@ -186,6 +189,22 @@ class GameProcess:
 
                     # Получаем относительные координаты клика
                     click_coordinates = pg.mouse.get_pos()
+
+                    # Если нажата кнопка открытия главного меню
+                    if game_menu.is_open_button_clicked(click_coordinates):
+
+                        # Запускаем игровое меню и получаем значение нажатой кнопки
+                        game_menu.add_buttons(["continue_game", "main_menu"])
+                        result = game_menu.start()
+
+                        # Если нажата кнопка продолжения игры, то обновляем поле и переходим к следующей итерации
+                        if result == "continue_game":
+                            field.update()
+                            continue
+
+                        # Если нажата кнопка выхода в главном меню, то возвращаем значение "main_menu"
+                        if result == "main_menu":
+                            return "main_menu"
 
                     # Если координаты клика попадают в область интерфейса
                     if interface.are_interface_coordinates(click_coordinates[0], click_coordinates[1]):
