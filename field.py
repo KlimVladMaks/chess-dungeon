@@ -38,6 +38,12 @@ SQUARE_OCCUPIED_COLOR = "#FFFF00"
 # Цвет для занятой выбранной клетки
 SQUARE_SELECTED_COLOR = "#8B00FF"
 
+# Цвет вспышки клетки при её атаке
+FLASH_COLOR = (255, 0, 0, 128)
+
+# Время продолжительности вспышки клетки
+FLASH_DELAY = 300
+
 
 class SquareTemplate(pg.sprite.Sprite):
     """
@@ -428,6 +434,24 @@ class Square(SquareTemplate):
 
         # Обновляем клетку
         self.update()
+
+    def flash(self) -> None:
+        """
+        Функция для вызова кратковременной вспышки клетки.
+        """
+
+        # Закрашиваем клетку в цвет вспышки
+        flash = pg.Surface((SQUARE_SIDE_SIZE, SQUARE_SIDE_SIZE), pg.SRCALPHA)
+        flash.fill(FLASH_COLOR)
+        self.image.blit(flash, (0, 0))
+        self.field.update()
+
+        # Делаем небольшую задержку
+        pg.time.delay(FLASH_DELAY)
+
+        # Возвращаем оригинальное изображение клетки
+        self.update()
+        self.field.update()
 
 
 class NonexistentSquare(SquareTemplate):
