@@ -467,8 +467,13 @@ class Square(SquareTemplate):
         :param attacked_square: Клетка, которую атакуют.
         """
 
-        # Если на атакуемой клетке нет фигуры, то завершаем выполнение функции
+        # Если действие совершает фигура игрока и атакуемая клетка не занята, то просто завершаем функцию
+        if (not attacked_square.is_occupied) and ("Enemy" not in type(attack_square.inner_piece).__name__):
+            return
+
+        # Если атакуемая клетка не занята, то совершаем небольшую задержку и завершаем функцию
         if not attacked_square.is_occupied:
+            pg.time.delay(FLASH_DELAY)
             return
 
         # Закрашиваем клетки в соответствующие цвета
