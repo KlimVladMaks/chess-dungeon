@@ -294,6 +294,7 @@ class Piece:
         :cell: клетка на которую способность использовали
         """
         
+        cell.attack_flash(self.cell, cell)
         spell.cast(self, cell)
         spell.cooldown_now = spell.cooldown
         self.AP -= spell.cost

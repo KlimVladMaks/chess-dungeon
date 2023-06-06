@@ -341,7 +341,6 @@ class EnemyPiece(Piece):
                 self.alarm()
 
             #Пока нет анимации
-            sleep(0.2)
             self.field.update()
 
 
