@@ -467,6 +467,10 @@ class Square(SquareTemplate):
         :param attacked_square: Клетка, которую атакуют.
         """
 
+        # Если на атакуемой клетке нет фигуры, то завершаем выполнение функции
+        if not attacked_square.is_occupied:
+            return
+
         # Закрашиваем клетки в соответствующие цвета
         attack_square.flash("blue")
         attacked_square.flash("red")
