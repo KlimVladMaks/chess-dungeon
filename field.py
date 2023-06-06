@@ -440,7 +440,7 @@ class Square(SquareTemplate):
 
     def flash(self, color="red") -> None:
         """
-        Функция для вызова кратковременной вспышки клетки.
+        Функция для закрашивания клетки в цвет вспышки.
 
         :param color: Цвет вспышки (red, blue).
         """
@@ -458,12 +458,26 @@ class Square(SquareTemplate):
         self.image.blit(flash, (0, 0))
         self.field.update()
 
-        # Делаем небольшую задержку
+    @staticmethod
+    def attack_flash(attack_square: 'Square', attacked_square: 'Square') -> None:
+        """
+        Функция для реализации необходимых вспышек для обозначения атаке.
+
+        :param attack_square: Клетка, с которой атакуют.
+        :param attacked_square: Клетка, которую атакуют.
+        """
+
+        # Закрашиваем клетки в соответствующие цвета
+        attack_square.flash("blue")
+        attacked_square.flash("red")
+
+        # Совершаем небольшую задержку
         pg.time.delay(FLASH_DELAY)
 
-        # Возвращаем оригинальное изображение клетки
-        self.update()
-        self.field.update()
+        # Возвращаем клеткам их нормальный цвет
+        attack_square.update()
+        attacked_square.update()
+        attack_square.field.update()
 
 
 class NonexistentSquare(SquareTemplate):
