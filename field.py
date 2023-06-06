@@ -39,7 +39,10 @@ SQUARE_OCCUPIED_COLOR = "#FFFF00"
 SQUARE_SELECTED_COLOR = "#8B00FF"
 
 # Цвет вспышки клетки при её атаке
-FLASH_COLOR = (255, 0, 0, 128)
+FLASH_ATTACKED_COLOR = (255, 0, 0, 128)
+
+# Цвет вспышки клетки с которой атакуют
+FLASH_ATTACK_COLOR = (0, 0, 255, 128)
 
 # Время продолжительности вспышки клетки
 FLASH_DELAY = 300
@@ -435,14 +438,23 @@ class Square(SquareTemplate):
         # Обновляем клетку
         self.update()
 
-    def flash(self) -> None:
+    def flash(self, color="red") -> None:
         """
         Функция для вызова кратковременной вспышки клетки.
+
+        :param color: Цвет вспышки (red, blue).
         """
 
-        # Закрашиваем клетку в цвет вспышки
+        # Закрашиваем клетку в цвет вспышки в зависимости от требуемого цвета
         flash = pg.Surface((SQUARE_SIDE_SIZE, SQUARE_SIDE_SIZE), pg.SRCALPHA)
-        flash.fill(FLASH_COLOR)
+
+        if color == "red":
+            flash.fill(FLASH_ATTACKED_COLOR)
+        elif color == "blue":
+            flash.fill(FLASH_ATTACK_COLOR)
+        else:
+            flash.fill(FLASH_ATTACKED_COLOR)
+
         self.image.blit(flash, (0, 0))
         self.field.update()
 
