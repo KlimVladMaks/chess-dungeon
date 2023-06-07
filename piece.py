@@ -158,9 +158,10 @@ class Piece:
             #создаём путь, куда попадают видимые клетки
             #первая клетка всегда попадает в путь
             #если клетка - стена то клетки после неё не попадают в видимые клетки
-            way = [(y, x)]
             if self.field.is_fog(y, x):
                 return way
+            way = [(y, x)]
+
         else:
             return []
         
@@ -183,9 +184,9 @@ class Piece:
             
             if self.field.is_into_map(y, x):
                 #вновь проверяем, а не смотрим ли мы сквозь стену?
-                way.append((y, x))
                 if self.field.is_fog(y, x):
                     return way
+                way.append((y, x))
                 #если мы в режиме непрозрачных фигур
                 if opaque_piece:
                     if not self.field.get_square_by_pos(y, x).inner_piece is None:
@@ -293,8 +294,11 @@ class Piece:
         :id_spell: кодовое слово способности
         :cell: клетка на которую способность использовали
         """
-        
-        cell.attack_flash(self.cell, cell)
+        if spell.cast_type == "attack":
+            cell.attack_flash(self.cell, cell)
+        elif spell.cast_type == "area_attack":
+            cell.attack_flash(self.cell, spell.give_enemies_in_area(self, cell))
+
         spell.cast(self, cell)
         spell.cooldown_now = spell.cooldown
         self.AP -= spell.cost

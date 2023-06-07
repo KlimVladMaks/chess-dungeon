@@ -13,7 +13,7 @@ class Spell:
     Этот класс хранит информацию о способности фигуры
     """
 
-    def __init__(self, id: str, name: str, description: str, cooldown: int, cost: int):
+    def __init__(self, id: str, cast_type: str, name: str, description: str, cooldown: int, cost: int):
 
         """
         :cooldown: время перезарядки способности в ходах
@@ -26,6 +26,7 @@ class Spell:
         """
 
         self.id = id
+        self.cast_type = cast_type
         self.name = name
         self.description = description
         self.cooldown = cooldown
@@ -88,10 +89,21 @@ class Spell:
 
         return rhomb
 
+    def give_enemies_in_area(spell, self: "Piece", host_cell: "Square") -> None:
+
+        """
+        Для area_attack скилов. Вернёт всех атакуемых врагов в области
+        """
+
+        return None
+
 class Piece_Move(Spell):
 
     def __init__(self):
-        super().__init__('move', "Перемещение", "Переместитесь на клетку в зоне движения", 0, 1)
+        super().__init__('move', "move", "Перемещение", "Переместитесь на клетку в зоне движения", 0, 1)
+
+    def zone(spell, self: "Piece", host_cell: "Square" = None):
+        return spell.target(self)
 
     def target(spell, self: "Piece", host_cell = None) -> list["Square"]:
 
@@ -182,7 +194,7 @@ class Piece_Move(Spell):
 class PawnAttack1(Spell):
   
     def __init__(self):
-        super().__init__("attack", "Атака", "Обычная атака (ближний бой)", 1, 2)
+        super().__init__("attack", "attack", "Атака", "Обычная атака (ближний бой)", 1, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -197,7 +209,7 @@ class PawnAttack1(Spell):
         for cell_coor in potential:
             x, y = cell_coor[0], cell_coor[1]
             cell = self.field.get_square_by_pos(y, x)
-            if not cell is None:
+            if not cell is None and not cell.is_exist is None:
                 potential_square.append(cell)
 
         return potential_square
@@ -235,7 +247,7 @@ class PawnAttack1(Spell):
 class PawnAttack2_Move(Spell):
 
     def __init__(self):
-        super().__init__("lunge_move", "Выпад", "подойдите к противнику, чтобы потом атаковать (ближний бой)", 2, 2)
+        super().__init__("lunge_move", "move", "Выпад", "подойдите к противнику, чтобы потом атаковать (ближний бой)", 2, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
         
@@ -250,7 +262,7 @@ class PawnAttack2_Move(Spell):
         for cell_coor in potential:
             x, y = cell_coor[0], cell_coor[1]
             cell = self.field.get_square_by_pos(y, x)
-            if not cell is None:
+            if not cell is None and not cell.is_exist is None:
                 potential_square.append(cell)
 
         return potential_square
@@ -281,7 +293,7 @@ class PawnAttack2_Move(Spell):
 class PawnAttack2_Attack(Spell):
 
     def __init__(self):
-        super().__init__("lunge_attack", "Выпад", "Атакуйте противника! (ближний бой)", 0, 0)
+        super().__init__("lunge_attack", "attack", "Выпад", "Атакуйте противника! (ближний бой)", 0, 0)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
         #Дальность выпада
@@ -298,7 +310,7 @@ class PawnAttack2_Attack(Spell):
         for cell_coor in potential:
             x, y = cell_coor[0], cell_coor[1]
             cell = self.field.get_square_by_pos(y, x)
-            if not cell is None:
+            if not cell is None and not cell.is_exist is None:
                 potential_square.append(cell)
 
         return potential_square
@@ -329,7 +341,7 @@ class PawnAttack2_Attack(Spell):
 class PawnUtility(Spell):
 
     def __init__(self):
-        super().__init__("just_pawn", "Всего лишь пешка", "Фигура делает сильную атаку и  наносит себе 50% от нанесенного урона (ближний бой)", 3, 2)
+        super().__init__("just_pawn", "attack", "Всего лишь пешка", "Фигура делает сильную атаку и  наносит себе 50% от нанесенного урона (ближний бой)", 3, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -344,7 +356,7 @@ class PawnUtility(Spell):
         for cell_coor in potential:
             x, y = cell_coor[0], cell_coor[1]
             cell = self.field.get_square_by_pos(y, x)
-            if not cell is None:
+            if not cell is None and not cell.is_exist is None:
                 potential_square.append(cell)
 
         return potential_square
@@ -386,7 +398,7 @@ class PawnUtility(Spell):
 class BishopAttack1(Spell):
 
     def __init__(self):
-        super().__init__('shot', "Выстрел", "Обычная атака (дальний бой)", 1, 2)
+        super().__init__('shot', "attack", "Выстрел", "Обычная атака (дальний бой)", 1, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -454,7 +466,7 @@ class BishopAttack1(Spell):
 class BishopAttack2(Spell):
 
     def __init__(self):
-        super().__init__('poisoned_arrow', "Отравленная стрела", "Атакует и снижает меткость противника (дальний бой)", 2, 2)
+        super().__init__('poisoned_arrow', "attack", "Отравленная стрела", "Атакует и снижает меткость противника (дальний бой)", 2, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -524,7 +536,7 @@ class BishopAttack2(Spell):
 class BishopUtility(Spell):
 
     def __init__(self):
-        super().__init__("emergency_care", "Неотложная помощь", "Восстанавливает здоровье себе или союзнику", 3, 2)
+        super().__init__("emergency_care", "assistance", "Неотложная помощь", "Восстанавливает здоровье себе или союзнику", 3, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -578,7 +590,7 @@ class BishopUtility(Spell):
 class KnightAttack1_Move(Spell):
 
     def __init__(self):
-        super().__init__("swift_attack_move", "Стремительная атака", "Стремительно приближается для атаки чтобы потом атаковать противника", 1, 2)
+        super().__init__("swift_attack_move", "move", "Стремительная атака", "Стремительно приближается для атаки чтобы потом атаковать противника", 1, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -627,7 +639,7 @@ class KnightAttack1_Move(Spell):
 class KnightAttack1_Attack(Spell):
 
     def __init__(self):
-        super().__init__("swift_attack_attack", "Стремительная атака", "Атакуйте противника и снизьте ему меткость", 0, 0)
+        super().__init__("swift_attack_attack", "attack", "Стремительная атака", "Атакуйте противника и снизьте ему меткость", 0, 0)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
         #Дальность удара
@@ -644,7 +656,7 @@ class KnightAttack1_Attack(Spell):
         for cell_coor in potential:
             x, y = cell_coor[0], cell_coor[1]
             cell = self.field.get_square_by_pos(y, x)
-            if not cell is None:
+            if not cell is None and not cell.is_exist is None:
                 potential_square.append(cell)
 
         return potential_square
@@ -686,7 +698,7 @@ class KnightAttack1_Attack(Spell):
 class KnightAttack2(Spell):
 
     def __init__(self):
-        super().__init__("tactical_retreat", "Тактическое отступление", "Делает дальнее перемещение и восстанавливает себе небольшое количество здоровья", 2, 2)
+        super().__init__("tactical_retreat", "attack", "Тактическое отступление", "Делает дальнее перемещение и восстанавливает себе небольшое количество здоровья", 2, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -741,7 +753,7 @@ class KnightAttack2(Spell):
 class KnightUtility(Spell):
 
     def __init__(self):
-        super().__init__("sabotage", "Диверсия", "Стремительно приближается для атаки, наносит урон по области, если цель одна, то наносит повышенный урон", 3, 2)
+        super().__init__("sabotage", "area_attack", "Диверсия", "Стремительно приближается для атаки, наносит урон по области, если цель одна, то наносит повышенный урон", 3, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -820,7 +832,7 @@ class KnightUtility(Spell):
         for cell_coor in potential:
             x, y = cell_coor[0], cell_coor[1]
             cell = self.field.get_square_by_pos(y, x)
-            if not cell is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
+            if not cell is None and not cell.is_exist is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
                 enemies_list.append(cell)
 
         return enemies_list
@@ -829,7 +841,7 @@ class KnightUtility(Spell):
 class RookAttack1(Spell):
 
     def __init__(self):
-        super().__init__("tactical_offensive", "Тактическое наступление", "Стремительно приближается для атаки и прибавляет себе небольшое количество защиты (ближний бой)", 1, 2)
+        super().__init__("tactical_offensive", "attack", "Тактическое наступление", "Стремительно приближается для атаки и прибавляет себе небольшое количество защиты (ближний бой)", 1, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -906,7 +918,7 @@ class RookAttack1(Spell):
 class RookAttack2(Spell):
 
     def __init__(self):
-        super().__init__("shield_strike", "Удар щитом", "Наносит удар расходуя всю свою защиту нанося с её помощью урон (ближний бой)", 2, 2)
+        super().__init__("shield_strike", "attack", "Удар щитом", "Наносит удар расходуя всю свою защиту нанося с её помощью урон (ближний бой)", 2, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -921,7 +933,7 @@ class RookAttack2(Spell):
         for cell_coor in potential:
             x, y = cell_coor[0], cell_coor[1]
             cell = self.field.get_square_by_pos(y, x)
-            if not cell is None:
+            if not cell is None and not cell.is_exist is None:
                 potential_square.append(cell)
 
         return potential_square
@@ -961,7 +973,7 @@ class RookAttack2(Spell):
 class RookUtility(Spell):
 
     def __init__(self):
-        super().__init__("fortress", "Крепость", "Добавляет большое количество  защиты себе или союзнику", 3, 2)
+        super().__init__("fortress", "assistance", "Крепость", "Добавляет большое количество  защиты себе или союзнику", 3, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -1016,7 +1028,7 @@ class RookUtility(Spell):
 class QueenAttack1(Spell):
     
     def __init__(self):
-        super().__init__('into_the_heart', "В самое сердце", "Наносит урон игнорируя защиту (дальний бой)", 1, 2)
+        super().__init__('into_the_heart', "attack", "В самое сердце", "Наносит урон игнорируя защиту (дальний бой)", 1, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -1075,7 +1087,7 @@ class QueenAttack1(Spell):
 class QueenAttack2(Spell):
 
     def __init__(self):
-        super().__init__("bitchiness", "Стервозность", "Стремительно приближается для атаки и наносит дополнительный урон за пройденный путь до врага", 1, 2)
+        super().__init__("bitchiness", "attack", "Стервозность", "Стремительно приближается для атаки и наносит дополнительный урон за пройденный путь до врага", 1, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -1151,7 +1163,7 @@ class QueenAttack2(Spell):
 class QueenUtility(Spell):
 
     def __init__(self):
-        super().__init__("courtesy_of_kings", "Вежливость королей", "Пассивно всегда имеет 100% точность", 0, 0)
+        super().__init__("courtesy_of_kings", "passive", "Вежливость королей", "Пассивно всегда имеет 100% точность", 0, 0)
         
     def zone(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
 
@@ -1173,14 +1185,18 @@ class QueenUtility(Spell):
 class KingAttack1(Spell):
 
     def __init__(self):
-        super().__init__("royal_grace", "Королевская милость", "Снимает с союзной фигуры все негативные эффекты", 3, 2)
+        super().__init__("royal_grace", "assistance",  "Королевская милость", "Снимает с союзной фигуры все негативные эффекты", 3, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
 
         if host_cell is None:
             host_cell = self.cell
         
-        return self.game.get_overview_for_player_pieces()
+        if type(self).__name__ == "EnemyKing":
+            return self.game.get_overview_for_computer_pieces()
+        
+        elif type(self).__name__ == "King":
+            return self.game.get_overview_for_player_pieces()
 
     def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
         
@@ -1208,7 +1224,7 @@ class KingAttack1(Spell):
 class KingAttack2(Spell):
 
     def __init__(self):
-        super().__init__("a_volley_of_arrows", "Залп стрел", "Наносит небольшой урон по области", 3, 2)
+        super().__init__("a_volley_of_arrows", "area_attack",  "Залп стрел", "Наносит небольшой урон по области", 3, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
 
@@ -1269,7 +1285,7 @@ class KingAttack2(Spell):
         for cell_coor in potential:
             x, y = cell_coor[0], cell_coor[1]
             cell = self.field.get_square_by_pos(y, x)
-            if not cell is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
+            if not cell is None and not cell.is_exist is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
                 enemies_list.append(cell)
 
         return enemies_list
