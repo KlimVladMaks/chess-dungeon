@@ -47,6 +47,9 @@ FLASH_ATTACK_COLOR = (0, 0, 255, 128)
 # Время продолжительности вспышки клетки
 FLASH_DELAY = 300
 
+# Цвет для просматриваемой клетки
+VIEWED_SQUARE_COLOR = (255, 165, 0, 128)
+
 
 class SquareTemplate(pg.sprite.Sprite):
     """
@@ -207,6 +210,9 @@ class Square(SquareTemplate):
         # Флаг, указывающий на то, является ли фигура на клетке выбранной
         self.is_selected = False
 
+        # Флаг, указывающий на то, является ли клетка просматриваемой
+        self.is_viewed = False
+
     def change_regime(self) -> None:
         """
         Функция для изменения режима шахматной клетки.
@@ -318,6 +324,12 @@ class Square(SquareTemplate):
                 # Иначе
                 else:
                     self.image = pg.image.load("design/pieces/black_king.png")
+
+        # Если клетка просматривается, то дополнительно выделяем клетку
+        if self.is_viewed:
+            view = pg.Surface((SQUARE_SIDE_SIZE, SQUARE_SIDE_SIZE), pg.SRCALPHA)
+            view.fill(VIEWED_SQUARE_COLOR)
+            self.image.blit(view, (0, 0))
 
     def increase_size(self) -> None:
         """
@@ -458,8 +470,23 @@ class Square(SquareTemplate):
         self.image.blit(flash, (0, 0))
         self.field.update()
 
+    def on_view(self) -> None:
+        """
+        Функция для переведения клетки в режим обзора.
+        """
+        self.is_viewed = True
+        self.update()
+
+    def off_view(self) -> None:
+        """
+        Функция для выключения у клетки режима обзора.
+        """
+        self.is_viewed = False
+        self.update()
+
     @staticmethod
-    def attack_flash(attack_square: 'Square', attacked_square: 'Square') -> None:
+    def attack_flash(attack_square: tp.Union['Square', list['Square']],
+                     attacked_square: tp.Union['Square', list['Square']]) -> None:
         """
         Функция для реализации необходимых вспышек для обозначения атаке.
 
@@ -468,25 +495,50 @@ class Square(SquareTemplate):
         """
 
         # Если действие совершает фигура игрока и атакуемая клетка не занята, то просто завершаем функцию
-        if (not attacked_square.is_occupied) and ("Enemy" not in type(attack_square.inner_piece).__name__):
-            return
+        # if (not attacked_square.is_occupied) and ("Enemy" not in type(attack_square.inner_piece).__name__):
+        #     return
 
         # Если атакуемая клетка не занята, то совершаем небольшую задержку и завершаем функцию
-        if not attacked_square.is_occupied:
-            pg.time.delay(FLASH_DELAY)
-            return
+        # if not attacked_square.is_occupied:
+        #     pg.time.delay(FLASH_DELAY)
+        #     return
 
-        # Закрашиваем клетки в соответствующие цвета
-        attack_square.flash("blue")
-        attacked_square.flash("red")
+        # Закрашиваем атакующие клетки
+        if isinstance(attack_square, Square):
+            attack_square.flash("blue")
+        elif isinstance(attack_square, list):
+            for square in attack_square:
+                square.flash("blue")
+
+        # Закрашиваем атакуемые клетки
+        if isinstance(attacked_square, Square):
+            attacked_square.flash("red")
+        elif isinstance(attacked_square, list):
+            for square in attacked_square:
+                square.flash("red")
 
         # Совершаем небольшую задержку
         pg.time.delay(FLASH_DELAY)
 
-        # Возвращаем клеткам их нормальный цвет
-        attack_square.update()
-        attacked_square.update()
-        attack_square.field.update()
+        # Возвращаем атакующим клеткам обычный цвет
+        if isinstance(attack_square, Square):
+            attack_square.update()
+        elif isinstance(attack_square, list):
+            for square in attack_square:
+                square.update()
+
+        # Возвращаем атакуемым клеткам обычный цвет
+        if isinstance(attacked_square, Square):
+            attacked_square.update()
+        elif isinstance(attacked_square, list):
+            for square in attacked_square:
+                square.update()
+
+        # Обновляем игровое поле
+        if isinstance(attacked_square, Square):
+            attacked_square.field.update()
+        elif isinstance(attacked_square, list):
+            attacked_square[0].field.update()
 
 
 class NonexistentSquare(SquareTemplate):

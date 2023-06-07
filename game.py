@@ -39,6 +39,9 @@ class Game:
         # Свойство для хранения вражеского короля
         self.computer_king: tp.Union[Piece, None] = None
 
+        # Список для хранения просматриваемых клеток
+        self.viewed_squares: tp.Union[list[Square], None] = None
+
     def clear_activated_squares(self) -> None:
         """
         Функция для очистки клеток, ранее выбранных для того или иного действия.
@@ -73,6 +76,10 @@ class Game:
         # лишь при наличии хотя бы одной выделенной клетки)
         if square_for_action and (self.selected_spell != spell):
             self.selected_spell = spell
+
+            # Отключаем режим просмотра для всех клеток
+            self.off_view_for_all_squares()
+
         else:
             self.selected_spell = None
 
@@ -183,3 +190,24 @@ class Game:
 
         # Возвращаем полученное множество
         return pieces_overview_set
+
+    def off_view_for_all_squares(self) -> None:
+        """
+        Функция для отключения режима просмотра для всех клеток.
+        """
+
+        # Если есть просматриваемые клетки
+        if self.viewed_squares is not None:
+
+            # Выключаем у них режим просмотра
+            for square in self.viewed_squares:
+                square.off_view()
+
+            # Убираем все сопутствующие атрибуты (список и флаг)
+            self.viewed_squares = None
+
+            # Обновляем игровое поле
+            self.field.update()
+
+
+

@@ -227,6 +227,7 @@ class GameProcess:
                             game.clear_activated_squares()
 
                         # Изменяем режим для выбранного действия
+                        # (Также отключает режим просмотра для всех видимых клеток)
                         game.toggle_action_mode(button.spell)
 
                         # Переходим к следующей итерации цикла
@@ -351,6 +352,49 @@ class GameProcess:
                 elif e.type == pg.MOUSEBUTTONUP and e.button == 3:
                     field.is_moving = False
                     field.skip_first_move = False
+
+                # Если курсор движется
+                elif e.type == pg.MOUSEMOTION:
+
+                    # Получаем координаты курсора
+                    mouse_pos = pg.mouse.get_pos()
+
+                    # Если координаты попадают в область интерфейса
+                    if interface.are_interface_coordinates(mouse_pos[0], mouse_pos[1]):
+
+                        # Получаем кнопку над которой находится курсор
+                        button = interface.get_button_by_coordinates(mouse_pos[0], mouse_pos[1])
+
+                        # Если кнопка не равна None и нет выбранного действия
+                        if button is not None and game.selected_spell is None:
+
+                            # Извлекаем из кнопки способность
+                            button_spell = button.spell
+
+                            # Получаем список клеток из области действия способности
+                            game.viewed_squares = button_spell.zone(game.selected_piece)
+
+                            # Защита от None
+                            if game.viewed_squares is None:
+                                continue
+
+                            # Делаем все полученные клетки просматриваемыми
+                            for square in game.viewed_squares:
+                                square.on_view()
+
+                            # Обновляем игровое поле
+                            game.field.update()
+
+                            # Переходим к следующей итерации
+                            continue
+
+                        # Иначе отключаем режим просмотра для всех клеток
+                        else:
+                            game.off_view_for_all_squares()
+
+                    # Иначе отключаем режим просмотра для всех клеток
+                    else:
+                        game.off_view_for_all_squares()
 
 
 def main() -> None:
