@@ -42,6 +42,9 @@ class Game:
         # Список для хранения просматриваемых клеток
         self.viewed_squares: tp.Union[list[Square], None] = None
 
+        # Просматриваемая способность
+        self.viewed_spell: tp.Union[Spell, None] = None
+
     def clear_activated_squares(self) -> None:
         """
         Функция для очистки клеток, ранее выбранных для того или иного действия.
@@ -203,8 +206,9 @@ class Game:
             for square in self.viewed_squares:
                 square.off_view()
 
-            # Убираем все сопутствующие атрибуты (список и флаг)
+            # Убираем все сопутствующие атрибуты
             self.viewed_squares = None
+            self.viewed_spell = None
 
             # Обновляем игровое поле
             self.field.update()

@@ -371,6 +371,13 @@ class GameProcess:
                             # Извлекаем из кнопки способность
                             button_spell = button.spell
 
+                            # Если курсор переведён с кнопки другой способности, то очищаем предыдущее выделение
+                            if (game.viewed_spell is not None) and (button_spell.id != game.viewed_spell.id):
+                                game.off_view_for_all_squares()
+
+                            # Сохраняем новую просматриваемую способность
+                            game.viewed_spell = button_spell
+
                             # Получаем список клеток из области действия способности
                             game.viewed_squares = button_spell.zone(game.selected_piece)
 

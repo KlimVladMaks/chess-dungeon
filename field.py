@@ -91,6 +91,9 @@ class SquareTemplate(pg.sprite.Sprite):
         # (В данном классе всегда равно False, так как это просто шаблон)
         self.is_selected = False
 
+        # Флаг, указывающий на то, является ли клетка просматриваемой
+        self.is_viewed = False
+
     def get_pos(self) -> tuple[int, int]:
         """
         Функция для получения позиции клетки в списке игровых клеток поля.
@@ -167,6 +170,20 @@ class SquareTemplate(pg.sprite.Sprite):
         return None
 
     def deselect(self) -> None:
+        """
+        Функция, не используемая для данного класса.
+        Всегда возвращает None.
+        """
+        return None
+
+    def on_view(self) -> None:
+        """
+        Функция, не используемая для данного класса.
+        Всегда возвращает None.
+        """
+        return None
+
+    def off_view(self) -> None:
         """
         Функция, не используемая для данного класса.
         Всегда возвращает None.
