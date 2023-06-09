@@ -50,6 +50,12 @@ FLASH_DELAY = 300
 # Цвет для просматриваемой клетки
 VIEWED_SQUARE_COLOR = (255, 165, 0, 128)
 
+# Размер шрифта для размещения текста на шахматной клетке
+SQUARE_FONT_SIZE = 30
+
+# Цвет текста, размещаемого на шахматной клетке
+SQUARE_FONT_COLOR = (255, 165, 0)
+
 
 class SquareTemplate(pg.sprite.Sprite):
     """
@@ -230,6 +236,9 @@ class Square(SquareTemplate):
         # Флаг, указывающий на то, является ли клетка просматриваемой
         self.is_viewed = False
 
+        # Сохраняем шрифт для размещения надписей на клетке
+        self.font = pg.font.Font(None, SQUARE_FONT_SIZE)
+
     def change_regime(self) -> None:
         """
         Функция для изменения режима шахматной клетки.
@@ -341,6 +350,10 @@ class Square(SquareTemplate):
                 # Иначе
                 else:
                     self.image = pg.image.load("design/pieces/black_king.png")
+
+            # Рисуем на клетке с фигурой значение количества HP у данной фигуры
+            hp_text = self.font.render(str(self.inner_piece.hp), True, SQUARE_FONT_COLOR)
+            self.image.blit(hp_text, (0, 0))
 
         # Если клетка просматривается, то дополнительно выделяем клетку
         if self.is_viewed:

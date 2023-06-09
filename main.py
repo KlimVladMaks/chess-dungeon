@@ -254,6 +254,9 @@ class GameProcess:
                             # Удаляем фигуру из соответствующего списка, если она была уничтожена
                             game.del_destroyed_pieces()
 
+                            # Обновляем кликнутую клетку
+                            square_clicked.update()
+
                             # Проверяем игру на завершение и при необходимости возвращаем результат игрового процесса
                             match game.get_game_status():
                                 case "lose":
