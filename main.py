@@ -435,19 +435,19 @@ def main() -> None:
             active_object = main_menu.start()
 
         # Запускаем демо игровой процесс
-        elif active_object == "demo":
+        elif (active_object == "demo") or (active_object == "restart"):
             active_object = GameProcess.start(screen)
 
         # Запускаем финальное меню при проигрыше
         elif active_object == "lose_menu":
             final_menu = FinalMenu(screen)
-            final_menu.add_buttons(["quit", "main_menu"])
+            final_menu.add_buttons(["quit", "restart", "main_menu"])
             active_object = final_menu.start(False)
 
         # Запускаем финальное меню при победе
         elif active_object == "win_menu":
             final_menu = FinalMenu(screen)
-            final_menu.add_buttons(["quit", "main_menu"])
+            final_menu.add_buttons(["quit", "restart", "main_menu"])
             active_object = final_menu.start(True)
 
 
