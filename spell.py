@@ -742,7 +742,7 @@ class KnightAttack2(Spell):
         
         Piece_Move().cast(self, other)
 
-        hill = randrange(int(self.min_damage*0.5), int(self.max_damage*0.5) + 1)
+        hill = randrange(int(self.min_damage*0.5) + 1, int(self.max_damage*0.5) + 2)
 
         print(f"Лечение восстановило {hill} хп!")
         self.hp += hill
@@ -949,9 +949,7 @@ class RookAttack2(Spell):
         target_list = []
             
         #cреди этих клеток можно атаковать только противников
-        for cell_coor in potential:
-            x, y = cell_coor[0], cell_coor[1]
-            cell = self.field.get_square_by_pos(y, x)
+        for cell in potential:
             if not cell is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
                  target_list.append(cell)
 
