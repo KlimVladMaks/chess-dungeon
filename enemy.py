@@ -1,6 +1,7 @@
 """
 Заметка:
 Для каждого spell определить функцию get_priority_of_square и передавать в try_cast желаемый приоритет
+При определение желательной позиции для каста спела не учитывается занятость фигуры
 """
 
 from piece import *
@@ -420,11 +421,11 @@ class EnemyPawn(EnemyPiece, Pawn):
                 #Пытаемся идти для рывка
                 #Для обработки рывков немного инверсируем
                 #Сначала ищем клетку из которой можно атаковать
-                spell = PawnAttack2_Move()
+                spell = PawnAttack2_Attack()
                 desirable_position = self.get_desirable_position(spell, target)
                 if not desirable_position is None:
                     #Потом откуда к ней можно перейти
-                    spell = PawnAttack2_Attack()
+                    spell = PawnAttack2_Move()
                     desirable_position = self.get_desirable_position(spell, desirable_position)
 
                 if not desirable_position is None:
@@ -672,11 +673,11 @@ class EnemyKnight(EnemyPiece, Knight):
                 #Пытаемся идти для рывка
                 #Для обработки рывков немного инверсируем
                 #Сначала ищем клетку из которой можно атаковать
-                spell = KnightAttack1_Move()
+                spell = KnightAttack1_Attack()
                 desirable_position = self.get_desirable_position(spell, target)
                 if not desirable_position is None:
                     #Потом откуда к ней можно перейти
-                    spell = KnightAttack1_Attack()
+                    spell = KnightAttack1_Move()
                     desirable_position = self.get_desirable_position(spell, desirable_position)
 
                 if not desirable_position is None:
