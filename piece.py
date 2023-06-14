@@ -185,11 +185,11 @@ class Piece:
                 #вновь проверяем, а не смотрим ли мы сквозь стену?
                 if self.field.is_fog(y, x):
                     return way
+                way.append((y, x))
                 #если мы в режиме непрозрачных фигур
                 if opaque_piece:
                     if not self.field.get_square_by_pos(y, x).inner_piece is None:
                         return way
-                way.append((y, x))
             
         return way
     
@@ -420,6 +420,7 @@ class Queen(Piece):
     def new_turn(self) -> None:
 
         super().new_turn()
+        print(self.AP)
 
         self.cast_spell(QueenUtility(), self.cell)
 

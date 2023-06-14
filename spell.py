@@ -857,7 +857,7 @@ class RookAttack1(Spell):
         self.radius_fov = range_ram
 
         #таранем всё, что видим
-        potential = self.get_fovs(cell = host_cell)
+        potential = self.get_fovs(cell = host_cell, opaque_piece=True)
 
         #восстановим обзор
         self.radius_fov = radius_fov
@@ -877,17 +877,7 @@ class RookAttack1(Spell):
         #cреди этих клеток можно атаковать только противников
         for cell in potential:
             if not cell is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
-                coordinates_other = self.field.get_pos_by_square(cell)
-                coordinates_self = self.field.get_pos_by_square(self.cell)
-                way_to_target = self.get_view_for_line(False, coordinates_self[::-1], coordinates_other[::-1])[:-1]
-                piece_in_way = False
-                for pos_in_way in way_to_target:
-                    cell_in_way = self.field.get_square_by_pos(pos_in_way[0], pos_in_way[1])
-                    if not cell_in_way is None and not cell_in_way.inner_piece is None:
-                        piece_in_way = True
-                        break
-                if not piece_in_way:
-                    target_list.append(cell)
+                target_list.append(cell)
 
         return target_list
 
@@ -903,6 +893,18 @@ class RookAttack1(Spell):
 
         #и вот наша клетка!
         cell_for_move = self.field.get_square_by_pos(pos_cell_for_move[0], pos_cell_for_move[1])
+        if cell_for_move.inner_piece != self:
+            potential_pos = spell.zone(self, self.cell)
+            other_pos = self.field.get_pos_by_square(other)
+            potential_cells_for_move = []
+            for i in range(-1, 2):
+                for j in range(-1, 2):
+                    if (i, j) == (0, 0):
+                        continue
+                    potential_cell_for_move = self.field.get_square_by_pos(other_pos[0]+i, other_pos[1]+j)
+                    if potential_cell_for_move in potential_pos:
+                        potential_cells_for_move.append(potential_cell_for_move)
+            cell_for_move = self.field.get_nearest(self.cell, potential_cells_for_move)
         
         #ставим туда фигуру
         Piece_Move().cast(self, cell_for_move)
@@ -998,7 +1000,6 @@ class RookUtility(Spell):
 
         #щитуем, всё что видим
         potential = self.get_fovs(cell = host_cell)
-        potential.append(self.cell)
 
         #восстановим обзор
         self.radius_fov = radius_fov
@@ -1111,7 +1112,7 @@ class QueenAttack2(Spell):
         self.radius_fov = range_ram
 
         #таранем всё, что видим
-        potential = self.get_fovs(cell = host_cell)
+        potential = self.get_fovs(cell = host_cell, opaque_piece=True)
 
         #восстановим обзор
         self.radius_fov = radius_fov
@@ -1131,17 +1132,7 @@ class QueenAttack2(Spell):
         #cреди этих клеток можно атаковать только противников
         for cell in potential:
             if not cell is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
-                coordinates_other = self.field.get_pos_by_square(cell)
-                coordinates_self = self.field.get_pos_by_square(self.cell)
-                way_to_target = self.get_view_for_line(False, coordinates_self[::-1], coordinates_other[::-1])[:-1]
-                piece_in_way = False
-                for pos_in_way in way_to_target:
-                    cell_in_way = self.field.get_square_by_pos(pos_in_way[0], pos_in_way[1])
-                    if not cell_in_way is None and not cell_in_way.inner_piece is None:
-                        piece_in_way = True
-                        break
-                if not piece_in_way:
-                    target_list.append(cell)
+                target_list.append(cell)
 
         return target_list
 
@@ -1157,6 +1148,20 @@ class QueenAttack2(Spell):
 
         #и вот наша клетка!
         cell_for_move = self.field.get_square_by_pos(pos_cell_for_move[0], pos_cell_for_move[1])
+        if cell_for_move.inner_piece != self:
+            potential_pos = spell.zone(self, self.cell)
+            other_pos = self.field.get_pos_by_square(other)
+            potential_cells_for_move = []
+            for i in range(-1, 2):
+                for j in range(-1, 2):
+                    if (i, j) == (0, 0):
+                        continue
+                    potential_cell_for_move = self.field.get_square_by_pos(other_pos[0]+i, other_pos[1]+j)
+                    if potential_cell_for_move in potential_pos:
+                        potential_cells_for_move.append(potential_cell_for_move)
+            print('hi')
+            cell_for_move = self.field.get_nearest(self.cell, potential_cells_for_move)
+            print('hihi')
 
         #Теперь определим дальность
         range_run = len(self.field.get_way(self.cell, cell_for_move)) - 1

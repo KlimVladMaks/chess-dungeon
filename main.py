@@ -93,7 +93,7 @@ class GameProcess:
         piece_2 = Bishop('p1', game, field, field.get_square_by_pos(5, 5), 10, 0.7, 1, 3, 3, 4)
         piece_3 = Knight('p1', game, field, field.get_square_by_pos(5, 6), 10, 0.7, 1, 3, 3, 4)
         piece_4 = Rook('p1', game, field, field.get_square_by_pos(6, 5), 10, 0.7, 1, 3, 3, 4)
-        piece_5 = Queen('p1', game, field, field.get_square_by_pos(4, 6), 10, 0.7, 1, 3, 3, 4)
+        piece_5 = Queen('p1', game, field, field.get_square_by_pos(7, 6), 10, 0.7, 1, 3, 3, 4)
 
         enemy_1 = EnemyPawn('Shodan', game, field, field.get_square_by_pos(15, 17), 10, 0.7, 1, 3, 3, 4)
         enemy_1.set_way_patrol(field.get_square_by_pos(8, 6))
