@@ -553,7 +553,6 @@ class BishopUtility(Spell):
 
         #хилим, всё что видим
         potential = self.get_fovs(cell = host_cell)
-        potential.append(self.cell)
 
         #восстановим обзор
         self.radius_fov = radius_fov
@@ -570,7 +569,8 @@ class BishopUtility(Spell):
         #хилим только союзиков
         for cell in potential:
             if not cell is None and not cell.inner_piece is None and cell.inner_piece.team == self.team:
-                 target_list.append(cell)
+                if cell.inner_piece.hp != cell.inner_piece.max_hp:
+                    target_list.append(cell)
 
         return target_list
     
@@ -857,7 +857,7 @@ class RookAttack1(Spell):
         self.radius_fov = range_ram
 
         #таранем всё, что видим
-        potential = self.get_fovs(opaque_piece = True, cell = host_cell)
+        potential = self.get_fovs(cell = host_cell)
 
         #восстановим обзор
         self.radius_fov = radius_fov
@@ -877,7 +877,17 @@ class RookAttack1(Spell):
         #cреди этих клеток можно атаковать только противников
         for cell in potential:
             if not cell is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
-                 target_list.append(cell)
+                coordinates_other = self.field.get_pos_by_square(cell)
+                coordinates_self = self.field.get_pos_by_square(self.cell)
+                way_to_target = self.get_view_for_line(False, coordinates_self[::-1], coordinates_other[::-1])[:-1]
+                piece_in_way = False
+                for pos_in_way in way_to_target:
+                    cell_in_way = self.field.get_square_by_pos(pos_in_way[0], pos_in_way[1])
+                    if not cell_in_way is None and not cell_in_way.inner_piece is None:
+                        piece_in_way = True
+                        break
+                if not piece_in_way:
+                    target_list.append(cell)
 
         return target_list
 
@@ -1101,7 +1111,7 @@ class QueenAttack2(Spell):
         self.radius_fov = range_ram
 
         #таранем всё, что видим
-        potential = self.get_fovs(opaque_piece = True, cell = host_cell)
+        potential = self.get_fovs(cell = host_cell)
 
         #восстановим обзор
         self.radius_fov = radius_fov
@@ -1121,7 +1131,17 @@ class QueenAttack2(Spell):
         #cреди этих клеток можно атаковать только противников
         for cell in potential:
             if not cell is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
-                 target_list.append(cell)
+                coordinates_other = self.field.get_pos_by_square(cell)
+                coordinates_self = self.field.get_pos_by_square(self.cell)
+                way_to_target = self.get_view_for_line(False, coordinates_self[::-1], coordinates_other[::-1])[:-1]
+                piece_in_way = False
+                for pos_in_way in way_to_target:
+                    cell_in_way = self.field.get_square_by_pos(pos_in_way[0], pos_in_way[1])
+                    if not cell_in_way is None and not cell_in_way.inner_piece is None:
+                        piece_in_way = True
+                        break
+                if not piece_in_way:
+                    target_list.append(cell)
 
         return target_list
 
