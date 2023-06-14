@@ -24,6 +24,9 @@ BUTTON_SPACING = 20
 # Размеры кнопок интерфейса в формате (ширина, высота)
 BUTTON_SIZE = (70, 70)
 
+# Серый фильтр для наложения на неактивные фигуры
+GRAY_FILTER = (0, 0, 0, 128)
+
 
 class Button(pg.sprite.Sprite):
     """
@@ -66,35 +69,24 @@ class Button(pg.sprite.Sprite):
         Функция для обновления кнопки.
         """
 
-        # Если кнопка активна
-        if self.is_active:
+        # Отлавливаем ошибки на случай отсутствия подходящего изображения
+        try:
+            # Загружаем изображение кнопки
+            self.image = pg.image.load(f"design/interface/buttons/{self.spell.id}.png")
+        except:
+            pass
 
-            # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
-            if self.spell.id == "move":
-                self.image = pg.image.load("design/interface/move_button.png")
-            elif self.spell.id == "attack":
-                self.image = pg.image.load("design/interface/attack_button.png")
-            elif self.spell.id == "lunge_move":
-                self.image = pg.image.load("design/interface/lunge_move_button.png")
-            elif self.spell.id == "lunge_attack":
-                self.image = pg.image.load("design/interface/lunge_attack_button.png")
-            elif self.spell.id == "just_pawn":
-                self.image = pg.image.load("design/interface/just_pawn_button.png")
+        # Если кнопка не активна
+        if not self.is_active:
 
-        # Иначе
-        else:
+            # Затемняем кнопку
+            surface = pg.Surface(self.image.get_size(), pg.SRCALPHA)
+            surface.fill(GRAY_FILTER)
+            self.image.blit(surface, (0, 0))
 
-            # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
-            if self.spell.id == "move":
-                self.image = pg.image.load("design/interface/off_move_button.png")
-            elif self.spell.id == "attack":
-                self.image = pg.image.load("design/interface/off_attack_button.png")
-            elif self.spell.id == "lunge_move":
-                self.image = pg.image.load("design/interface/off_lunge_move_button.png")
-            elif self.spell.id == "lunge_attack":
-                self.image = pg.image.load("design/interface/off_lunge_attack_button.png")
-            elif self.spell.id == "just_pawn":
-                self.image = pg.image.load("design/interface/off_just_pawn_button.png")
+            # Навешиваем на кнопку значок блокировки
+            surface = pg.image.load("design/interface/block.png")
+            self.image.blit(surface, (0, 0))
 
 
 class Interface(pg.sprite.Sprite):

@@ -56,6 +56,9 @@ SQUARE_FONT_SIZE = 30
 # Цвет текста, размещаемого на шахматной клетке
 SQUARE_FONT_COLOR = (255, 165, 0)
 
+# Серый фильтр для наложения на неактивные фигуры
+GRAY_FILTER = (0, 0, 0, 128)
+
 
 class SquareTemplate(pg.sprite.Sprite):
     """
@@ -285,71 +288,43 @@ class Square(SquareTemplate):
         Функция для обновления шахматной клетки.
         """
 
-        # Если клетка активирована, то задаём ей активированный дизайн
-        if self.is_activated:
-            self.image = pg.image.load("design/field/activated_square.png")
+        # Загружаем базовый вариант клетки
+        self.image = pg.image.load("design/field/square.png")
 
-        # Иначе, задаём ей обычный дизайн
-        else:
-            self.image = pg.image.load("design/field/square.png")
+        # Если клетка не занята фигурой
+        if not self.is_occupied:
 
-        # Если клетка занята, то рисуем на ней фигуру
-        if self.is_occupied:
+            # Если клетка активирована, то добавляем значок активации
+            if self.is_activated:
+                surface = pg.image.load("design/field/activated_square.png")
+                self.image.blit(surface, (0, 0))
 
-            # Если на клетке стоит белая пешка
-            if type(self.inner_piece).__name__ == "Pawn":
+        # Если клетка занята фигурой
+        elif self.is_occupied:
 
-                # Если фигура имеет ОД (может совершать действия)
-                if self.inner_piece.active_turn:
+            # Отлавливаем ошибки на случай отсутствия подходящего изображения
+            try:
+                # Рисуем на клетке соответсвующую фигуру в зависимости от названия класса
+                surface = pg.image.load(f"design/pieces/{type(self.inner_piece).__name__}.png")
+                self.image.blit(surface, (0, 0))
+            except:
+                pass
 
-                    # Если клетка выбрана
-                    if self.is_selected:
-                        self.image = pg.image.load("design/pieces/selected_pawn.png")
+            # Если клетка не имеет доступных ходов и это не вражеская клетка, преобразуем её в чёрно-белые тона
+            if (not self.inner_piece.active_turn) and ("Enemy" not in type(self.inner_piece).__name__):
+                surface = pg.Surface(self.image.get_size(), pg.SRCALPHA)
+                surface.fill(GRAY_FILTER)
+                self.image.blit(surface, (0, 0))
 
-                    # Если клетка активирована
-                    elif self.is_activated:
-                        self.image = pg.image.load("design/pieces/attacked_pawn.png")
+            # Если клетка выбрана, то добавляем значок выбранной фигуры
+            if self.is_selected:
+                surface = pg.image.load("design/game/select.png")
+                self.image.blit(surface, (0, 0))
 
-                    # Иначе
-                    else:
-                        self.image = pg.image.load("design/pieces/pawn.png")
-
-                # Если клетка не имеет ОД (не может совершать действия)
-                else:
-
-                    # Если клетка выбрана
-                    if self.is_selected:
-                        self.image = pg.image.load("design/pieces/off_selected_pawn.png")
-
-                    # Если клетка активирована
-                    elif self.is_activated:
-                        self.image = pg.image.load("design/pieces/off_attacked_pawn.png")
-
-                    # Иначе
-                    else:
-                        self.image = pg.image.load("design/pieces/off_pawn.png")
-
-            # Если на клетке стоит чёрная пешка
-            elif type(self.inner_piece).__name__ == "EnemyPawn":
-
-                # Если клетка активирована
-                if self.is_activated:
-                    self.image = pg.image.load("design/pieces/attacked_black_pawn.png")
-
-                # Иначе
-                else:
-                    self.image = pg.image.load("design/pieces/black_pawn.png")
-
-            # Если на клетке стоит чёрный король
-            elif type(self.inner_piece).__name__ == "EnemyKing":
-
-                # Если клетка активирована
-                if self.is_activated:
-                    self.image = pg.image.load("design/pieces/attacked_black_king.png")
-
-                # Иначе
-                else:
-                    self.image = pg.image.load("design/pieces/black_king.png")
+            # Если клетка активирована, добавляем значок воздействия на фигуру
+            if self.is_activated:
+                surface = pg.image.load("design/game/white_attack.png")
+                self.image.blit(surface, (0, 0))
 
             # Рисуем на клетке с фигурой значение количества HP у данной фигуры
             hp_text = self.font.render(str(self.inner_piece.hp), True, SQUARE_FONT_COLOR)
