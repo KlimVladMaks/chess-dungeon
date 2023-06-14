@@ -420,7 +420,6 @@ class Queen(Piece):
     def new_turn(self) -> None:
 
         super().new_turn()
-        print(self.AP)
 
         self.cast_spell(QueenUtility(), self.cell)
 
