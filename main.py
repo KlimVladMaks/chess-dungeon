@@ -364,6 +364,9 @@ class GameProcess:
                     # Получаем координаты курсора
                     mouse_pos = pg.mouse.get_pos()
 
+                    # Получаем квадрат, на котором находится курсор
+                    view_square = field.get_square_by_coordinates(mouse_pos[0], mouse_pos[1])
+
                     # Если координаты попадают в область интерфейса
                     if interface.are_interface_coordinates(mouse_pos[0], mouse_pos[1]):
 
@@ -403,6 +406,21 @@ class GameProcess:
                         # Иначе отключаем режим просмотра для всех клеток
                         else:
                             game.off_view_for_all_squares()
+
+                    # Если клетка, на которую наведён курсор существует и активна
+                    elif (view_square is not None) and (view_square.is_activated):
+
+                        # Выделяем клетку как просматриваемую
+                        view_square.on_view()
+
+                        # Если просматриваемая клетка не находится в списке просматриваемых клеток, то очищаем от 
+                        # выделения все ранее просматриваемые клети и обновляем список просматриваемых клеток
+                        if (game.viewed_squares is None) or (view_square not in game.viewed_squares):
+                            game.off_view_for_all_squares()
+                            game.viewed_squares = [view_square]
+
+                        # Обновляем игровое поле
+                        game.field.update()
 
                     # Иначе отключаем режим просмотра для всех клеток
                     else:

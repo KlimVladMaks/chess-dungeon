@@ -103,6 +103,9 @@ class SquareTemplate(pg.sprite.Sprite):
         # Флаг, указывающий на то, является ли клетка просматриваемой
         self.is_viewed = False
 
+        # Указываем, что клетка не активна
+        self.is_activated = False
+
     def get_pos(self) -> tuple[int, int]:
         """
         Функция для получения позиции клетки в списке игровых клеток поля.
