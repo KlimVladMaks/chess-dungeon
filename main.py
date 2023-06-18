@@ -142,6 +142,9 @@ class GameProcess:
                 # Если нажата кнопка Enter
                 elif e.type == pg.KEYDOWN and e.key == pg.K_RETURN:
 
+                    # Очищаем все просматриваемые клетки
+                    game.off_view_for_all_squares()
+
                     # Завершаем текущий игровой такт
                     game.finish_game_tact()
 
@@ -240,6 +243,9 @@ class GameProcess:
                         if square_clicked.is_activated:
 
                             """Нужно быть осторожнее с добавлением новых действий, требующих другой обработки"""
+
+                            # Очищаем все просматриваемые клетки
+                            game.off_view_for_all_squares()
 
                             # Очищаем ранее активированные клетки
                             game.clear_activated_squares()
@@ -410,14 +416,46 @@ class GameProcess:
                     # Если клетка, на которую наведён курсор существует и активна
                     elif (view_square is not None) and (view_square.is_activated):
 
-                        # Выделяем клетку как просматриваемую
-                        view_square.on_view()
+                        # Получаем область клеток на которые распространяется выбранная способность
+                        squares_area = game.selected_spell.give_area_of_attack(game.selected_piece, view_square)
 
-                        # Если просматриваемая клетка не находится в списке просматриваемых клеток, то очищаем от 
-                        # выделения все ранее просматриваемые клети и обновляем список просматриваемых клеток
-                        if (game.viewed_squares is None) or (view_square not in game.viewed_squares):
-                            game.off_view_for_all_squares()
-                            game.viewed_squares = [view_square]
+                        # Если способность не наносит эффект по области
+                        if squares_area is None:
+                            
+                            # Выделяем клетку как просматриваемую
+                            view_square.on_view()
+
+                            # Если просматриваемая клетка не является базовой просматриваемой клеткой
+                            if view_square != game.base_viewed_square:
+
+                                # Очищаем все предыдущие просматриваемые клетки
+                                game.off_view_for_all_squares()
+
+                                # Делаем новую клетку базовой и просматриваемой
+                                game.base_viewed_square = view_square
+                                game.viewed_squares = [view_square]
+
+                        # Иначе
+                        else:
+
+                            # Выделяем стартовую клетку как просматриваемую
+                            view_square.on_view()
+
+                            # Выделяем для просмотра все клетки из полученной области
+                            for square in squares_area:
+                                square.on_view()
+                            
+                            # Если просматриваемая клетка не является базовой просматриваемой клеткой
+                            if view_square != game.base_viewed_square:
+
+                                # Очищаем все предыдущие просматриваемые клетки
+                                game.off_view_for_all_squares()
+
+                                # Делаем новую клетку базовой и просматриваемой, а также обновляем список 
+                                # просматриваемых клеток
+                                game.base_viewed_square = view_square
+                                game.viewed_squares = squares_area
+                                game.viewed_squares.append(view_square)
 
                         # Обновляем игровое поле
                         game.field.update()

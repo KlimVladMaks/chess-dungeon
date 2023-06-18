@@ -42,6 +42,9 @@ class Game:
         # Список для хранения просматриваемых клеток
         self.viewed_squares: tp.Union[list[Square], None] = None
 
+        # Базовая просматриваемая клетка (относительно которой распространяется область обзора)
+        self.base_viewed_square: tp.Union[Square, None] = None
+
         # Просматриваемая способность
         self.viewed_spell: tp.Union[Spell, None] = None
 
@@ -198,6 +201,9 @@ class Game:
         """
         Функция для отключения режима просмотра для всех клеток.
         """
+
+        # Убираем базовую просматриваемую клетку
+        self.base_viewed_square = None
 
         # Если есть просматриваемые клетки
         if self.viewed_squares is not None:
