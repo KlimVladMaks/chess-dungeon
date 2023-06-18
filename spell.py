@@ -707,7 +707,7 @@ class KnightAttack1_Attack(Spell):
 class KnightAttack2(Spell):
 
     def __init__(self):
-        super().__init__("tactical_retreat", "attack", "Тактическое отступление", "Делает дальнее перемещение и восстанавливает себе небольшое количество здоровья", 2, 2)
+        super().__init__("tactical_retreat", "move", "Тактическое отступление", "Делает дальнее перемещение и восстанавливает себе небольшое количество здоровья", 2, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
