@@ -824,19 +824,29 @@ class KnightUtility(Spell):
         Воспомогательная функция для target
         """
 
+        potential = spell.give_area_of_attack(self, host_cell)
+
+        enemies_list = []
+        for cell in potential:
+            if not cell.inner_piece is None and cell.inner_piece.team != self.team:
+                enemies_list.append(cell)
+
+        return enemies_list
+
+    def give_area_of_attack(spell, self, host_cell):
+
         area = 2
         y0, x0 = host_cell.get_pos()
         potential = spell.draw_rhomb(1, area, x0, y0)
 
-        enemies_list = []
+        square_list = []
         for cell_coor in potential:
             x, y = cell_coor[0], cell_coor[1]
             cell = self.field.get_square_by_pos(y, x)
-            if not cell is None and not cell.is_exist is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
-                enemies_list.append(cell)
+            if not cell is None and not cell.is_exist is None:
+                square_list.append(cell)
 
-        return enemies_list
-    
+        return square_list
 
 class RookAttack1(Spell):
 
@@ -1300,15 +1310,26 @@ class KingAttack2(Spell):
         Воспомогательная функция для target
         """
 
+        potential = spell.give_area_of_attack(self, host_cell)
+
+        enemies_list = []
+        for cell in potential:
+            if not cell.inner_piece is None and cell.inner_piece.team != self.team:
+                enemies_list.append(cell)
+
+        return enemies_list
+
+    def give_area_of_attack(spell, self, host_cell):
+
         area = 2
         y0, x0 = host_cell.get_pos()
         potential = spell.draw_rhomb(1, area, x0, y0)
 
-        enemies_list = []
+        square_list = []
         for cell_coor in potential:
             x, y = cell_coor[0], cell_coor[1]
             cell = self.field.get_square_by_pos(y, x)
-            if not cell is None and not cell.is_exist is None and not cell.inner_piece is None and cell.inner_piece.team != self.team:
-                enemies_list.append(cell)
+            if not cell is None and not cell.is_exist is None:
+                square_list.append(cell)
 
-        return enemies_list
+        return square_list
