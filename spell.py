@@ -827,7 +827,7 @@ class KnightUtility(Spell):
             else:
                 print(f"Атакующая фигура промахнулась")
 
-    def give_enemies_in_area(spell, self, host_cell):
+    def give_enemies_in_area(spell: "Spell", self: "Piece", host_cell: "Square") -> list["Square"]:
 
         """
         Воспомогательная функция для target
@@ -842,7 +842,7 @@ class KnightUtility(Spell):
 
         return enemies_list
 
-    def give_area_of_attack(spell: "Spell", self: "Square", host_cell: "Square") -> list["Square"]:
+    def give_area_of_attack(spell: "Spell", self: "Piece", host_cell: "Square") -> list["Square"]:
 
         area = 2
         y0, x0 = host_cell.get_pos()
@@ -1313,7 +1313,7 @@ class KingAttack2(Spell):
                 damage = randrange(self.min_damage, self.max_damage + 1)
                 enemy.give_damage(damage)
 
-    def give_enemies_in_area(spell: "Spell", self: "Square", host_cell: "Square") -> list["Square"]:
+    def give_enemies_in_area(spell: "Spell", self: "Piece", host_cell: "Square") -> list["Square"]:
 
         """
         Воспомогательная функция для target
@@ -1328,7 +1328,7 @@ class KingAttack2(Spell):
 
         return enemies_list
 
-    def give_area_of_attack(spell: "Spell", self: "Square", host_cell: "Square") -> list["Square"]:
+    def give_area_of_attack(spell: "Spell", self: "Piece", host_cell: "Square") -> list["Square"]:
 
         area = 2
         y0, x0 = host_cell.get_pos()
