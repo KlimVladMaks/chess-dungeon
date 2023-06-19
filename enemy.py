@@ -782,3 +782,80 @@ class EnemyRook(EnemyPiece, Rook):
                     print(f"Враг не может найти позицию для использования {spell.name}")
                     self.AP = 0
                     pass
+
+class EnemyQueen(EnemyPiece, Queen):
+
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+
+    def alarm(self):
+
+        """
+        Поведение при обнаружении фигур игрока конём
+        self.spell_list[0] - PieceMove()
+        self.spell_list[1] - QueenAttack1()
+        self.spell_list[2] - QueenAttack2()
+        """
+
+        #Переменная для отследивания было ли совершено действие
+        is_cast = False
+
+        #Сперва пытаемся сделать рывок с разгона
+        spell = self.spell_list[2]
+        if spell.cooldown_now == 0:
+            #Берём одну случайную цель
+            if self.AP == 2:
+                enemies = spell.target(self)
+                if enemies:
+                    enemy = random.choice(enemies)
+                    #Определяем дальнюю клетку откуда сможем использовать навык
+                    cell_for_move = self.field.get_farthest(enemy, spell.zone(self))
+                    #Идём туда
+                    self.go_to_position(cell_for_move)
+                    #И кастуем
+                    is_cast = self.try_cast_spell(spell)
+
+        #Завершаем действие, если способность использована
+        if is_cast:
+            return
+        
+        #Иначе просто стреляем
+        spell = self.spell_list[1]
+        if spell.cooldown_now == 0:
+            is_cast = self.try_cast_spell(spell)
+
+        #Завершаем действие, если способность использована
+        if is_cast:
+            return
+            
+        #Ищем ближнего противника
+        target = self.get_nearest_enemy()
+
+        #Коль он найден, то
+        if not target is None:
+            #Просто подходим на выстрел
+            spell = self.spell_list[1]
+            if spell.cooldown_now <= 1:
+                desirable_position = self.get_desirable_position(spell, target)
+
+                if not desirable_position is None:
+                    print('Враг движется к цели')
+                    #передвигает фигуру на позицию или максимально близко к ней
+                    self.go_to_position(desirable_position)
+                    return
+            
+                else:
+                    #не делаем ничего
+                    print(f"Враг не может найти позицию для использования {spell.name}")
+                    self.AP = 0
+                    pass
+            
+            else:
+                self.AP = 0
+                pass
+
+        else:
+            #не делаем ничего
+            print(f"Ближайщей цели нет, враг бездействует")
+            self.AP = 0
+            pass

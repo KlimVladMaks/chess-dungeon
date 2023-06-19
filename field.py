@@ -1026,3 +1026,77 @@ class Field:
             i += 1
 
         return nearest_cell
+    
+        """Совместно с svgarik"""
+
+    def get_farthest(self, start: "Square", endest: list["Square"]) -> tp.Union["Square", None]:
+
+        """
+        Функция возвращает 
+        Функция считает фигуры преградой
+
+        :param start: Начальная клетка.
+        :param endest: список конечных клетка.
+        :return: дальняя клетка из списка от стартовой клетке
+        """
+
+        # храним индекс рассматриваемого элемента, симулируя очередь
+        # и саму очередь, в которой храним клетку от которой параллельно идём
+        # и ещё один массив, чтобы узнавать длину и при этом спокойно узнавать, были ли мы уже в этой клетке
+        # и массив со ссылкой на обратную клетку пришли для восстановления пути
+        i = 0
+        moves = []
+        len_way = []
+
+        # проверим о выходе за пределы массива (зачем?)
+        row_pos, col_pos = start.get_pos()
+        if self.is_into_map(row_pos, col_pos):
+            moves.append((row_pos, col_pos))
+            len_way.append(0)
+
+        #конечная клетка
+        farthest_cell = None
+
+        while i < len(moves):
+
+            # проверяем были ли мы уже в соседних клетках от текущей
+            # и, если не были и туда идти не больше radius_move добавляем в очередь
+            # ах да, ещё проверка выхода за пределы массива
+
+            if self.get_square_by_pos(moves[i][0], moves[i][1]) in endest:
+                farthest_cell = self.get_square_by_pos(moves[i][0], moves[i][1])
+                endest.remove(farthest_cell)
+                if not endest:
+                    break
+
+            if (not (moves[i][0] + 1, moves[i][1]) in moves  # ещё не посетили
+                    and self.is_into_map(moves[i][0] + 1, moves[i][1])  # в пределах поля
+                        and not self.is_barrier(moves[i][0] + 1, moves[i][1])  # можно пройти
+                            and self.get_square_by_pos(moves[i][0] + 1, moves[i][1]).inner_piece is None):  # нет фигуры (если фигура = стена)
+                moves.append((moves[i][0] + 1, moves[i][1]))
+                len_way.append(len_way[i] + 1)
+
+            if (not (moves[i][0] - 1, moves[i][1]) in moves
+                    and self.is_into_map(moves[i][0] - 1, moves[i][1])
+                        and not self.is_barrier(moves[i][0] - 1, moves[i][1])
+                            and self.get_square_by_pos(moves[i][0] - 1, moves[i][1]).inner_piece is None):
+                moves.append((moves[i][0] - 1, moves[i][1]))
+                len_way.append(len_way[i] + 1)
+
+            if (not (moves[i][0], moves[i][1] + 1) in moves
+                    and self.is_into_map(moves[i][0], moves[i][1] + 1)
+                        and not self.is_barrier(moves[i][0], moves[i][1] + 1)
+                            and self.get_square_by_pos(moves[i][0], moves[i][1] + 1).inner_piece is None):
+                moves.append((moves[i][0], moves[i][1] + 1))
+                len_way.append(len_way[i] + 1)
+
+            if (not (moves[i][0], moves[i][1] - 1) in moves
+                    and self.is_into_map(moves[i][0], moves[i][1] - 1)
+                        and not self.is_barrier(moves[i][0], moves[i][1] - 1)
+                            and self.get_square_by_pos(moves[i][0], moves[i][1] - 1).inner_piece is None):
+                moves.append((moves[i][0], moves[i][1] - 1))
+                len_way.append(len_way[i] + 1)
+
+            i += 1
+
+        return farthest_cell
