@@ -101,11 +101,15 @@ class GameProcess:
         enemy_2.set_way_patrol(field.get_square_by_pos(6, 19))
         enemy_3 = EnemyBishop('Shodan', game, field, field.get_square_by_pos(18, 17), 10, 0.7, 1, 3, 3, 4)
         enemy_3.set_way_patrol(field.get_square_by_pos(5, 17))
-        enemy_4 = EnemyKing('Shodan', game, field, field.get_square_by_pos(18, 18), 10, 0.7, 1, 3, 3, 4)
+        enemy_5 = EnemyKnight('Shodan', game, field, field.get_square_by_pos(18, 20), 10, 0.7, 1, 3, 3, 4)
+        enemy_5.set_way_patrol(field.get_square_by_pos(5, 19))
+        enemy_6 = EnemyQueen('Shodan', game, field, field.get_square_by_pos(18, 16), 10, 0.7, 1, 3, 3, 4)
+        enemy_6.set_way_patrol(field.get_square_by_pos(16, 17))
+        enemy_4 = EnemyKing('Shodan', game, field, field.get_square_by_pos(18, 18), 20, 0.7, 1, 3, 3, 4)
 
         # Помещаем все фигуры в соответствующие списки
         game.player_pieces = [piece_1, piece_2, piece_3, piece_4, piece_5]
-        game.computer_pieces = [enemy_1, enemy_2, enemy_3, enemy_4]
+        game.computer_pieces = [enemy_1, enemy_2, enemy_3, enemy_4, enemy_5, enemy_6]
 
         for piece in game.player_pieces:
             piece.cell.add_inner_piece(piece)

@@ -1115,7 +1115,7 @@ class QueenAttack1(Spell):
 class QueenAttack2(Spell):
 
     def __init__(self):
-        super().__init__("bitchiness", "attack", "Стервозность", "Стремительно приближается для атаки и наносит дополнительный урон за пройденный путь до врага", 1, 2)
+        super().__init__("bitchiness", "attack", "Стервозность", "Стремительно приближается для атаки и наносит дополнительный урон за пройденный путь до врага", 2, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
