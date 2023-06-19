@@ -27,6 +27,12 @@ BUTTON_SIZE = (70, 70)
 # Серый фильтр для наложения на неактивные фигуры
 GRAY_FILTER = (0, 0, 0, 128)
 
+# Размер текста для отображения кулдауна способностей
+COOLDOWN_FONT_SIZE = 50
+
+# Цвет текста для отображения кулдауна способностей
+COOLDOWN_FONT_COLOR = (255, 165, 0)
+
 
 class Button(pg.sprite.Sprite):
     """
@@ -54,6 +60,9 @@ class Button(pg.sprite.Sprite):
 
         # Сохраняем флаг, является ли кнопка активной
         self.is_active = is_active
+
+        # Текст для отображения кулдауна способностей
+        self.cooldown_font = pg.font.Font(None, COOLDOWN_FONT_SIZE)
 
         # Задаём поверхность кнопки
         self.image = pg.Surface((button_size[0], button_size[1]))
@@ -87,6 +96,10 @@ class Button(pg.sprite.Sprite):
             # Навешиваем на кнопку значок блокировки
             surface = pg.image.load("design/interface/block.png")
             self.image.blit(surface, (0, 0))
+
+            # Наносим на кнопку величину кулдауна
+            cooldown_text = self.cooldown_font.render(str(self.spell.cooldown_now), True, COOLDOWN_FONT_COLOR)
+            self.image.blit(cooldown_text, (0, 0))
 
 
 class Interface(pg.sprite.Sprite):
@@ -216,8 +229,9 @@ class Interface(pg.sprite.Sprite):
         for spell in buttons_spell:
 
             # Проверяем, является ли данная способность доступной
-            # (Способность доступна, если у фигуры количество ОД больше нуля или если стоимость способности равна нулю)
-            if (piece.AP > 0) or (spell.cost == 0):
+            # (Способность доступна, если у фигуры количество ОД больше нуля, или если стоимость способности равна нулю,
+            # и только если кулдаун меньше или равен нулю)
+            if ((piece.AP > 0) or (spell.cost == 0)) and (spell.cooldown_now <= 0):
                 is_active_spell = True
             else:
                 is_active_spell = False
