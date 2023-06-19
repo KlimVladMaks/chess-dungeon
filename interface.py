@@ -33,6 +33,15 @@ COOLDOWN_FONT_SIZE = 50
 # Цвет текста для отображения кулдауна способностей
 COOLDOWN_FONT_COLOR = (255, 165, 0)
 
+# Размер текста для интерфейса
+INTERFACE_FONT_SIZE = 25
+
+# Цвет текста для интерфейса
+INTERFACE_FONT_COLOR = (0, 0, 0)
+
+# Отступы для текста интерфейса
+INTERFACE_TEXT_MARGIN = 10
+
 
 class Button(pg.sprite.Sprite):
     """
@@ -61,7 +70,7 @@ class Button(pg.sprite.Sprite):
         # Сохраняем флаг, является ли кнопка активной
         self.is_active = is_active
 
-        # Текст для отображения кулдауна способностей
+        # Шрифт для отображения кулдауна способностей
         self.cooldown_font = pg.font.Font(None, COOLDOWN_FONT_SIZE)
 
         # Задаём поверхность кнопки
@@ -137,6 +146,9 @@ class Interface(pg.sprite.Sprite):
 
         # Флаг, показывающий, открыт ли интерфейс
         self.is_open = False
+
+        # Шрифт для отображения текста на интерфейсе
+        self.font = pg.font.Font(None, INTERFACE_FONT_SIZE)
 
     def show(self) -> None:
         """
@@ -301,7 +313,50 @@ class Interface(pg.sprite.Sprite):
             if button.action == del_button_action:
                 button.action = add_button_action
 
+    def add_text(self, text: str) -> None:
+        """
+        Функция для добавления текста в интерфейс.
 
+        :param text: Текст для добавления в интерфейс.
+        """
+
+        # Отлавливаем ошибки
+        try:
+
+            # Создаём поверхность с текстом
+            text_surface = self.font.render(text, False, INTERFACE_FONT_COLOR)
+
+            # Если текст превышает допустимую ширину
+            if text_surface.get_width() > (self.image.get_width() // 2):
+
+                # Разбивает строку на строки допустимой длины и помещаем их в список
+                words = text.split(' ')
+                lines = []
+                current_line = words[0]
+                for word in words[1:]:
+                    if self.font.size(current_line + ' ' + word)[0] < (self.image.get_width() // 2):
+                        current_line += ' ' + word
+                    else:
+                        lines.append(current_line)
+                        current_line = word
+                lines.append(current_line)
+            
+                # Создаём новую поверхность допустимых размеров
+                text_surface = pg.Surface((self.image.get_width() // 2, self.image.get_height()), pg.SRCALPHA)
+            
+                # Заполняем новую поверхность новыми строками, реализуя перенос строк 
+                y = 0
+                for line in lines:
+                    text_surface.blit(self.font.render(line, False, INTERFACE_FONT_COLOR), (0, y))
+                    y += self.font.size(line)[1]
+
+            # Выводим текст на интерфейс
+            self.image.blit(text_surface, (self.image.get_width() // 2, INTERFACE_TEXT_MARGIN))
+            self.screen.blit(self.image, self.rect)
+            pg.display.update()
+
+        except Exception as e:
+            pass
 
 
 

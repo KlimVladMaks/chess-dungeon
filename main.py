@@ -379,8 +379,8 @@ class GameProcess:
                         # Получаем кнопку над которой находится курсор
                         button = interface.get_button_by_coordinates(mouse_pos[0], mouse_pos[1])
 
-                        # Если кнопка не равна None и нет выбранного действия
-                        if button is not None and game.selected_spell is None:
+                        # Если кнопка не равна None
+                        if button is not None:
 
                             # Извлекаем из кнопки способность
                             button_spell = button.spell
@@ -389,19 +389,28 @@ class GameProcess:
                             if (game.viewed_spell is not None) and (button_spell.id != game.viewed_spell.id):
                                 game.off_view_for_all_squares()
 
+                                # Очищаем интерфейс от текста
+                                interface.show()
+                            
                             # Сохраняем новую просматриваемую способность
                             game.viewed_spell = button_spell
 
                             # Получаем список клеток из области действия способности
                             game.viewed_squares = button_spell.zone(game.selected_piece)
 
-                            # Защита от None
-                            if game.viewed_squares is None:
-                                continue
+                            # Выводим описание способности в интерфейсе
+                            interface.add_text(button_spell.description)
 
-                            # Делаем все полученные клетки просматриваемыми
-                            for square in game.viewed_squares:
-                                square.on_view()
+                            # Если нет выбранного действия
+                            if game.selected_spell is None:
+
+                                # Защита от None
+                                if game.viewed_squares is None:
+                                    continue
+
+                                # Делаем все полученные клетки просматриваемыми
+                                for square in game.viewed_squares:
+                                    square.on_view()
 
                             # Обновляем игровое поле
                             game.field.update()
@@ -412,6 +421,9 @@ class GameProcess:
                         # Иначе отключаем режим просмотра для всех клеток
                         else:
                             game.off_view_for_all_squares()
+
+                            # Очищаем интерфейс от текста
+                            interface.show()
 
                     # Если клетка, на которую наведён курсор существует и активна
                     elif (view_square is not None) and (view_square.is_activated):
@@ -463,6 +475,10 @@ class GameProcess:
                     # Иначе отключаем режим просмотра для всех клеток
                     else:
                         game.off_view_for_all_squares()
+
+                        # Если интерфейс открыт, очищаем его от текста
+                        if interface.is_open:
+                            interface.show()
 
 
 def main() -> None:
