@@ -18,7 +18,12 @@ if tp.TYPE_CHECKING:
 
 class EnemyPiece(Piece):
 
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int, difficulty: float):
+        max_hp = int(max_hp * difficulty)
+        accuracy = accuracy * difficulty
+        min_damage = int(min_damage * difficulty)
+        max_damage = int(max_damage * difficulty)
+
         super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         self.action = "patrol"
         self.way_patrol = []
@@ -361,8 +366,8 @@ class EnemyPiece(Piece):
 
 class EnemyPawn(EnemyPiece, Pawn):
 
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int, difficulty: float):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov, difficulty)
 
     def alarm(self):
 
@@ -469,8 +474,8 @@ class EnemyPawn(EnemyPiece, Pawn):
             pass
 
 class EnemyKing(EnemyPiece, King):
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int, difficulty: float):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov, difficulty)
         self.action = "attack"
 
     def alarm(self):
