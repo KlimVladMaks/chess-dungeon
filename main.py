@@ -6,6 +6,7 @@ from enemy import *
 from interface import *
 from game import *
 from menu import *
+from king_square import *
 
 # Ширина и высота экрана
 SCREEN_WIDTH = 800
@@ -88,6 +89,12 @@ class GameProcess:
         # Создаём экземпляр класса для управления процессом игры
         game = Game(field)
 
+        # Создаём клетку (кнопку) короля игрока
+        player_king = King('p1', game, field, Square(0, 0, field), 10, 0.7, 1, 3, 3, 4)
+        king_square = KingSquare(field, player_king)
+        player_king.cell = king_square
+        field.king_square = king_square
+
         # Тест расположения фигуры
         piece_1 = Pawn('p1', game, field, field.get_square_by_pos(6, 6), 10, 0.7, 1, 3, 3, 4)
         piece_2 = Bishop('p1', game, field, field.get_square_by_pos(5, 5), 10, 0.7, 1, 3, 3, 4)
@@ -163,6 +170,9 @@ class GameProcess:
                     # Делаем новый ход для каждой фигуры игрока
                     for piece in game.player_pieces:
                         piece.new_turn()
+                    
+                    # Делаем новый ход для короля игрока
+                    king_square.inner_piece.new_turn()
 
                     # Удаляем уничтоженные фигуры из соответсвующий списков
                     game.del_destroyed_pieces()

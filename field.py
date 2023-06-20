@@ -4,6 +4,7 @@ import typing as tp
 if tp.TYPE_CHECKING:
     from piece import Piece
     from menu import GameMenu
+    from king_square import KingSquare
 
 # Размер стороны шахматной клетки
 SQUARE_SIDE_SIZE = 50
@@ -594,6 +595,7 @@ class Field:
         :param screen_absolute_coordinates: Абсолютные координаты экрана игры.
         :param field_map: Карта игрового поля.
         :param game_menu: Игровое меню.
+        :param king_square: Клетка (кнопка) короля игрока.
         """
 
         # Сохраняем экран игры
@@ -613,6 +615,9 @@ class Field:
 
         # Сохраняем игровое меню
         self.game_menu = game_menu
+
+        # Свойство для кнопки короля игрока
+        self.king_square: tp.Union[KingSquare, None] = None
 
         # Двухмерный список для хранения спрайтов шахматных клеток
         self.squares_list: list[list[SquareTemplate]] = []
@@ -688,6 +693,10 @@ class Field:
         :return: Клетка с заданными координатами или None, если клетка не найдена.
         """
 
+        # Если координаты клетки совпадают с координатами клетки короля игрока, то возвращаем её
+        if self.king_square.rect.collidepoint(x_coordinate, y_coordinate):
+            return self.king_square
+
         # Рассчитываем абсолютные координаты клетки
         x_absolute = x_coordinate + self.screen_absolute_coordinates[0]
         y_absolute = y_coordinate + self.screen_absolute_coordinates[1]
@@ -758,7 +767,14 @@ class Field:
         self.screen.blit(self.screen_field, (0, 0))
 
         # Отрисовываем кнопку открытия игрового меню
-        self.screen.blit(self.game_menu.open_menu_button.image, self.game_menu.open_menu_button.rect)
+        self.screen_field.blit(self.game_menu.open_menu_button.image, self.game_menu.open_menu_button.rect)
+        self.screen.blit(self.screen_field, (0, 0))
+
+        # Отрисовываем кнопку короля, если она добавлена
+        if self.king_square is not None:
+            self.king_square.update()
+            self.screen_field.blit(self.king_square.image, self.king_square.rect)
+            self.screen.blit(self.screen_field, (0, 0))
 
         # Обновляем экран
         pg.display.update()
