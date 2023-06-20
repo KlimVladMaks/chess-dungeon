@@ -1,4 +1,5 @@
 import typing as tp
+from field import Square
 from spell import *
 
 if tp.TYPE_CHECKING:
@@ -442,4 +443,5 @@ class King(Piece):
         self.spell_list.append(KingAttack1())
         self.spell_list.append(KingAttack2())
 
-        #У короля пока пусто
+    def get_fovs(self, cell=None, opaque_piece=False) -> list[Square]:
+        return []

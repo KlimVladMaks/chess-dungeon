@@ -90,7 +90,7 @@ class GameProcess:
         game = Game(field)
 
         # Создаём клетку (кнопку) короля игрока
-        player_king = King('p1', game, field, Square(0, 0, field), 10, 0.7, 1, 3, 3, 4)
+        player_king = King('p1', game, field, None, 10, 1, 1, 3, 0, 0)
         king_square = KingSquare(field, player_king)
         player_king.cell = king_square
         field.king_square = king_square

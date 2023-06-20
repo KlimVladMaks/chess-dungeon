@@ -1230,9 +1230,6 @@ class KingAttack1(Spell):
         super().__init__("royal_grace", "assistance",  "Королевская милость", "Снимает с союзной фигуры все негативные эффекты", 3, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
-
-        if host_cell is None:
-            host_cell = self.cell
         
         if type(self).__name__ == "EnemyKing":
             return self.game.get_overview_for_computer_pieces()
@@ -1241,9 +1238,6 @@ class KingAttack1(Spell):
             return self.game.get_overview_for_player_pieces()
 
     def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
-        
-        if host_cell is None:
-            host_cell = self.cell
 
         potential = spell.zone(self, host_cell = host_cell)
 
@@ -1269,9 +1263,6 @@ class KingAttack2(Spell):
         super().__init__("a_volley_of_arrows", "area_attack",  "Залп стрел", "Наносит небольшой урон по области", 3, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
-
-        if host_cell is None:
-            host_cell = self.cell
         
         if type(self).__name__ == "EnemyKing":
             return self.game.get_overview_for_computer_pieces()
@@ -1280,10 +1271,7 @@ class KingAttack2(Spell):
             return self.game.get_overview_for_player_pieces()
 
     def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
-        
-        if host_cell is None:
-            host_cell = self.cell
-        
+
         potential = spell.zone(self, host_cell = host_cell)
 
         #фильтруем
@@ -1291,7 +1279,7 @@ class KingAttack2(Spell):
 
         #только клетки, рядом с коими есть враг
         for cell in potential:
-            if not cell.is_exist is None and not self.field.get_way(self.cell, cell, piece_is_barrier=True) is None:
+            if not cell.is_exist is None:
                 if spell.give_enemies_in_area(self, cell):
                     target_list.append(cell)
 
