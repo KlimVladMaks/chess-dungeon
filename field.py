@@ -54,8 +54,11 @@ VIEWED_SQUARE_COLOR = (255, 165, 0, 128)
 # Размер шрифта для размещения текста на шахматной клетке
 SQUARE_FONT_SIZE = 30
 
-# Цвет текста, размещаемого на шахматной клетке
-SQUARE_FONT_COLOR = (255, 165, 0)
+# Цвет текста, размещаемого на шахматной клетке (очки здоровья)
+SQUARE_FONT_COLOR_HP = (255, 165, 0)
+
+# Цвет текста, размещаемого на шахматной клетке (очки щита)
+SQUARE_FONT_COLOR_SHIELD = (0, 0, 255)
 
 # Серый фильтр для наложения на неактивные фигуры
 GRAY_FILTER = (0, 0, 0, 128)
@@ -331,8 +334,15 @@ class Square(SquareTemplate):
                 self.image.blit(surface, (0, 0))
 
             # Рисуем на клетке с фигурой значение количества HP у данной фигуры
-            hp_text = self.font.render(str(self.inner_piece.hp), True, SQUARE_FONT_COLOR)
+            hp_text = self.font.render(str(self.inner_piece.hp), True, SQUARE_FONT_COLOR_HP)
             self.image.blit(hp_text, (0, 0))
+
+            # Если у фигуры есть щит, то рисуем его значение
+            if self.inner_piece.shield > 0:
+                shield_text = self.font.render(str(self.inner_piece.shield), True, SQUARE_FONT_COLOR_SHIELD)
+                self.image.blit(shield_text, 
+                                (0, 
+                                self.image.get_height() - shield_text.get_height()))
 
         # Если клетка просматривается, то дополнительно выделяем клетку
         if self.is_viewed:
