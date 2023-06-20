@@ -442,6 +442,3 @@ class King(Piece):
         self.spell_list = []
         self.spell_list.append(KingAttack1())
         self.spell_list.append(KingAttack2())
-
-    def get_fovs(self, cell=None, opaque_piece=False) -> list[Square]:
-        return []
