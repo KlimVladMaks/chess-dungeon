@@ -67,6 +67,12 @@ class MenuButton(pg.sprite.Sprite):
             self.image = pg.image.load("design/menu/continue_game_button.png")
         elif self.value == "restart":
             self.image = pg.image.load("design/menu/restart_button.png")
+        elif self.value == "hard":
+            self.image = pg.image.load("design/menu/hard_button.png")
+        elif self.value == "normal":
+            self.image = pg.image.load("design/menu/normal_button.png")
+        elif self.value == "easy":
+            self.image = pg.image.load("design/menu/easy_button.png")
 
 
 class MainMenu:
@@ -399,5 +405,9 @@ class GameMenu:
         return None
 
 
-
+class DifficultyMenu(MainMenu):
+    """
+    Меню для выбора сложности игры.
+    """
+    pass
 

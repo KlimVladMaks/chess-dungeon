@@ -524,9 +524,26 @@ def main() -> None:
             main_menu = MainMenu(screen)
             main_menu.add_buttons(["demo", "quit"])
             active_object = main_menu.start()
+        
+        # Перед началом игры спрашиваем уровень сложности
+        elif (active_object == "demo") or (active_object == "restart"):
+            difficulty_menu = DifficultyMenu(screen)
+            difficulty_menu.add_buttons(["hard", "normal", "easy", "main_menu"])
+            difficulty = difficulty_menu.start()
+            if difficulty == "main_menu":
+                active_object = "main_menu"
+                continue
+            global GAME_DIFFICULTY
+            if difficulty == "easy":
+                GAME_DIFFICULTY = 0.5
+            elif difficulty == "normal":
+                GAME_DIFFICULTY = 1
+            elif difficulty == "hard":
+                GAME_DIFFICULTY = 1.5
+            active_object = "demo_start"
 
         # Запускаем демо игровой процесс
-        elif (active_object == "demo") or (active_object == "restart"):
+        elif active_object == "demo_start":
             active_object = GameProcess.start(screen)
 
         # Запускаем финальное меню при проигрыше
