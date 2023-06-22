@@ -918,7 +918,7 @@ class KnightAttack2(Spell):
         priority = []
 
         for cell in target:
-            price = random.random()
+            price = random()
             priority.append((price, cell))
         
         return sorted(priority, key=lambda x: x[0], reverse=True)
