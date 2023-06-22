@@ -343,6 +343,11 @@ class Square(SquareTemplate):
                 self.image.blit(shield_text, 
                                 (0, 
                                 self.image.get_height() - shield_text.get_height()))
+            
+            # Если на фигуру наложены эффекты, то добавляем специальный значок
+            if len(self.inner_piece.effect_list) > 0:
+                surface = pg.image.load("design/game/debuff.png")
+                self.image.blit(surface, (0, 0))
 
         # Если клетка просматривается, то дополнительно выделяем клетку
         if self.is_viewed:
