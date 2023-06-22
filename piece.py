@@ -1,9 +1,11 @@
 import typing as tp
+from field import Square
 from spell import *
-from effect import *
 
 if tp.TYPE_CHECKING:
     from field import Square, Field
+    from game import Game
+    from effect import Effect
 
 
 class Piece:
@@ -12,7 +14,7 @@ class Piece:
     Класс для шаблона Фигуры.
     """
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
 
         """
         :team: команда фигуры
@@ -33,6 +35,7 @@ class Piece:
 
         self.team = team
         self.cell = cell
+        self.game = game
         self.field = field
         self.radius_fov = radius_fov
         self.radius_move = radius_move
@@ -41,12 +44,11 @@ class Piece:
         self.accuracy = accuracy
         self.min_damage = min_damage
         self.max_damage = max_damage
-
-        self.spell_list: list[Spell] = [Piece_Move()]
-        self.effect_list: list[Effect] = []
-        self.active_turn: bool = True
-        self.AP: int = 2
-        self.shield: int = 0
+        self.spell_list = [Piece_Move()]
+        self.effect_list: list["Effect"] = []
+        self.active_turn = True
+        self.AP = 2
+        self.shield = 0
 
     def get_fovs(self, cell = None, opaque_piece = False) -> list["Square"]:
         """
@@ -106,7 +108,7 @@ class Piece:
             else:
                 y += 1
 
-        foving_cell = []
+        foving_cell = [self.cell]
         for pos in list(fovs):
             cell = self.field.get_square_by_pos(pos[0], pos[1])
             if cell != self.cell:
@@ -156,11 +158,11 @@ class Piece:
         #проверяем, что не выходим за краницы массива
         if self.field.is_into_map(y, x):
             #создаём путь, куда попадают видимые клетки
-            #первая клетка всегда попадает в путь
             #если клетка - стена то клетки после неё не попадают в видимые клетки
-            way = [(y, x)]
             if self.field.is_fog(y, x):
                 return way
+            way = [(y, x)]
+
         else:
             return []
         
@@ -183,9 +185,9 @@ class Piece:
             
             if self.field.is_into_map(y, x):
                 #вновь проверяем, а не смотрим ли мы сквозь стену?
-                way.append((y, x))
                 if self.field.is_fog(y, x):
                     return way
+                way.append((y, x))
                 #если мы в режиме непрозрачных фигур
                 if opaque_piece:
                     if not self.field.get_square_by_pos(y, x).inner_piece is None:
@@ -198,15 +200,6 @@ class Piece:
         """
         Функция добавляет объекты класса Spell в piece.spell_list
         """
-
-    def update_spell_list(self) -> None:
-
-        """
-        Функция заного создаёт список способностей
-        """
-
-        self.spell_list = [Piece_Move()]
-        self.create_spell_list()
         
     def give_damage(self, damage: int) -> None:
 
@@ -261,8 +254,8 @@ class Piece:
 
     def destroy(self):
         self.cell.del_inner_piece()
+        self.game.del_piece(self)
         print("Фигура рассыпалась в каменную крошку!")
-        print(f"ХП фигуры = {self.hp} | положение = {self.field.get_pos_by_square(self.cell)}, пешка {self}")
 
     def new_turn(self) -> None:
 
@@ -271,7 +264,6 @@ class Piece:
         """
         
         self.AP = 2
-        self.update_spell_list()
 
         for spell in self.spell_list:
             if spell.cooldown_now > 0:
@@ -303,7 +295,11 @@ class Piece:
         :id_spell: кодовое слово способности
         :cell: клетка на которую способность использовали
         """
-        
+        if spell.cast_type == "attack":
+            cell.attack_flash(self.cell, cell)
+        elif spell.cast_type == "area_attack":
+            cell.attack_flash(self.cell, spell.give_enemies_in_area(self, cell))
+
         spell.cast(self, cell)
         spell.cooldown_now = spell.cooldown
         self.AP -= spell.cost
@@ -318,9 +314,9 @@ class Pawn(Piece):
     Класс пешки
     """
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
         #инициируем фигуру
-        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         #собираем спелы специальной функцией
         self.create_spell_list()
 
@@ -335,14 +331,23 @@ class Pawn(Piece):
         self.spell_list.append(PawnAttack2_Move())
         self.spell_list.append(PawnUtility())
 
+    def new_turn(self) -> None:
+
+        print(type(self.spell_list[2]).__name__, "!!!")
+        if type(self.spell_list[2]).__name__ == "PawnAttack2_Attack":
+            self.spell_list[2] = PawnAttack2_Move()
+            self.spell_list[2].cooldown_now = self.spell_list[2].cooldown
+
+        super().new_turn()
+
 class Bishop(Piece):
 
     """
     Класс слона
     """
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         self.create_spell_list()
 
     def create_spell_list(self) -> None:
@@ -358,8 +363,8 @@ class Bishop(Piece):
 
 class Knight(Piece):
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         self.create_spell_list()
 
     def create_spell_list(self) -> None:
@@ -373,11 +378,18 @@ class Knight(Piece):
         self.spell_list.append(KnightAttack2())
         self.spell_list.append(KnightUtility())
 
+    def new_turn(self) -> None:
+
+        if type(self.spell_list[1]).__name__ == "KnightAttack1_Attack":
+            self.spell_list[1] = KnightAttack1_Move()
+            self.spell_list[1].cooldown_now = self.spell_list[1].cooldown
+
+        super().new_turn()
 
 class Rook(Piece):
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         self.create_spell_list()
 
     def create_spell_list(self) -> None:
@@ -393,8 +405,8 @@ class Rook(Piece):
 
 class Queen(Piece):
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         self.create_spell_list()
 
     def create_spell_list(self) -> None:
@@ -410,16 +422,15 @@ class Queen(Piece):
     def new_turn(self) -> None:
 
         super().new_turn()
-        
-        #QueenUtility
-        if self.accuracy != 1:
-            self.accuracy = 1
+        print(self.AP)
+
+        self.cast_spell(QueenUtility(), self.cell)
 
 
 class King(Piece):
 
-    def __init__(self, team: str, field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
         self.create_spell_list()
 
     def create_spell_list(self) -> None:
@@ -430,14 +441,5 @@ class King(Piece):
 
         #Отнимаем движение
         self.spell_list = []
-
-        #У короля пока пусто
-
-    def update_spell_list(self) -> None:
-
-        """
-        Функция заного создаёт список способностей
-        У короля отличается обработака
-        """
-
-        self.create_spell_list()
+        self.spell_list.append(KingAttack1())
+        self.spell_list.append(KingAttack2())

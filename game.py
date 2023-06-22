@@ -4,6 +4,7 @@ import typing as tp
 if tp.TYPE_CHECKING:
     from piece import Piece
     from field import Field
+    from field import Square
     from spell import Spell
 
 
@@ -28,6 +29,9 @@ class Game:
         # Свойство для хранения выбранного действия
         self.selected_spell: tp.Union[Spell, None] = None
 
+        # Словарь для хранения команд фигур
+        self.pieces_teams: dict[str, list[Piece]] = {}
+
         # Списки для хранения фигур игрока и фигур компьютера
         self.player_pieces: list[Piece] = []
         self.computer_pieces: list[Piece] = []
@@ -35,7 +39,16 @@ class Game:
         # Свойство для хранения вражеского короля
         self.computer_king: tp.Union[Piece, None] = None
 
-    def clear_activated_squares(self):
+        # Список для хранения просматриваемых клеток
+        self.viewed_squares: tp.Union[list[Square], None] = None
+
+        # Базовая просматриваемая клетка (относительно которой распространяется область обзора)
+        self.base_viewed_square: tp.Union[Square, None] = None
+
+        # Просматриваемая способность
+        self.viewed_spell: tp.Union[Spell, None] = None
+
+    def clear_activated_squares(self) -> None:
         """
         Функция для очистки клеток, ранее выбранных для того или иного действия.
         """
@@ -51,7 +64,7 @@ class Game:
                 cell.change_regime()
         self.field.update()
 
-    def toggle_action_mode(self, spell: 'Spell'):
+    def toggle_action_mode(self, spell: 'Spell') -> None:
         """
         Функция для включения/выключения режима заданного действия.
 
@@ -69,10 +82,14 @@ class Game:
         # лишь при наличии хотя бы одной выделенной клетки)
         if square_for_action and (self.selected_spell != spell):
             self.selected_spell = spell
+
+            # Отключаем режим просмотра для всех клеток
+            self.off_view_for_all_squares()
+
         else:
             self.selected_spell = None
 
-    def finish_game_tact(self):
+    def finish_game_tact(self) -> None:
         """
         Функция для завершения игрового такта (очистка активированных клеток, снятие выбранных действий и фигур и т.д.).
         """
@@ -88,7 +105,7 @@ class Game:
         self.selected_piece = None
         self.selected_spell = None
 
-    def del_destroyed_pieces(self):
+    def del_destroyed_pieces(self) -> None:
         """
         Функция для удаления всех уничтоженных фигур из соответствующего списка.
         """
@@ -103,6 +120,25 @@ class Game:
             if piece.hp <= 0:
                 self.computer_pieces.remove(piece)
 
+    def del_piece(self, piece: 'Piece') -> None:
+        """
+        Функция для удаления фигуры из соответствующего списка.
+
+        :param piece: Фигура, которую нужно удалить.
+        """
+
+        # Перебираем все фигуры игрока и если там есть совпадающая с заданной, то удаляем её
+        for player_piece in self.player_pieces:
+            if player_piece == piece:
+                self.player_pieces.remove(player_piece)
+                return
+
+        # Перебираем все фигуры компьютера и если там есть совпадающая с заданной, то удаляем её
+        for computer_piece in self.computer_pieces:
+            if computer_piece == piece:
+                self.computer_pieces.remove(computer_piece)
+                return
+
     def get_game_status(self) -> str:
         """
         Функция для выведения состояния игры.
@@ -112,7 +148,7 @@ class Game:
         """
 
         # Если у игрока не осталось фигур, возвращаем "lose"
-        if len(self.player_pieces) == 0 and False:
+        if len(self.player_pieces) == 0:
             return "lose"
 
         # Если у компьютера не осталось фигур, возвращаем "win"
@@ -127,6 +163,61 @@ class Game:
         # Иначе возвращаем "continue"
         return "continue"
 
+    def get_overview_for_player_pieces(self) -> set['Square']:
+        """
+        Функция для получения клеток в области обзора всех фигур игрока.
+
+        :return: Множество, содержащее клетки из области обзора.
+        """
+
+        # Множество для хранения клеток из области обзора
+        pieces_overview_set = set()
+
+        # Перебираем все фигуры и собираем клетки из их области обзора
+        for piece in self.player_pieces:
+            pieces_overview_set.update(piece.get_fovs())
+
+        # Возвращаем полученное множество
+        return pieces_overview_set
+
+    def get_overview_for_computer_pieces(self) -> set['Square']:
+        """
+        Функция для получения клеток в области обзора всех фигур компьютера.
+
+        :return: Множество, содержащее клетки из области обзора.
+        """
+
+        # Множество для хранения клеток из области обзора
+        pieces_overview_set = set()
+
+        # Перебираем все фигуры и собираем клетки из их области обзора
+        for piece in self.computer_pieces:
+            pieces_overview_set.update(piece.get_fovs())
+
+        # Возвращаем полученное множество
+        return pieces_overview_set
+
+    def off_view_for_all_squares(self) -> None:
+        """
+        Функция для отключения режима просмотра для всех клеток.
+        """
+
+        # Убираем базовую просматриваемую клетку
+        self.base_viewed_square = None
+
+        # Если есть просматриваемые клетки
+        if self.viewed_squares is not None:
+
+            # Выключаем у них режим просмотра
+            for square in self.viewed_squares:
+                square.off_view()
+
+            # Убираем все сопутствующие атрибуты
+            self.viewed_squares = None
+            self.viewed_spell = None
+
+            # Обновляем игровое поле
+            self.field.update()
 
 
 

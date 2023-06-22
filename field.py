@@ -3,6 +3,8 @@ import typing as tp
 
 if tp.TYPE_CHECKING:
     from piece import Piece
+    from menu import GameMenu
+    from king_square import KingSquare
 
 # Размер стороны шахматной клетки
 SQUARE_SIDE_SIZE = 50
@@ -36,6 +38,30 @@ SQUARE_OCCUPIED_COLOR = "#FFFF00"
 
 # Цвет для занятой выбранной клетки
 SQUARE_SELECTED_COLOR = "#8B00FF"
+
+# Цвет вспышки клетки при её атаке
+FLASH_ATTACKED_COLOR = (255, 0, 0, 128)
+
+# Цвет вспышки клетки с которой атакуют
+FLASH_ATTACK_COLOR = (0, 0, 255, 128)
+
+# Время продолжительности вспышки клетки
+FLASH_DELAY = 300
+
+# Цвет для просматриваемой клетки
+VIEWED_SQUARE_COLOR = (255, 165, 0, 128)
+
+# Размер шрифта для размещения текста на шахматной клетке
+SQUARE_FONT_SIZE = 30
+
+# Цвет текста, размещаемого на шахматной клетке (очки здоровья)
+SQUARE_FONT_COLOR_HP = (255, 165, 0)
+
+# Цвет текста, размещаемого на шахматной клетке (очки щита)
+SQUARE_FONT_COLOR_SHIELD = (0, 0, 255)
+
+# Серый фильтр для наложения на неактивные фигуры
+GRAY_FILTER = (0, 0, 0, 128)
 
 
 class SquareTemplate(pg.sprite.Sprite):
@@ -77,6 +103,12 @@ class SquareTemplate(pg.sprite.Sprite):
         # Флаг, указывающий на то, является ли фигура на клетке выбранной
         # (В данном классе всегда равно False, так как это просто шаблон)
         self.is_selected = False
+
+        # Флаг, указывающий на то, является ли клетка просматриваемой
+        self.is_viewed = False
+
+        # Указываем, что клетка не активна
+        self.is_activated = False
 
     def get_pos(self) -> tuple[int, int]:
         """
@@ -160,6 +192,20 @@ class SquareTemplate(pg.sprite.Sprite):
         """
         return None
 
+    def on_view(self) -> None:
+        """
+        Функция, не используемая для данного класса.
+        Всегда возвращает None.
+        """
+        return None
+
+    def off_view(self) -> None:
+        """
+        Функция, не используемая для данного класса.
+        Всегда возвращает None.
+        """
+        return None
+
 
 class Square(SquareTemplate):
     """
@@ -196,6 +242,12 @@ class Square(SquareTemplate):
 
         # Флаг, указывающий на то, является ли фигура на клетке выбранной
         self.is_selected = False
+
+        # Флаг, указывающий на то, является ли клетка просматриваемой
+        self.is_viewed = False
+
+        # Сохраняем шрифт для размещения надписей на клетке
+        self.font = pg.font.Font(None, SQUARE_FONT_SIZE)
 
     def change_regime(self) -> None:
         """
@@ -243,71 +295,60 @@ class Square(SquareTemplate):
         Функция для обновления шахматной клетки.
         """
 
-        # Если клетка активирована, то задаём ей активированный дизайн
-        if self.is_activated:
-            self.image = pg.image.load("design/field/activated_square.png")
+        # Загружаем базовый вариант клетки
+        self.image = pg.image.load("design/field/square.png")
 
-        # Иначе, задаём ей обычный дизайн
-        else:
-            self.image = pg.image.load("design/field/square.png")
+        # Если клетка не занята фигурой
+        if not self.is_occupied:
 
-        # Если клетка занята, то рисуем на ней фигуру
-        if self.is_occupied:
+            # Если клетка активирована, то добавляем значок активации
+            if self.is_activated:
+                surface = pg.image.load("design/field/activated_square.png")
+                self.image.blit(surface, (0, 0))
 
-            # Если на клетке стоит белая пешка
-            if self.inner_piece.team == "Glados":
+        # Если клетка занята фигурой
+        elif self.is_occupied:
 
-                # Если фигура имеет ОД (может совершать действия)
-                if self.inner_piece.active_turn:
+            # Отлавливаем ошибки на случай отсутствия подходящего изображения
+            try:
+                # Рисуем на клетке соответсвующую фигуру в зависимости от названия класса
+                surface = pg.image.load(f"design/pieces/{type(self.inner_piece).__name__}.png")
+                self.image.blit(surface, (0, 0))
+            except:
+                pass
 
-                    # Если клетка выбрана
-                    if self.is_selected:
-                        self.image = pg.image.load("design/pieces/selected_pawn.png")
+            # Если клетка не имеет доступных ходов и это не вражеская клетка, преобразуем её в чёрно-белые тона
+            if (not self.inner_piece.active_turn) and ("Enemy" not in type(self.inner_piece).__name__):
+                surface = pg.Surface(self.image.get_size(), pg.SRCALPHA)
+                surface.fill(GRAY_FILTER)
+                self.image.blit(surface, (0, 0))
 
-                    # Если клетка активирована
-                    elif self.is_activated:
-                        self.image = pg.image.load("design/pieces/attacked_pawn.png")
+            # Если клетка выбрана, то добавляем значок выбранной фигуры
+            if self.is_selected:
+                surface = pg.image.load("design/game/select.png")
+                self.image.blit(surface, (0, 0))
 
-                    # Иначе
-                    else:
-                        self.image = pg.image.load("design/pieces/pawn.png")
+            # Если клетка активирована, добавляем значок воздействия на фигуру
+            if self.is_activated:
+                surface = pg.image.load("design/game/white_attack.png")
+                self.image.blit(surface, (0, 0))
 
-                # Если клетка не имеет ОД (не может совершать действия)
-                else:
+            # Рисуем на клетке с фигурой значение количества HP у данной фигуры
+            hp_text = self.font.render(str(self.inner_piece.hp), True, SQUARE_FONT_COLOR_HP)
+            self.image.blit(hp_text, (0, 0))
 
-                    # Если клетка выбрана
-                    if self.is_selected:
-                        self.image = pg.image.load("design/pieces/off_selected_pawn.png")
+            # Если у фигуры есть щит, то рисуем его значение
+            if self.inner_piece.shield > 0:
+                shield_text = self.font.render(str(self.inner_piece.shield), True, SQUARE_FONT_COLOR_SHIELD)
+                self.image.blit(shield_text, 
+                                (0, 
+                                self.image.get_height() - shield_text.get_height()))
 
-                    # Если клетка активирована
-                    elif self.is_activated:
-                        self.image = pg.image.load("design/pieces/off_attacked_pawn.png")
-
-                    # Иначе
-                    else:
-                        self.image = pg.image.load("design/pieces/off_pawn.png")
-
-            # Если на клетке стоит чёрная пешка
-            elif self.inner_piece.team == "Shodan" and type(self.inner_piece).__name__ == "EnemyPawn":
-
-                # Если клетка активирована
-                if self.is_activated:
-                    self.image = pg.image.load("design/pieces/attacked_black_pawn.png")
-
-                # Иначе
-                else:
-                    self.image = pg.image.load("design/pieces/black_pawn.png")
-
-            # Если на клетке стоит чёрный король
-            elif type(self.inner_piece).__name__ == "EnemyKing":
-
-                # Если клетка активирована
-                if self.is_activated:
-                    self.image = pg.image.load("design/pieces/attacked_black_king.png")
-
-                # Иначе
-                else:
-                    self.image = pg.image.load("design/pieces/black_king.png")
+        # Если клетка просматривается, то дополнительно выделяем клетку
+        if self.is_viewed:
+            view = pg.Surface((SQUARE_SIDE_SIZE, SQUARE_SIDE_SIZE), pg.SRCALPHA)
+            view.fill(VIEWED_SQUARE_COLOR)
+            self.image.blit(view, (0, 0))
 
     def increase_size(self) -> None:
         """
@@ -428,6 +469,96 @@ class Square(SquareTemplate):
         # Обновляем клетку
         self.update()
 
+    def flash(self, color="red") -> None:
+        """
+        Функция для закрашивания клетки в цвет вспышки.
+
+        :param color: Цвет вспышки (red, blue).
+        """
+
+        # Закрашиваем клетку в цвет вспышки в зависимости от требуемого цвета
+        flash = pg.Surface((SQUARE_SIDE_SIZE, SQUARE_SIDE_SIZE), pg.SRCALPHA)
+
+        if color == "red":
+            flash.fill(FLASH_ATTACKED_COLOR)
+        elif color == "blue":
+            flash.fill(FLASH_ATTACK_COLOR)
+        else:
+            flash.fill(FLASH_ATTACKED_COLOR)
+
+        self.image.blit(flash, (0, 0))
+        self.field.update()
+
+    def on_view(self) -> None:
+        """
+        Функция для переведения клетки в режим обзора.
+        """
+        self.is_viewed = True
+        self.update()
+
+    def off_view(self) -> None:
+        """
+        Функция для выключения у клетки режима обзора.
+        """
+        self.is_viewed = False
+        self.update()
+
+    @staticmethod
+    def attack_flash(attack_square: tp.Union['Square', list['Square']],
+                     attacked_square: tp.Union['Square', list['Square']]) -> None:
+        """
+        Функция для реализации необходимых вспышек для обозначения атаке.
+
+        :param attack_square: Клетка, с которой атакуют.
+        :param attacked_square: Клетка, которую атакуют.
+        """
+
+        # Если действие совершает фигура игрока и атакуемая клетка не занята, то просто завершаем функцию
+        # if (not attacked_square.is_occupied) and ("Enemy" not in type(attack_square.inner_piece).__name__):
+        #     return
+
+        # Если атакуемая клетка не занята, то совершаем небольшую задержку и завершаем функцию
+        # if not attacked_square.is_occupied:
+        #     pg.time.delay(FLASH_DELAY)
+        #     return
+
+        # Закрашиваем атакующие клетки
+        if isinstance(attack_square, Square):
+            attack_square.flash("blue")
+        elif isinstance(attack_square, list):
+            for square in attack_square:
+                square.flash("blue")
+
+        # Закрашиваем атакуемые клетки
+        if isinstance(attacked_square, Square):
+            attacked_square.flash("red")
+        elif isinstance(attacked_square, list):
+            for square in attacked_square:
+                square.flash("red")
+
+        # Совершаем небольшую задержку
+        pg.time.delay(FLASH_DELAY)
+
+        # Возвращаем атакующим клеткам обычный цвет
+        if isinstance(attack_square, Square):
+            attack_square.update()
+        elif isinstance(attack_square, list):
+            for square in attack_square:
+                square.update()
+
+        # Возвращаем атакуемым клеткам обычный цвет
+        if isinstance(attacked_square, Square):
+            attacked_square.update()
+        elif isinstance(attacked_square, list):
+            for square in attacked_square:
+                square.update()
+
+        # Обновляем игровое поле
+        if isinstance(attacked_square, Square):
+            attacked_square.field.update()
+        elif isinstance(attacked_square, list):
+            attacked_square[0].field.update()
+
 
 class NonexistentSquare(SquareTemplate):
     """
@@ -463,7 +594,8 @@ class Field:
                  screen_field: pg.Surface,
                  background: pg.Surface,
                  screen_absolute_coordinates: list[int],
-                 field_map: list[list[int]]) -> None:
+                 field_map: list[list[int]],
+                 game_menu: 'GameMenu') -> None:
         """
         Функция для инициализации игрового поля.
 
@@ -472,6 +604,8 @@ class Field:
         :param background: Фон игры.
         :param screen_absolute_coordinates: Абсолютные координаты экрана игры.
         :param field_map: Карта игрового поля.
+        :param game_menu: Игровое меню.
+        :param king_square: Клетка (кнопка) короля игрока.
         """
 
         # Сохраняем экран игры
@@ -488,6 +622,12 @@ class Field:
 
         # Сохраняем карту игрового поля
         self.field_map = field_map
+
+        # Сохраняем игровое меню
+        self.game_menu = game_menu
+
+        # Свойство для кнопки короля игрока
+        self.king_square: tp.Union[KingSquare, None] = None
 
         # Двухмерный список для хранения спрайтов шахматных клеток
         self.squares_list: list[list[SquareTemplate]] = []
@@ -563,6 +703,10 @@ class Field:
         :return: Клетка с заданными координатами или None, если клетка не найдена.
         """
 
+        # Если координаты клетки совпадают с координатами клетки короля игрока, то возвращаем её
+        if self.king_square.rect.collidepoint(x_coordinate, y_coordinate):
+            return self.king_square
+
         # Рассчитываем абсолютные координаты клетки
         x_absolute = x_coordinate + self.screen_absolute_coordinates[0]
         y_absolute = y_coordinate + self.screen_absolute_coordinates[1]
@@ -631,6 +775,18 @@ class Field:
         self.screen_field.blit(self.background, (0, 0))
         self.squares_group.draw(self.screen_field)
         self.screen.blit(self.screen_field, (0, 0))
+
+        # Отрисовываем кнопку открытия игрового меню
+        self.screen_field.blit(self.game_menu.open_menu_button.image, self.game_menu.open_menu_button.rect)
+        self.screen.blit(self.screen_field, (0, 0))
+
+        # Отрисовываем кнопку короля, если она добавлена
+        if self.king_square is not None:
+            self.king_square.update()
+            self.screen_field.blit(self.king_square.image, self.king_square.rect)
+            self.screen.blit(self.screen_field, (0, 0))
+
+        # Обновляем экран
         pg.display.update()
 
     def move(self, x_shift: int, y_shift: int) -> None:
@@ -824,3 +980,149 @@ class Field:
 
         else:
             return None
+
+    """Совместно с svgarik"""
+
+    def get_nearest(self, start: "Square", endest: list["Square"]) -> tp.Union["Square", None]:
+
+        """
+        Функция возвращает 
+        Функция считает фигуры преградой
+
+        :param start: Начальная клетка.
+        :param endest: список конечных клетка.
+        :return: ближайщая клетка из списка к стартовой клетке
+        """
+
+        # храним индекс рассматриваемого элемента, симулируя очередь
+        # и саму очередь, в которой храним клетку от которой параллельно идём
+        # и ещё один массив, чтобы узнавать длину и при этом спокойно узнавать, были ли мы уже в этой клетке
+        # и массив со ссылкой на обратную клетку пришли для восстановления пути
+        i = 0
+        moves = []
+        len_way = []
+
+        # проверим о выходе за пределы массива (зачем?)
+        row_pos, col_pos = start.get_pos()
+        if self.is_into_map(row_pos, col_pos):
+            moves.append((row_pos, col_pos))
+            len_way.append(0)
+
+        #конечная клетка
+        nearest_cell = None
+
+        while i < len(moves):
+
+            # проверяем были ли мы уже в соседних клетках от текущей
+            # и, если не были и туда идти не больше radius_move добавляем в очередь
+            # ах да, ещё проверка выхода за пределы массива
+
+            if self.get_square_by_pos(moves[i][0], moves[i][1]) in endest:
+                nearest_cell = self.get_square_by_pos(moves[i][0], moves[i][1])
+                break
+
+            if (not (moves[i][0] + 1, moves[i][1]) in moves  # ещё не посетили
+                    and self.is_into_map(moves[i][0] + 1, moves[i][1])  # в пределах поля
+                        and not self.is_barrier(moves[i][0] + 1, moves[i][1])  # можно пройти
+                            and self.get_square_by_pos(moves[i][0] + 1, moves[i][1]).inner_piece is None):  # нет фигуры (если фигура = стена)
+                moves.append((moves[i][0] + 1, moves[i][1]))
+                len_way.append(len_way[i] + 1)
+
+            if (not (moves[i][0] - 1, moves[i][1]) in moves
+                    and self.is_into_map(moves[i][0] - 1, moves[i][1])
+                        and not self.is_barrier(moves[i][0] - 1, moves[i][1])
+                            and self.get_square_by_pos(moves[i][0] - 1, moves[i][1]).inner_piece is None):
+                moves.append((moves[i][0] - 1, moves[i][1]))
+                len_way.append(len_way[i] + 1)
+
+            if (not (moves[i][0], moves[i][1] + 1) in moves
+                    and self.is_into_map(moves[i][0], moves[i][1] + 1)
+                        and not self.is_barrier(moves[i][0], moves[i][1] + 1)
+                            and self.get_square_by_pos(moves[i][0], moves[i][1] + 1).inner_piece is None):
+                moves.append((moves[i][0], moves[i][1] + 1))
+                len_way.append(len_way[i] + 1)
+
+            if (not (moves[i][0], moves[i][1] - 1) in moves
+                    and self.is_into_map(moves[i][0], moves[i][1] - 1)
+                        and not self.is_barrier(moves[i][0], moves[i][1] - 1)
+                            and self.get_square_by_pos(moves[i][0], moves[i][1] - 1).inner_piece is None):
+                moves.append((moves[i][0], moves[i][1] - 1))
+                len_way.append(len_way[i] + 1)
+
+            i += 1
+
+        return nearest_cell
+    
+        """Совместно с svgarik"""
+
+    def get_farthest(self, start: "Square", endest: list["Square"]) -> tp.Union["Square", None]:
+
+        """
+        Функция возвращает 
+        Функция считает фигуры преградой
+
+        :param start: Начальная клетка.
+        :param endest: список конечных клетка.
+        :return: дальняя клетка из списка от стартовой клетке
+        """
+
+        # храним индекс рассматриваемого элемента, симулируя очередь
+        # и саму очередь, в которой храним клетку от которой параллельно идём
+        # и ещё один массив, чтобы узнавать длину и при этом спокойно узнавать, были ли мы уже в этой клетке
+        # и массив со ссылкой на обратную клетку пришли для восстановления пути
+        i = 0
+        moves = []
+        len_way = []
+
+        # проверим о выходе за пределы массива (зачем?)
+        row_pos, col_pos = start.get_pos()
+        if self.is_into_map(row_pos, col_pos):
+            moves.append((row_pos, col_pos))
+            len_way.append(0)
+
+        #конечная клетка
+        farthest_cell = None
+
+        while i < len(moves):
+
+            # проверяем были ли мы уже в соседних клетках от текущей
+            # и, если не были и туда идти не больше radius_move добавляем в очередь
+            # ах да, ещё проверка выхода за пределы массива
+
+            if self.get_square_by_pos(moves[i][0], moves[i][1]) in endest:
+                farthest_cell = self.get_square_by_pos(moves[i][0], moves[i][1])
+                endest.remove(farthest_cell)
+                if not endest:
+                    break
+
+            if (not (moves[i][0] + 1, moves[i][1]) in moves  # ещё не посетили
+                    and self.is_into_map(moves[i][0] + 1, moves[i][1])  # в пределах поля
+                        and not self.is_barrier(moves[i][0] + 1, moves[i][1])  # можно пройти
+                            and self.get_square_by_pos(moves[i][0] + 1, moves[i][1]).inner_piece is None):  # нет фигуры (если фигура = стена)
+                moves.append((moves[i][0] + 1, moves[i][1]))
+                len_way.append(len_way[i] + 1)
+
+            if (not (moves[i][0] - 1, moves[i][1]) in moves
+                    and self.is_into_map(moves[i][0] - 1, moves[i][1])
+                        and not self.is_barrier(moves[i][0] - 1, moves[i][1])
+                            and self.get_square_by_pos(moves[i][0] - 1, moves[i][1]).inner_piece is None):
+                moves.append((moves[i][0] - 1, moves[i][1]))
+                len_way.append(len_way[i] + 1)
+
+            if (not (moves[i][0], moves[i][1] + 1) in moves
+                    and self.is_into_map(moves[i][0], moves[i][1] + 1)
+                        and not self.is_barrier(moves[i][0], moves[i][1] + 1)
+                            and self.get_square_by_pos(moves[i][0], moves[i][1] + 1).inner_piece is None):
+                moves.append((moves[i][0], moves[i][1] + 1))
+                len_way.append(len_way[i] + 1)
+
+            if (not (moves[i][0], moves[i][1] - 1) in moves
+                    and self.is_into_map(moves[i][0], moves[i][1] - 1)
+                        and not self.is_barrier(moves[i][0], moves[i][1] - 1)
+                            and self.get_square_by_pos(moves[i][0], moves[i][1] - 1).inner_piece is None):
+                moves.append((moves[i][0], moves[i][1] - 1))
+                len_way.append(len_way[i] + 1)
+
+            i += 1
+
+        return farthest_cell

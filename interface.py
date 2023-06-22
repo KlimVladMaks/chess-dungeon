@@ -24,6 +24,24 @@ BUTTON_SPACING = 20
 # Размеры кнопок интерфейса в формате (ширина, высота)
 BUTTON_SIZE = (70, 70)
 
+# Серый фильтр для наложения на неактивные фигуры
+GRAY_FILTER = (0, 0, 0, 128)
+
+# Размер текста для отображения кулдауна способностей
+COOLDOWN_FONT_SIZE = 50
+
+# Цвет текста для отображения кулдауна способностей
+COOLDOWN_FONT_COLOR = (255, 165, 0)
+
+# Размер текста для интерфейса
+INTERFACE_FONT_SIZE = 25
+
+# Цвет текста для интерфейса
+INTERFACE_FONT_COLOR = (0, 0, 0)
+
+# Отступы для текста интерфейса
+INTERFACE_TEXT_MARGIN = 10
+
 
 class Button(pg.sprite.Sprite):
     """
@@ -52,13 +70,16 @@ class Button(pg.sprite.Sprite):
         # Сохраняем флаг, является ли кнопка активной
         self.is_active = is_active
 
+        # Шрифт для отображения кулдауна способностей
+        self.cooldown_font = pg.font.Font(None, COOLDOWN_FONT_SIZE)
+
         # Задаём поверхность кнопки
         self.image = pg.Surface((button_size[0], button_size[1]))
 
         # Обновляем кнопку, чтобы задать её изображение
         self.update()
 
-        # Задаём поверхность кнопки
+        # Задаём область кнопки
         self.rect = pg.Rect(coordinates[0], coordinates[1], button_size[0], button_size[1])
 
     def update(self):
@@ -66,35 +87,28 @@ class Button(pg.sprite.Sprite):
         Функция для обновления кнопки.
         """
 
-        # Если кнопка активна
-        if self.is_active:
+        # Отлавливаем ошибки на случай отсутствия подходящего изображения
+        try:
+            # Загружаем изображение кнопки
+            self.image = pg.image.load(f"design/interface/buttons/{self.spell.id}.png")
+        except:
+            pass
 
-            # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
-            if self.spell.id == "move":
-                self.image = pg.image.load("design/interface/move_button.png")
-            elif self.spell.id == "attack":
-                self.image = pg.image.load("design/interface/attack_button.png")
-            elif self.spell.id == "lunge_move":
-                self.image = pg.image.load("design/interface/lunge_move_button.png")
-            elif self.spell.id == "lunge_attack":
-                self.image = pg.image.load("design/interface/lunge_attack_button.png")
-            elif self.spell.id == "just_pawn":
-                self.image = pg.image.load("design/interface/just_pawn_button.png")
+        # Если кнопка не активна
+        if not self.is_active:
 
-        # Иначе
-        else:
+            # Затемняем кнопку
+            surface = pg.Surface(self.image.get_size(), pg.SRCALPHA)
+            surface.fill(GRAY_FILTER)
+            self.image.blit(surface, (0, 0))
 
-            # Задаём изображение поверхности кнопки в соответствии с типом действия кнопки
-            if self.spell.id == "move":
-                self.image = pg.image.load("design/interface/off_move_button.png")
-            elif self.spell.id == "attack":
-                self.image = pg.image.load("design/interface/off_attack_button.png")
-            elif self.spell.id == "lunge_move":
-                self.image = pg.image.load("design/interface/off_lunge_move_button.png")
-            elif self.spell.id == "lunge_attack":
-                self.image = pg.image.load("design/interface/off_lunge_attack_button.png")
-            elif self.spell.id == "just_pawn":
-                self.image = pg.image.load("design/interface/off_just_pawn_button.png")
+            # Навешиваем на кнопку значок блокировки
+            surface = pg.image.load("design/interface/block.png")
+            self.image.blit(surface, (0, 0))
+
+            # Наносим на кнопку величину кулдауна
+            cooldown_text = self.cooldown_font.render(str(self.spell.cooldown_now), True, COOLDOWN_FONT_COLOR)
+            self.image.blit(cooldown_text, (0, 0))
 
 
 class Interface(pg.sprite.Sprite):
@@ -133,10 +147,16 @@ class Interface(pg.sprite.Sprite):
         # Флаг, показывающий, открыт ли интерфейс
         self.is_open = False
 
+        # Шрифт для отображения текста на интерфейсе
+        self.font = pg.font.Font(None, INTERFACE_FONT_SIZE)
+
     def show(self) -> None:
         """
         Функция для вывода интерфейса на экран.
         """
+
+        # Полностью закрашиваем интерфейс
+        self.image.fill(INTERFACE_BACKGROUND_COLOR)
 
         # Отрисовываем кнопки интерфейса
         self.buttons_group.draw(self.image)
@@ -221,8 +241,9 @@ class Interface(pg.sprite.Sprite):
         for spell in buttons_spell:
 
             # Проверяем, является ли данная способность доступной
-            # (Способность доступна, если у фигуры количество ОД больше нуля или если стоимость способности равна нулю)
-            if (piece.AP > 0) or (spell.cost == 0):
+            # (Способность доступна, если у фигуры количество ОД больше нуля, или если стоимость способности равна нулю,
+            # и только если кулдаун меньше или равен нулю)
+            if ((piece.AP > 0) or (spell.cost == 0)) and (spell.cooldown_now <= 0):
                 is_active_spell = True
             else:
                 is_active_spell = False
@@ -292,7 +313,50 @@ class Interface(pg.sprite.Sprite):
             if button.action == del_button_action:
                 button.action = add_button_action
 
+    def add_text(self, text: str) -> None:
+        """
+        Функция для добавления текста в интерфейс.
 
+        :param text: Текст для добавления в интерфейс.
+        """
+
+        # Отлавливаем ошибки
+        try:
+
+            # Создаём поверхность с текстом
+            text_surface = self.font.render(text, False, INTERFACE_FONT_COLOR)
+
+            # Если текст превышает допустимую ширину
+            if text_surface.get_width() > (self.image.get_width() // 2):
+
+                # Разбивает строку на строки допустимой длины и помещаем их в список
+                words = text.split(' ')
+                lines = []
+                current_line = words[0]
+                for word in words[1:]:
+                    if self.font.size(current_line + ' ' + word)[0] < (self.image.get_width() // 2):
+                        current_line += ' ' + word
+                    else:
+                        lines.append(current_line)
+                        current_line = word
+                lines.append(current_line)
+            
+                # Создаём новую поверхность допустимых размеров
+                text_surface = pg.Surface((self.image.get_width() // 2, self.image.get_height()), pg.SRCALPHA)
+            
+                # Заполняем новую поверхность новыми строками, реализуя перенос строк 
+                y = 0
+                for line in lines:
+                    text_surface.blit(self.font.render(line, False, INTERFACE_FONT_COLOR), (0, y))
+                    y += self.font.size(line)[1]
+
+            # Выводим текст на интерфейс
+            self.image.blit(text_surface, (self.image.get_width() // 2, INTERFACE_TEXT_MARGIN))
+            self.screen.blit(self.image, self.rect)
+            pg.display.update()
+
+        except Exception as e:
+            pass
 
 
 
