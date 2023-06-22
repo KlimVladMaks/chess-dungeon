@@ -105,6 +105,14 @@ class Spell:
 
         return None
     
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> tp.Union[None, list[tuple[int, "Square"]]]:
+
+        """
+        Определяет превликательность цели
+        """
+
+        return None
+    
 
 class Piece_Move(Spell):
 
@@ -253,6 +261,20 @@ class PawnAttack1(Spell):
         else:
             print(f"Атакующая фигура промахнулась")
 
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            price = 100 - cell.inner_piece.hp
+            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+                price *= 0.5
+            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+                price *= 2
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
+
 class PawnAttack2_Move(Spell):
 
     def __init__(self):
@@ -298,6 +320,19 @@ class PawnAttack2_Move(Spell):
         
         self.spell_list[0].cast(self, other)
         self.spell_list[self.spell_list.index(spell)] = PawnAttack2_Attack()
+
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            price = 0
+            enemy = PawnAttack2_Attack().give_priority_target(self, PawnAttack2_Attack().target(self, host_cell = cell))
+            if len(enemy):
+                price = enemy[0][0] / len(enemy)
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
 
 class PawnAttack2_Attack(Spell):
 
@@ -345,6 +380,20 @@ class PawnAttack2_Attack(Spell):
         
         PawnAttack1().cast(self, other)
         self.spell_list[self.spell_list.index(spell)] = PawnAttack2_Move()
+
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            price = 100 - cell.inner_piece.hp
+            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+                price *= 0.5
+            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+                price *= 2
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
 
 
 class PawnUtility(Spell):
@@ -403,6 +452,20 @@ class PawnUtility(Spell):
             
         else:
             print(f"Атакующая фигура промахнулась")
+
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            price = 100 - cell.inner_piece.hp
+            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+                price *= 0.5
+            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+                price *= 2
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
 
 class BishopAttack1(Spell):
 
@@ -471,6 +534,29 @@ class BishopAttack1(Spell):
             
         else:
             print(f"Атакующая фигура промахнулась")
+
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            #определяем дальность выстрела
+
+            #для этого возмём координаты клетки с врагом
+            coordinates_other = self.field.get_pos_by_square(cell)
+            coordinates_self = self.field.get_pos_by_square(self.cell)
+            #и проложим линию обзора
+            range_shot = len(self.get_view_for_line(False, coordinates_self[::-1], coordinates_other[::-1])) - 1
+            accuracy_coefficient = 0.4
+            accuracy = self.accuracy * (1 / range_shot) ** (accuracy_coefficient)
+            price = (100 - cell.inner_piece.hp) * accuracy
+            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+                price *= 0.5
+            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+                price *= 2
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
 
 class BishopAttack2(Spell):
 
@@ -542,6 +628,33 @@ class BishopAttack2(Spell):
         else:
             print(f"Атакующая фигура промахнулась")
 
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            #определяем дальность выстрела
+
+            #для этого возмём координаты клетки с врагом
+            coordinates_other = self.field.get_pos_by_square(cell)
+            coordinates_self = self.field.get_pos_by_square(self.cell)
+            #и проложим линию обзора
+            range_shot = len(self.get_view_for_line(False, coordinates_self[::-1], coordinates_other[::-1])) - 1
+            accuracy_coefficient = 0.4
+            accuracy = self.accuracy * (1 / range_shot) ** (accuracy_coefficient)
+            price = (100 - cell.inner_piece.hp) * accuracy
+
+            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+                price *= 0.5
+            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+                price *= 2
+            elif type(cell.inner_piece).__name__ in ["Knight", "EnemyKnight"]:
+                price *= 1.5
+                
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
+
 class BishopUtility(Spell):
 
     def __init__(self):
@@ -596,6 +709,20 @@ class BishopUtility(Spell):
             other.hp = other.max_hp
         print(f"Хп цели: {other.hp}/{other.max_hp}")
 
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            price = cell.inner_piece.max_hp - cell.inner_piece.hp
+            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+                price *= 0.5
+            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+                price *= 2
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
+
 class KnightAttack1_Move(Spell):
 
     def __init__(self):
@@ -611,7 +738,7 @@ class KnightAttack1_Move(Spell):
         radius_move = self.radius_move
 
         #определяем дальность атаки
-        range_move = 5
+        range_move = int(self.radius_move * 1.5)
         self.radius_move = range_move
 
         #идём куда дойдём
@@ -644,6 +771,19 @@ class KnightAttack1_Move(Spell):
         
         self.spell_list[0].cast(self, other)
         self.spell_list[self.spell_list.index(spell)] = KnightAttack1_Attack()
+
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            price = 0
+            enemy = KnightAttack1_Attack().give_priority_target(self, KnightAttack1_Attack().target(self, host_cell = cell))
+            if len(enemy):
+                price = enemy[0][0] / len(enemy)
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
 
 class KnightAttack1_Attack(Spell):
 
@@ -704,6 +844,18 @@ class KnightAttack1_Attack(Spell):
 
         self.spell_list[self.spell_list.index(spell)] = KnightAttack1_Move()
 
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            price = 100 - cell.inner_piece.hp
+            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+                price *= 0.5
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
+
 class KnightAttack2(Spell):
 
     def __init__(self):
@@ -719,7 +871,7 @@ class KnightAttack2(Spell):
         radius_move = self.radius_move
 
         #определяем дальность атаки
-        range_move = 8
+        range_move = self.radius_move * 2
         self.radius_move = range_move
 
         #идём куда дойдём
@@ -758,6 +910,18 @@ class KnightAttack2(Spell):
         if self.hp > self.max_hp:
             self.hp = self.max_hp
         print(f"Хп: {self.hp}/{self.max_hp}")
+
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        #Конь должен выбирать дальнюю клетку от всех противников, но... Пока так
+
+        priority = []
+
+        for cell in target:
+            price = random.random()
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
 
 class KnightUtility(Spell):
 
@@ -826,6 +990,24 @@ class KnightUtility(Spell):
 
             else:
                 print(f"Атакующая фигура промахнулась")
+                
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            price = 0
+            enemies = spell.give_enemies_in_area(self, cell)
+            for enemy in enemies:
+                price += 100 - enemy.inner_piece.hp
+            price / len(enemies)
+            if len(enemies) == 1:
+                price *= 2
+            else:
+                price *= len(enemies) / 3
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
 
     def give_enemies_in_area(spell: "Spell", self: "Piece", host_cell: "Square") -> list["Square"]:
 
@@ -946,6 +1128,20 @@ class RookAttack1(Spell):
         else:
             print(f"Атакующая фигура промахнулась")
 
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            price = 100 - cell.inner_piece.hp
+            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+                price *= 0.5
+            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+                price *= 2
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
+
 class RookAttack2(Spell):
 
     def __init__(self):
@@ -998,6 +1194,20 @@ class RookAttack2(Spell):
             
         else:
             print(f"Атакующая фигура промахнулась")
+
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            price = 100 - cell.inner_piece.hp
+            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+                price *= 0.5
+            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+                price *= 2
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
 
 class RookUtility(Spell):
 
@@ -1052,6 +1262,22 @@ class RookUtility(Spell):
         print(f"Цель получила щит прочностью {shield}")
         other.shield += shield
         print(f"Прочность щита цели: {other.shield}")
+
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            price = 100 - cell.inner_piece.hp
+            if cell.inner_piece == self:
+                price *= 3
+            elif type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+                price *= 0.5
+            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+                price *= 2
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
 
 class QueenAttack1(Spell):
     
@@ -1111,6 +1337,20 @@ class QueenAttack1(Spell):
             
         else:
             print(f"Атакующая фигура промахнулась")
+
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            price = 100 - cell.inner_piece.hp
+            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+                price *= 0.5
+            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+                price *= 2
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
 
 class QueenAttack2(Spell):
 
@@ -1202,6 +1442,20 @@ class QueenAttack2(Spell):
         else:
             print(f"Атакующая фигура промахнулась")
 
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            price = 100 - cell.inner_piece.hp
+            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+                price *= 0.5
+            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+                price *= 2
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
+
 class QueenUtility(Spell):
 
     def __init__(self):
@@ -1257,6 +1511,22 @@ class KingAttack1(Spell):
 
         print("Все негативные эффекты сняты!")
 
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            price = 0
+            for effect in cell.inner_piece.effect_list:
+                price += (effect.strength + effect.timer)
+            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+                price *= 0.5
+            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+                price *= 2
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
+
 class KingAttack2(Spell):
 
     def __init__(self):
@@ -1300,6 +1570,24 @@ class KingAttack2(Spell):
             if random() < self.accuracy + 1:
                 damage = randrange(self.min_damage, self.max_damage + 1)
                 enemy.give_damage(damage)
+
+    def give_priority_target(spell, self: "Piece", target: list["Square"]) -> list[tuple[float, "Square"]]:
+        
+        priority = []
+
+        for cell in target:
+            price = 0
+            for enemy in spell.give_enemies_in_area(self, cell):
+                if type(enemy).__name__ in ["Pawn", "EnemyPawn"]:
+                    price += 0.5
+                elif type(enemy).__name__ in ["Queen", "EnemyQueen"]:
+                    price += 2
+                else:
+                    price += 1
+
+            priority.append((price, cell))
+        
+        return sorted(priority, key=lambda x: x[0], reverse=True)
 
     def give_enemies_in_area(spell: "Spell", self: "Piece", host_cell: "Square") -> list["Square"]:
 

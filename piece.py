@@ -5,6 +5,7 @@ from spell import *
 if tp.TYPE_CHECKING:
     from field import Square, Field
     from game import Game
+    from effect import Effect
 
 
 class Piece:
@@ -44,7 +45,7 @@ class Piece:
         self.min_damage = min_damage
         self.max_damage = max_damage
         self.spell_list = [Piece_Move()]
-        self.effect_list = []
+        self.effect_list: list["Effect"] = []
         self.active_turn = True
         self.AP = 2
         self.shield = 0

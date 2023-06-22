@@ -28,6 +28,7 @@ class EnemyPiece(Piece):
         self.action = "patrol"
         self.way_patrol = []
         self.pos_patrol = 0
+        self.difficulty = difficulty
 
     def set_way_patrol(self, end: "Square") -> None:
 
@@ -66,7 +67,7 @@ class EnemyPiece(Piece):
 
         return False
     
-    def choice_square(self, squares: list[Piece], spell: Spell) -> tp.Union[Piece, None]:
+    def choice_square(self, squares: list[Square], spell: Spell) -> tp.Union[Piece, None]:
 
         """
         Функция выбирает предпочитаемую клетку для использования способности
@@ -77,8 +78,11 @@ class EnemyPiece(Piece):
 
         if not squares:
             return None
-
-        return random.choice(squares)
+        
+        if self.difficulty == 0.5:
+            return spell.give_priority_target(self, squares)[-1][1]
+        else:
+            return spell.give_priority_target(self, squares)[0][1]
 
     def get_nearest_enemy(self) -> tp.Union["Square", None]:
 
@@ -260,6 +264,11 @@ class EnemyPiece(Piece):
         """
 
         way = self.field.get_way(self.cell, pos, piece_is_barrier=True)
+
+        if way is None:
+            self.AP = 0
+            print("Враг не нашёл маршрут к цели и пропускает ход")
+            return
 
         if len(way) <= self.radius_move + 1:
             self.cast_spell(self.spell_list[0], pos)
@@ -701,6 +710,11 @@ class EnemyKnight(EnemyPiece, Knight):
                     self.AP = 0
                     pass
 
+        else:
+            print(f"Враг не находит ближайщую цель")
+            self.AP = 0
+
+
 class EnemyRook(EnemyPiece, Rook):
 
     def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int, difficulty: float):
@@ -787,6 +801,12 @@ class EnemyRook(EnemyPiece, Rook):
                     print(f"Враг не может найти позицию для использования {spell.name}")
                     self.AP = 0
                     pass
+
+        
+        else:
+            print(f"Враг не находит ближайщую цель")
+            self.AP = 0
+
 
 class EnemyQueen(EnemyPiece, Queen):
 
