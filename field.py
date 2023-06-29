@@ -1273,7 +1273,6 @@ class EditField:
         # Задаём верхнюю пару кнопок редактирования
         x = (self.get_field_width() // 2) - EDIT_BUTTON_SIZE[0]
         y = -EDIT_BUTTON_SIZE[1] - (EDIT_BUTTON_SIZE[1] // 2)
-        print(x, y)
         edit_button = EditButton(x, y, "add", "top")
         self.edit_buttons_group.add(edit_button)
         x += EDIT_BUTTON_SIZE[0]
