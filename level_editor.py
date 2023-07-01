@@ -3,6 +3,7 @@ import pygame as pg
 
 # Импорты файлов
 from field import EditField
+from field import EditButton
 
 # Ширина и высота экрана
 SCREEN_WIDTH = 800
@@ -66,6 +67,34 @@ class LevelEditor:
                 if e.type == pg.QUIT:
                     pg.quit()
                     raise SystemExit
+
+                # Если нажата левая клавиша мыши
+                elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
+                    
+                    # Получаем координаты клика
+                    click_coordinates = pg.mouse.get_pos()
+
+                    # Получаем кликнутый объект
+                    clicked_object = edit_field.get_clicked_object(click_coordinates[0], click_coordinates[1])
+
+                    # если кликнутого объекта нет, то пропускаем итерацию
+                    if clicked_object is None:
+                        continue
+
+                    # Если клик пришёлся на кнопку редактирования поля
+                    if isinstance(clicked_object, EditButton):
+                        
+                        # Если кликнута кнопка увеличения стороны поля, то увеличиваем эту сторону и обновляем поле
+                        if clicked_object.button_type == "add":
+                            edit_field.increase_side(clicked_object.side_type)
+                            edit_field.update()
+                            continue
+
+                        # Если кликнута кнопка уменьшения стороны поля, то уменьшаем эту сторону и обновляем поле
+                        if clicked_object.button_type == "delete":
+                            edit_field.decrease_side(clicked_object.side_type)
+                            edit_field.update()
+                            continue
 
                 # Если нажата правая клавиша мыши, то ставим флаг движения карты и флаг для пропуска первого сдвига
                 elif e.type == pg.MOUSEBUTTONDOWN and e.button == 3:

@@ -1137,6 +1137,9 @@ class Field:
 # Размер кнопки редактирования
 EDIT_BUTTON_SIZE = (50, 50)
 
+# Минимально допустимое количество клеток в строке или столбце поля
+MIN_SQUARES_IN_ROW_AND_COLUMN = 3
+
 class EditButton(pg.sprite.Sprite):
     """
     Класс для реализации кнопки редактирования поля (увеличения или уменьшения поля).
@@ -1233,21 +1236,32 @@ class EditField:
         # Сохраняем копию начальной карты поля
         self.field_map = initial_field_map.copy()
 
-        # Двухмерный список для хранения спрайтов шахматных клеток
-        self.squares_list: list[list[SquareTemplate]] = []
-
-        # Группа для хранения спрайтов шахматных клеток
-        self.squares_group = pg.sprite.Group()
-
         # Флаг движения игрового поля
         self.is_moving = False
 
         # Флаг скрытия первого сдвига при движении игрового поля
         self.skip_first_move = False
 
+        # Создаём структуру поля
+        self.create()
+
+    def create(self) -> None:
+        """
+        Функция для создания или пересоздания структуры игрового поля
+        """
+
+        # Заливаем поверхность поля фоном
+        self.screen_field.blit(self.background, (0, 0))
+        
+        # Двухмерный список для хранения спрайтов шахматных клеток
+        self.squares_list: list[list[SquareTemplate]] = []
+
+        # Группа для хранения спрайтов шахматных клеток
+        self.squares_group = pg.sprite.Group()
+
         # Извлекаем координаты начала экрана
-        x = self.screen_absolute_coordinates[0]
-        y = self.screen_absolute_coordinates[1]
+        x = -self.screen_absolute_coordinates[0]
+        y = -self.screen_absolute_coordinates[1]
 
         # Создаём шахматные клетки, задаём им стартовые координаты и помещаем в спрайт-группу.
         # Заполняем двухмерный список с шахматными клетками
@@ -1264,15 +1278,15 @@ class EditField:
                     inner_list.append(nonexistent_square)
                 x += SQUARE_SIDE_SIZE
             y += SQUARE_SIDE_SIZE
-            x = 0
+            x = -self.screen_absolute_coordinates[0]
             self.squares_list.append(inner_list)
         
         # Создаём группу для спрайтов кнопок увеличения и уменьшения сторон поля
         self.edit_buttons_group = pg.sprite.Group()
 
         # Задаём верхнюю пару кнопок редактирования
-        x = (self.get_field_width() // 2) - EDIT_BUTTON_SIZE[0]
-        y = -EDIT_BUTTON_SIZE[1] - (EDIT_BUTTON_SIZE[1] // 2)
+        x = -self.screen_absolute_coordinates[0] + (self.get_field_width() // 2) - EDIT_BUTTON_SIZE[0]
+        y = -self.screen_absolute_coordinates[1] - EDIT_BUTTON_SIZE[1] - (EDIT_BUTTON_SIZE[1] // 2)
         edit_button = EditButton(x, y, "add", "top")
         self.edit_buttons_group.add(edit_button)
         x += EDIT_BUTTON_SIZE[0]
@@ -1280,8 +1294,8 @@ class EditField:
         self.edit_buttons_group.add(edit_button)
 
         # Задаём правую пару кнопок редактирования
-        x = self.get_field_width() + (EDIT_BUTTON_SIZE[0] // 2)
-        y = (self.get_field_height() // 2) - EDIT_BUTTON_SIZE[1]
+        x = -self.screen_absolute_coordinates[0] + self.get_field_width() + (EDIT_BUTTON_SIZE[0] // 2)
+        y = -self.screen_absolute_coordinates[1] + (self.get_field_height() // 2) - EDIT_BUTTON_SIZE[1]
         edit_button = EditButton(x, y, "add", "right")
         self.edit_buttons_group.add(edit_button)
         y += EDIT_BUTTON_SIZE[1]
@@ -1289,8 +1303,8 @@ class EditField:
         self.edit_buttons_group.add(edit_button)
 
         # Задаём нижнюю пару кнопок редактирования
-        x = (self.get_field_width() // 2) - EDIT_BUTTON_SIZE[0]
-        y = self.get_field_height() + (EDIT_BUTTON_SIZE[1] // 2)
+        x = -self.screen_absolute_coordinates[0] + (self.get_field_width() // 2) - EDIT_BUTTON_SIZE[0]
+        y = -self.screen_absolute_coordinates[1] + self.get_field_height() + (EDIT_BUTTON_SIZE[1] // 2)
         edit_button = EditButton(x, y, "add", "bottom")
         self.edit_buttons_group.add(edit_button)
         x += EDIT_BUTTON_SIZE[0]
@@ -1298,8 +1312,8 @@ class EditField:
         self.edit_buttons_group.add(edit_button)
 
         # Задаём левую пару кнопок редактирования
-        x = -(EDIT_BUTTON_SIZE[0] // 2) - EDIT_BUTTON_SIZE[0]
-        y = (self.get_field_height() // 2) - EDIT_BUTTON_SIZE[1]
+        x = -self.screen_absolute_coordinates[0] - (EDIT_BUTTON_SIZE[0] // 2) - EDIT_BUTTON_SIZE[0]
+        y = -self.screen_absolute_coordinates[1] + (self.get_field_height() // 2) - EDIT_BUTTON_SIZE[1]
         edit_button = EditButton(x, y, "add", "left")
         self.edit_buttons_group.add(edit_button)
         y += EDIT_BUTTON_SIZE[1]
@@ -1376,11 +1390,13 @@ class EditField:
         screen_height = self.screen_field.get_height()
 
         # Если при сдвиге по X на экран не попадает ни одной целой клетки, то обнуляем сдвиг по X
-        if (x_screen_test < -(screen_width - square_side_size)) or (x_screen_test > (field_width - square_side_size)):
+        if (x_screen_test < -(screen_width - square_side_size)) or \
+           (x_screen_test > (field_width - square_side_size)):
             x_shift = 0
         
         # Если при сдвиге по Y на экран не попадает ни одной целой клетки, то обнуляем сдвиг по Y
-        if (y_screen_test < -(screen_height - square_side_size)) or (y_screen_test > (field_height - square_side_size)):
+        if (y_screen_test < -(screen_height - square_side_size)) or \
+           (y_screen_test > (field_height - square_side_size)):
             y_shift = 0
 
         # Сдвигаем каждую клетку игрового поля
@@ -1414,3 +1430,121 @@ class EditField:
 
         # Перемещаем поле в центр экрана
         self.move(x_shift, y_shift)
+
+    def get_clicked_object(self, x: int, y: int) -> tp.Union[Square, EditButton, None]:
+        """
+        Функция для получения кликнутого объекта.
+
+        :param x: Координата клика по x.
+        :param y: Координата клика по y.
+
+        :return: Кликнутый объект или None, если кликнутого объекта не найдено.
+        """
+        
+        # Перебираем все клетки и если клик пришёлся на какую-то клетку, то возвращаем её
+        for square in self.squares_group:
+            if square.rect.collidepoint(x, y):
+                return square
+        
+        # Перебираем все кнопки редактирования и если клик пришёлся на какую-то кнопку, то возвращаем её
+        for edit_button in self.edit_buttons_group:
+            if edit_button.rect.collidepoint(x, y):
+                return edit_button
+        
+        # Иначе возвращаем None
+        return None
+
+    def increase_side(self, side_type: str) -> None:
+        """
+        Функция для увеличения одной из сторон поля.
+
+        :param side_type: Тип стороны поля, которую нужно увеличить ("top", "right", "bottom", "left").
+        """
+        
+        # Если нужно увеличить верхнюю сторону поля
+        if side_type == "top":
+            
+            # Создаём список клеток верхней строки
+            top_row_list = [1 for _ in range(len(self.squares_list[0]))]
+
+            # Добавляем созданный список в начало списка карты
+            self.field_map.insert(0, top_row_list)
+
+        # Если нужно увеличить правую сторону поля
+        elif side_type == "right":
+            
+            # Добавляем 1 в конец каждого списка строки
+            for row_list in self.field_map:
+                row_list.append(1)
+            
+            # Сдвигаем поле
+            self.move(-SQUARE_SIDE_SIZE, 0)
+
+        # Если нужно увеличить нижнюю сторону поля
+        elif side_type == "bottom":
+
+            # Создаём список клеток нижней строки
+            bottom_row_list = [1 for _ in range(len(self.squares_list[0]))]
+
+            # Добавляем созданный список в конец списка карты
+            self.field_map.append(bottom_row_list)
+
+            # Сдвигаем поле
+            self.move(0, -SQUARE_SIDE_SIZE)
+
+        # Если нужно увеличить левую сторону поля
+        elif side_type == "left":
+            
+            # Добавляем 1 в начало каждого списка строки
+            for row_list in self.field_map:
+                row_list.insert(0, 1)
+
+        # Пересоздаём структуру поля
+        self.create()
+
+    def decrease_side(self, side_type: str) -> None:
+        """
+        Функция для уменьшения одной из сторон поля.
+
+        :param side_type: Тип стороны поля, которую нужно уменьшить ("top", "right", "bottom", "left").
+        """
+
+        # Если поле слишком маленькое для дальнейшего уменьшения, то завершаем функцию
+        if ((side_type == "top" or side_type == "bottom") and len(self.field_map) <= MIN_SQUARES_IN_ROW_AND_COLUMN) or \
+           ((side_type == "right" or side_type == "left") and len(self.field_map[0]) <= MIN_SQUARES_IN_ROW_AND_COLUMN):
+            return
+
+        # Если нужно уменьшить верхнюю сторону поля
+        if side_type == "top":
+            
+            # Удаляем первый список стоки из списка карты
+            self.field_map.pop(0)
+
+        # Если нужно уменьшить правую сторону поля
+        elif side_type == "right":
+            
+            # Удаляем последний элемент из каждой строки списка
+            for row_list in self.field_map:
+                row_list.pop()
+            
+            # Сдвигаем поле
+            self.move(SQUARE_SIDE_SIZE, 0)
+
+        # Если нужно уменьшить нижнюю сторону поля
+        elif side_type == "bottom":
+            
+            # Удаляем последний список строки из списка карты
+            self.field_map.pop()
+
+            # Сдвигаем поле
+            self.move(0, SQUARE_SIDE_SIZE)
+
+        # Если нужно уменьшить левую сторону поля
+        elif side_type == "left":
+            
+            # Удаляем первый элемент из каждой строки списка
+            for row_list in self.field_map:
+                row_list.pop(0)
+
+        # Пересоздаём структуру поля
+        self.create()
