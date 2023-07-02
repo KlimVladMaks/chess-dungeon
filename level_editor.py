@@ -90,7 +90,7 @@ class LevelEditor:
                     click_coordinates = pg.mouse.get_pos()
 
                     # Получаем кликнутый объект
-                    clicked_object = edit_field.get_clicked_object(click_coordinates[0], click_coordinates[1])
+                    clicked_object = edit_field.get_object_by_coordinates(click_coordinates[0], click_coordinates[1])
 
                     # если кликнутого объекта нет, то пропускаем итерацию
                     if clicked_object is None:
@@ -445,17 +445,6 @@ class EditField:
         edit_button = EditButton(x, y, "delete", "left")
         self.edit_buttons_group.add(edit_button)
 
-    def get_square_side_size(self) -> int:
-        """
-        Функция, возвращающая размер стороны клетки игрового поля.
-
-        :return: Текущий размер клетки игрового поля.
-        """
-
-        # Возвращаем размер стороны первой клетки в списке с игровыми клетками
-        # (т.к. все клетки имеют одинаковый размер)
-        return self.squares_list[0][0].rect.width
-
     def get_field_width(self) -> int:
         """
         Функция, возвращающая ширину игрового поля.
@@ -464,7 +453,7 @@ class EditField:
         """
 
         # Рассчитываем и возвращаем ширину игрового поля
-        return len(self.squares_list[0]) * self.get_square_side_size()
+        return len(self.squares_list[0]) * EDIT_SQUARE_SIDE_SIZE
 
     def get_field_height(self) -> int:
         """
@@ -474,7 +463,7 @@ class EditField:
         """
 
         # Рассчитываем и возвращаем высоту игрового поля
-        return len(self.squares_list) * self.get_square_side_size()
+        return len(self.squares_list) * EDIT_SQUARE_SIDE_SIZE
 
     def move(self, x_shift: int, y_shift: int) -> None:
         """
@@ -494,7 +483,7 @@ class EditField:
         field_height = self.get_field_height()
 
         # Получаем размеры одной клетки
-        square_side_size = self.get_square_side_size()
+        square_side_size = EDIT_SQUARE_SIDE_SIZE
 
         # Получаем размеры экрана
         screen_width = self.screen_field.get_width()
@@ -542,28 +531,46 @@ class EditField:
         # Перемещаем поле в центр экрана
         self.move(x_shift, y_shift)
 
-    def get_clicked_object(self, x: int, y: int) -> tp.Union[EditSquare, EditButton, None]:
+    def get_object_by_coordinates(self, x: int, y: int) -> tp.Union[EditSquare, EditButton, None]:
         """
-        Функция для получения кликнутого объекта.
+        Функция для получения объекта по его координатам.
 
-        :param x: Координата клика по x.
-        :param y: Координата клика по y.
+        :param x: Координата x.
+        :param y: Координата y.
 
-        :return: Кликнутый объект или None, если кликнутого объекта не найдено.
+        :return: Объект с заданными координатами или None, если объекта не найдено.
         """
         
-        # Перебираем все клетки и если клик пришёлся на какую-то клетку, то возвращаем её
-        for square in self.squares_group:
-            if square.rect.collidepoint(x, y):
-                return square
-        
-        # Перебираем все кнопки редактирования и если клик пришёлся на какую-то кнопку, то возвращаем её
+        # Перебираем все кнопки редактирования и если координаты попадают на какую-то кнопку, то возвращаем её
         for edit_button in self.edit_buttons_group:
             if edit_button.rect.collidepoint(x, y):
                 return edit_button
         
-        # Иначе возвращаем None
-        return None
+        # Рассчитываем абсолютные координаты клетки
+        x_absolute = x + self.screen_absolute_coordinates[0]
+        y_absolute = y + self.screen_absolute_coordinates[1]
+
+        # Получаем размер стороны клетки
+        square_side_size = EDIT_SQUARE_SIDE_SIZE
+
+        # Если абсолютные x или y меньше 0, то возвращаем None
+        if x_absolute < 0 or y_absolute < 0:
+            return None
+
+        # Отлавливаем ошибки для избежания выхода из диапазона
+        try:
+
+            # Рассчитываем позицию клетки и извлекаем её из двухмерного списка клеток
+            square_col = x_absolute // square_side_size
+            square_row = y_absolute // square_side_size
+            found_square = self.squares_list[square_row][square_col]
+
+        # При выходе из диапазона возвращаем None
+        except IndexError:
+            return None
+
+        # Возвращаем найденную клетку
+        return found_square
 
     def increase_side(self, side_type: str) -> None:
         """
