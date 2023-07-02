@@ -7,6 +7,7 @@ from interface import *
 from game import *
 from menu import *
 from king_square import *
+from level_editor import LevelEditor
 
 # Ширина и высота экрана
 SCREEN_WIDTH = 800
@@ -522,7 +523,7 @@ def main() -> None:
         # Запускаем главное меню
         if active_object == "main_menu":
             main_menu = MainMenu(screen)
-            main_menu.add_buttons(["demo", "quit"])
+            main_menu.add_buttons(["demo", "level_editor", "quit"])
             active_object = main_menu.start()
         
         # Перед началом игры спрашиваем уровень сложности
@@ -545,6 +546,10 @@ def main() -> None:
         # Запускаем демо игровой процесс
         elif active_object == "demo_start":
             active_object = GameProcess.start(screen)
+
+        # Запускаем редактор уровней
+        elif active_object == "level_editor":
+            LevelEditor.start(screen)
 
         # Запускаем финальное меню при проигрыше
         elif active_object == "lose_menu":

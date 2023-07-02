@@ -73,6 +73,8 @@ class MenuButton(pg.sprite.Sprite):
             self.image = pg.image.load("design/menu/normal_button.png")
         elif self.value == "easy":
             self.image = pg.image.load("design/menu/easy_button.png")
+        elif self.value == "level_editor":
+            self.image = pg.image.load("design/menu/level_editor_button.png")
 
 
 class MainMenu:
