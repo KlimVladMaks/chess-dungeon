@@ -7,7 +7,7 @@ from interface import *
 from game import *
 from menu import *
 from king_square import *
-from level_editor import LevelEditor
+from level_editor.level_editor import LevelEditor
 
 # Ширина и высота экрана
 SCREEN_WIDTH = 800

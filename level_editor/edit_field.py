@@ -1,20 +1,10 @@
-# Импорты библиотек
+# Импорт библиотек
 import pygame as pg
 import typing as tp
 
-# Ширина и высота экрана
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-
-# Частота кадров
-FPS = 60
-
-# Начальная карта игрового поля
-INITIAL_FIELD_MAP = [[1, 1, 1, 1, 1],
-                     [1, 1, 1, 1, 1],
-                     [1, 1, 1, 1, 1],
-                     [1, 1, 1, 1, 1],
-                     [1, 1, 1, 1, 1]]
+# Импорт файлов для задания типов
+if tp.TYPE_CHECKING:
+    from level_editor.level_editor import LevelEditor
 
 # Размер стороны клетки редактируемого поля
 EDIT_SQUARE_SIDE_SIZE = 50
@@ -30,139 +20,6 @@ SELECTED_EDIT_BUTTON_BORDER_WIDTH = 3
 
 # Цвет границы у выбранной клетки
 SELECTED_EDIT_BUTTON_BORDER_COLOR = (0, 0, 255)
-
-
-class LevelEditor:
-    """
-    Класс для реализации редактора уровней.
-    """
-    
-    @staticmethod
-    def start(screen: pg.Surface) -> None:
-        """
-        Метод для запуска редактора уровней.
-
-        :param screen: Экран игры.
-        """
-
-        # Абсолютные координаты экрана относительно карты уровня
-        screen_absolute_coordinates = [0, 0]
-        
-        # Часы для регулировки FPS
-        clock = pg.time.Clock()
-
-        # Поверхность для отображения игрового поля
-        screen_field = pg.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
-
-        # Устанавливаем фон
-        background = pg.image.load("design/level_editor/background.png")
-        screen.blit(background, (0, 0))
-        pg.display.update()
-
-        # Создаём редактируемое игровое поле
-        edit_field = EditField(screen, screen_field, background, screen_absolute_coordinates, INITIAL_FIELD_MAP)
-
-        # Создаём контроллер для управления редактором уровней
-        edit_controller = EditController()
-
-        # Центрируем и отрисовываем игровое поле
-        edit_field.center()
-        edit_field.update()
-
-        # Запускаем цикл работы редактора
-        while True:
-            
-            # Регулируем FPS
-            clock.tick(FPS)
-
-            # Перебираем игровые события
-            for e in pg.event.get():
-
-                # При закрытии игрового окна завершаем программу
-                if e.type == pg.QUIT:
-                    pg.quit()
-                    raise SystemExit
-
-                # Если нажата левая клавиша мыши
-                elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
-                    
-                    # Получаем координаты клика
-                    click_coordinates = pg.mouse.get_pos()
-
-                    # Получаем кликнутый объект
-                    clicked_object = edit_field.get_object_by_coordinates(click_coordinates[0], click_coordinates[1])
-
-                    # если кликнутого объекта нет, то пропускаем итерацию
-                    if clicked_object is None:
-                        continue
-
-                    # Если клик пришёлся на кнопку редактирования поля
-                    elif isinstance(clicked_object, EditButton):
-
-                        # Получаем кликнутую кнопку
-                        clicked_button = clicked_object
-                        
-                        # Если кликнута кнопка увеличения стороны поля, то увеличиваем эту сторону и обновляем поле
-                        if clicked_button.button_type == "add":
-                            edit_field.increase_side(clicked_button.side_type)
-                            edit_field.update()
-                            continue
-
-                        # Если кликнута кнопка уменьшения стороны поля, то уменьшаем эту сторону и обновляем поле
-                        elif clicked_button.button_type == "delete":
-                            edit_field.decrease_side(clicked_button.side_type)
-                            edit_field.update()
-                            continue
-
-                    # Если клик пришёлся на клетку поля
-                    elif isinstance(clicked_object, EditSquare):
-                        
-                        # Получаем кликнутую клетку
-                        clicked_square = clicked_object
-
-                        # Если кликнутая клетка уже была выбрана ранее, то снимаем с неё выделение и обновляем поле
-                        if clicked_square == edit_controller.selected_square:
-                            clicked_square.deselect()
-                            edit_controller.selected_square = None
-                            edit_field.update()
-                            continue
-
-                        # Если кликнутая клетка не была выбрана ранее, то снимаем выделение с предыдущей выбранной 
-                        # клетки (если она не равна None) и делаем выбранной кликнутую клетку и обновляем поле
-                        elif clicked_square != edit_controller.selected_square:
-                            if edit_controller.selected_square is not None:
-                                edit_controller.selected_square.deselect()
-                            clicked_square.select()
-                            edit_controller.selected_square = clicked_square
-                            edit_field.update()
-                            continue
-
-                # Если нажата правая клавиша мыши, то ставим флаг движения карты и флаг для пропуска первого сдвига
-                elif e.type == pg.MOUSEBUTTONDOWN and e.button == 3:
-                    edit_field.is_moving = True
-                    edit_field.skip_first_move = True
-                
-                # Если отпущена правая клавиша мыши, то снимаем флаг движения карты и флаг пропуска первого сдвига
-                elif e.type == pg.MOUSEBUTTONUP and e.button == 3:
-                    edit_field.is_moving = False
-                    edit_field.skip_first_move = False
-
-                # Если мышь движется с установленным флагом движения карты
-                elif e.type == pg.MOUSEMOTION and edit_field.is_moving:
-
-                    # Находим сдвиг курсора по x и y
-                    mouse_shift = pg.mouse.get_rel()
-                    x_shift = mouse_shift[0]
-                    y_shift = mouse_shift[1]
-
-                    # Если у поля стоит флаг пропуска первого сдвига, то снимаем данный флаг и пропускаем итерацию
-                    if edit_field.skip_first_move:
-                        edit_field.skip_first_move = False
-                        continue
-
-                    # Сдвигаем игровое поле и обновляем его
-                    edit_field.move(x_shift, y_shift)
-                    edit_field.update()
 
 
 class EditButton(pg.sprite.Sprite):
@@ -230,7 +87,7 @@ class EditSquare(pg.sprite.Sprite):
     Класс для реализации клетки на редактируемом поле.
     """
     
-    def __init__(self, x: int, y: int, field: LevelEditor) -> None:
+    def __init__(self, x: int, y: int, field: 'LevelEditor') -> None:
         """
         Функция для инициализации клетки редактируемого поля.
 
@@ -337,6 +194,7 @@ class EditField:
         :param background: Задний фон поля.
         :param screen_absolute_coordinates: Абсолютные координаты экрана относительно поля.
         :param initial_field_map: Начальная карта игрового поля.
+        :param edit_controller: Контроллер для управления редактированием.
         """
         
         # Сохраняем экран игры
@@ -486,8 +344,8 @@ class EditField:
         square_side_size = EDIT_SQUARE_SIDE_SIZE
 
         # Получаем размеры экрана
-        screen_width = self.screen_field.get_width()
-        screen_height = self.screen_field.get_height()
+        screen_width = self.screen.get_width()
+        screen_height = self.screen.get_height()
 
         # Если при сдвиге по X на экран не попадает ни одной целой клетки, то обнуляем сдвиг по X
         if (x_screen_test < -(screen_width - square_side_size)) or \
@@ -746,34 +604,6 @@ class EditField:
         
         # Добавляем кнопки редактирования к уменьшенному полю
         self.add_edit_buttons()
-
-
-class EditInterface:
-    """
-    Класс для реализации интерфейса редактирования.
-    """
-    pass
-
-
-class EditInterfaceButton:
-    """
-    Класс для реализации кнопки интерфейса редактирования.
-    """
-    pass
-
-
-class EditController:
-    """
-    Класс для реализации контроллера для управления редактором уровней.
-    """
-    
-    def __init__(self) -> None:
-        """
-        Функция для инициализации контроллера редактирования.
-        """
-        
-        # Текущая выбранная клетка
-        self.selected_square: tp.Union[EditSquare, None] = None
 
 
 # Область для отладки
