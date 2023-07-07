@@ -16,10 +16,13 @@ EDIT_BUTTON_SIZE = (50, 50)
 MIN_SQUARES_IN_ROW_AND_COLUMN = 3
 
 # Ширина границы у выбранной клетки
-SELECTED_EDIT_BUTTON_BORDER_WIDTH = 3
+SELECTED_EDIT_SQUARE_BORDER_WIDTH = 3
 
 # Цвет границы у выбранной клетки
-SELECTED_EDIT_BUTTON_BORDER_COLOR = (0, 0, 255)
+SELECTED_EDIT_SQUARE_BORDER_COLOR = (0, 0, 255)
+
+# Цвет заливки у выбранной клетки
+SELECTED_EDIT_SQUARE_FILL_COLOR = (0, 0, 255, 20)
 
 
 class EditButton(pg.sprite.Sprite):
@@ -106,7 +109,7 @@ class EditSquare(pg.sprite.Sprite):
         self.side_size = EDIT_SQUARE_SIDE_SIZE
 
         # Загружаем базовое изображение поверхности клетки
-        self.image = pg.image.load("./design/level_editor/edit_field/square.png")
+        self.image = pg.image.load("./design/field/square.png")
 
         # Задаём область клетки, основываясь на переданных координатах
         self.rect = pg.Rect(x, y, self.side_size, self.side_size)
@@ -114,21 +117,32 @@ class EditSquare(pg.sprite.Sprite):
         # Флаг, показывающий выбрана ли клетка
         self.is_selected = False
 
+        # Тип клетки
+        self.square_type = "square"
+
     def update(self) -> None:
         """
         Функция для обновления клетки. 
         """
         
-        # Загружаем базовый вариант клетки
-        self.image = pg.image.load("design/field/square.png")
+        # Если клетка является обычной клеткой, то задаём ей изображение обычной клетки
+        if self.square_type == "square":
+            self.image = pg.image.load("./design/field/square.png")
 
-        # Если клетка выбрана, то рисуем вокруг неё рамку
+        # Если клетка является барьером, то задаём ей изображение барьера
+        elif self.square_type == "barrier":
+            self.image = pg.image.load("./design/field/barrier.png")
+
+        # Если клетка выбрана, то рисуем вокруг неё рамку и делаем заливку
         if self.is_selected:
             surface = pg.Surface((self.side_size, self.side_size), pg.SRCALPHA)
+            surface.fill(SELECTED_EDIT_SQUARE_FILL_COLOR)
+            self.image.blit(surface, (0, 0))
+            surface = pg.Surface((self.side_size, self.side_size), pg.SRCALPHA)
             pg.draw.rect(surface, 
-                              SELECTED_EDIT_BUTTON_BORDER_COLOR, 
+                              SELECTED_EDIT_SQUARE_BORDER_COLOR, 
                               (0, 0, self.side_size, self.side_size), 
-                              SELECTED_EDIT_BUTTON_BORDER_WIDTH)
+                              SELECTED_EDIT_SQUARE_BORDER_WIDTH)
             self.image.blit(surface, (0, 0))
 
     def move(self, x_shift: int, y_shift: int) -> None:
@@ -172,6 +186,24 @@ class EditSquare(pg.sprite.Sprite):
         
         # Снимаем флаг выбора и обновляем клетку
         self.is_selected = False
+        self.update()
+
+    def set_barrier(self) -> None:
+        """
+        Функция, превращающая клетку в барьер.
+        """
+
+        # Задаём клетки тип барьера и обновляем её
+        self.square_type = "barrier"
+        self.update()
+
+    def set_square(self) -> None:
+        """
+        Функция для превращения клетки в обычную клетку.
+        """
+        
+        # Задаём клетки тип обычной клетки и обновляем её
+        self.square_type = "square"
         self.update()
 
 

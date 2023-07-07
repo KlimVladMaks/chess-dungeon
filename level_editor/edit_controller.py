@@ -30,8 +30,14 @@ class EditController:
         # Сохраняем интерфейс редактирования
         self.interface = interface
         
-        # Текущая выбранная клетка
-        self.selected_square: tp.Union['EditSquare', None] = None
+        # Список текущих выбранных клеток
+        self.selected_squares: list['EditSquare'] = []
+
+        # Флаг, показывающий, реализуется ли сейчас множественное выделение клеток
+        self.is_multiple_selection = False
+
+        # Флаг, показывающий, реализуется ли сейчас множественное снятие выделения клеток
+        self.is_multiple_deselection = False
 
     def select_square(self, square: 'EditSquare') -> None:
         """
@@ -40,33 +46,50 @@ class EditController:
         :param square: Клетка, которую нужно перевести в выбранный режим.
         """
 
-        # Если существует предыдущая выбранная клетка, то снимаем у неё режим выделения
-        if self.selected_square is not None:
-            self.selected_square.deselect()
-
-        # Переводим клетку в выбранный режим и сохраняем её в памяти
+        # Переводим клетку в выбранный режим и сохраняем её в списке выбранных клеток
         square.select()
-        self.selected_square = square
+        self.selected_squares.append(square)
 
-        # Добавляем к интерфейсу базовый набор кнопок и открываем интерфейс 
-        self.interface.add_buttons(EDIT_INTERFACE_BASE_LIST)
-        self.interface.open()
-
-    def deselect_square(self) -> None:
+    def deselect_squares(self) -> None:
         """
-        Функция для снятия выбранного режима у текущей выбранной клетки.
+        Функция для снятия выбранного режима у текущих выбранных клеток.
+
+        :param is_close_interface: Флаг, нужно ли закрывать интерфейс.
         """
 
-        # Если выделенной клетки нет, то завершаем функцию
-        if self.selected_square is None:
+        # Если выделенных клеток нет, то завершаем функцию
+        if len(self.selected_squares) == 0:
             return
 
-        # Снимаем выбранный режим у выбранной клетки и удаляем её из памяти
-        self.selected_square.deselect()
-        self.selected_square = None
+        # Снимаем выбранный режим у всех выбранных клеток и очищаем список выбранных клеток
+        for selected_square in self.selected_squares:
+            selected_square.deselect()
+        self.selected_squares = []
 
-        # Закрываем интерфейс
-        self.interface.close()
+    def deselect_square(self, square: 'EditSquare') -> None:
+        """
+        Функция для снятия выбранного режима у одной выбранной клетки.
+
+        :param square: Клетка, у которой нужно снять выбранный режим.
+        """
+        
+        # Снимаем выделение у заданной клетки и удаляем её из списка выделенных клеток
+        square.deselect()
+        self.selected_squares.remove(square)
+
+    def fix_interface(self) -> None:
+        """
+        Функция для актуализации состояния интерфейса.
+        """
+        
+        # При необходимости закрываем интерфейс
+        if len(self.selected_squares) == 0 and self.interface.is_open:
+            self.interface.close()
+        
+        # При необходимости открываем интерфейс с базовым набором кнопок
+        elif len(self.selected_squares) > 0 and not self.interface.is_open:
+            self.interface.add_buttons(EDIT_INTERFACE_BASE_LIST)
+            self.interface.open()
 
 
 # Область для отладки

@@ -188,6 +188,33 @@ class EditInterface(pg.sprite.Sprite):
             self.button_group.add(button)
             x += EDIT_BUTTON_SIZE[0] + EDIT_BUTTON_SPACING
 
+    def get_button_by_coordinates(self, x: int, y: int) -> tp.Union[EditInterfaceButton, None]:
+        """
+        Функция для получения кнопки интерфейса по координатам.
+
+        :param x: Координата x.
+        :param y: Координата y.
+        :return: Искомая кнопка или None, если кнопки с заданными координатами не найдено.
+        """
+        
+        # Если интерфейс закрыт, возвращаем None
+        if not self.is_open:
+            return None
+        
+        # Рассчитываем координаты кнопки на поверхности интерфейса
+        x_interface = x
+        y_interface = y - self.field.screen_field.get_height()
+
+        # Перебираем все кнопки из группы кнопок интерфейса
+        for button in self.button_group:
+            
+            # Если координаты попадают в область кнопки, то возвращаем эту кнопку
+            if button.rect.collidepoint(x_interface, y_interface):
+                return button
+        
+        # Иначе возвращаем None
+        return None
+
 
 # Область для отладки
 if __name__ == "__main__":

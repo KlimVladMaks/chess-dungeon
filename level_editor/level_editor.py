@@ -26,7 +26,7 @@ class LevelEditor:
     """
     Класс для реализации редактора уровней.
     """
-    
+
     @staticmethod
     def start(screen: pg.Surface) -> None:
         """
@@ -37,7 +37,7 @@ class LevelEditor:
 
         # Абсолютные координаты экрана относительно карты уровня
         screen_absolute_coordinates = [0, 0]
-        
+
         # Часы для регулировки FPS
         clock = pg.time.Clock()
 
@@ -45,12 +45,14 @@ class LevelEditor:
         screen_field = pg.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
         # Устанавливаем фон
-        background = pg.image.load("design/level_editor/edit_field/background.png")
+        background = pg.image.load(
+            "design/field/background.png")
         screen.blit(background, (0, 0))
         pg.display.update()
 
         # Создаём редактируемое игровое поле
-        edit_field = EditField(screen, screen_field, background, screen_absolute_coordinates, INITIAL_FIELD_MAP)
+        edit_field = EditField(screen, screen_field, background,
+                               screen_absolute_coordinates, INITIAL_FIELD_MAP)
 
         # Создаём интерфейс редактирования
         edit_interface = EditInterface(screen, edit_field)
@@ -67,7 +69,7 @@ class LevelEditor:
 
         # Запускаем цикл работы редактора
         while True:
-            
+
             # Регулируем FPS
             clock.tick(FPS)
 
@@ -81,39 +83,65 @@ class LevelEditor:
 
                 # Если нажата левая клавиша мыши
                 elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
-                    
+
                     # Получаем координаты клика
                     click_coordinates = pg.mouse.get_pos()
 
                     # Если клик пришёлся на интерфейс редактирования
                     if edit_interface.are_interface_coordinates(click_coordinates[0], click_coordinates[1]):
-                        continue
+
+                        # Получаем кнопку, на которую пришёлся клик
+                        button = edit_interface.get_button_by_coordinates(
+                            click_coordinates[0], click_coordinates[1])
+
+                        # Если клик не попал в кнопку, пропускаем итерацию
+                        if button is None:
+                            continue
+
+                        # Если нажата кнопка установки обычной клетки, то делаем все выделенные клетки обычными клетками
+                        elif button.button_type == "square":
+                            for selected_square in edit_controller.selected_squares:
+                                selected_square.set_square()
+                            edit_field.update()
+                            continue
+
+                        # Если нажата кнопка установки барьера, то делаем все выделенные клетки барьерами
+                        elif button.button_type == "barrier":
+                            for selected_square in edit_controller.selected_squares:
+                                selected_square.set_barrier()
+                            edit_field.update()
+                            continue
 
                     # Получаем кликнутый объект
                     clicked_object = edit_field.get_object_by_coordinates(click_coordinates[0], click_coordinates[1])
 
-                    # Если кликнутого объекта нет, снимаем выделение с текущей выделенной клетки
+                    # Если кликнутого объекта нет
                     if clicked_object is None:
-                        edit_controller.deselect_square()
+
+                        # Если нажата клавиша Ctrl, пропускаем итерацию
+                        keys = pg.key.get_pressed()
+                        if keys[pg.K_LCTRL] or keys[pg.K_RCTRL]:
+                            continue
+
+                        # Иначе снимаем выделение с текущих выделенных клеток
+                        edit_controller.deselect_squares()
+                        edit_field.update()
 
                     # Если клик пришёлся на кнопку изменения размера поля поля
                     elif isinstance(clicked_object, EditButton):
 
                         # Снимаем выделение с текущей выделенной клетки
-                        edit_controller.deselect_square()
+                        edit_controller.deselect_squares()
 
                         # Получаем кликнутую кнопку
                         clicked_button = clicked_object
-                        
+
                         # Если кликнута кнопка увеличения стороны поля
                         if clicked_button.button_type == "add":
 
                             # Увеличиваем соответствующую сторону и обновляем поле
                             edit_field.increase_side(clicked_button.side_type)
                             edit_field.update()
-
-                            # Переходим к новой итерации цикла
-                            continue
 
                         # Если кликнута кнопка уменьшения стороны поля
                         elif clicked_button.button_type == "delete":
@@ -122,24 +150,103 @@ class LevelEditor:
                             edit_field.decrease_side(clicked_button.side_type)
                             edit_field.update()
 
-                            # Переходим к новой итерации цикла
-                            continue
-
                     # Если клик пришёлся на клетку поля
                     elif isinstance(clicked_object, EditSquare):
-                        
+
+                        # Устанавливаем флаг множественного выделения клеток
+                        edit_controller.is_multiple_selection = True
+
                         # Получаем кликнутую клетку
                         clicked_square = clicked_object
 
-                        # Если кликнутая клетка уже была выбрана ранее, то снимаем у неё выбранный режим
-                        if clicked_square == edit_controller.selected_square:
-                            edit_controller.deselect_square()
+                        # Если нажата клавиша Ctrl
+                        keys = pg.key.get_pressed()
+                        if keys[pg.K_LCTRL] or keys[pg.K_RCTRL]:
+
+                            # Если кликнутая клетка выбрана, то снимаем флаг массового выделения и ставим флаг 
+                            # массового снятия выделения с клеток
+                            if clicked_square.is_selected:
+                                edit_controller.is_multiple_selection = False
+                                edit_controller.is_multiple_deselection = True
+
+                            # Если кликнутая клетка выделена, то снимаем с неё выделение
+                            if clicked_square.is_selected:
+                                edit_controller.deselect_square(clicked_square)
+                                edit_field.update()
+                            
+                            # Если кликнутая клетка не выделена, то выделяем её
+                            elif not clicked_square.is_selected:
+                                edit_controller.select_square(clicked_square)
+                                edit_field.update()
+
+                        # Если клик пришёлся на единственную выбранную клетку
+                        elif (len(edit_controller.selected_squares) == 1) and \
+                           (edit_controller.selected_squares[0] == clicked_square):
+
+                            # Снимаем выделение с ранее выделенной клетки
+                            edit_controller.deselect_squares()
+                            edit_field.update()
+
+                            # Снимаем флаг множественного выделения клеток
+                            edit_controller.is_multiple_selection = False
+
+                        # Иначе
+                        else:
+
+                            # Снимаем выделение с ранее выделенных клеток и выделяем кликнутую клетку, 
+                            # не закрывая интерфейс
+                            edit_controller.deselect_squares()
+                            edit_controller.select_square(clicked_square)
+                            edit_field.update()
+                        
+                    # Актуализируем интерфейс
+                    edit_controller.fix_interface()
+
+                # Если отпущена левая клавиша мыши, то снимаем флаги множественного выделения 
+                # и снятия выделения с клеток
+                elif e.type == pg.MOUSEBUTTONUP and e.button == 1:
+                    edit_controller.is_multiple_selection = False
+                    edit_controller.is_multiple_deselection = False
+
+                # Если мышь движется с установленным флагом множественного выделения клеток
+                elif e.type == pg.MOUSEMOTION and edit_controller.is_multiple_selection:
+                    
+                    # Получаем текущие координаты мыши
+                    mouse_pos = pg.mouse.get_pos()
+
+                    # Получаем объект, на который сейчас наведена мышь
+                    pointed_object = edit_field.get_object_by_coordinates(mouse_pos[0], mouse_pos[1])
+
+                    # Если мышь наведена на клетку поля
+                    if isinstance(pointed_object, EditSquare):
+                        
+                        # Получаем клетку, на которую наведена мышь
+                        pointed_square = pointed_object
+
+                        # Если клетка ещё не выделена, то выделяем её
+                        if not pointed_square.is_selected:
+                            edit_controller.select_square(pointed_square)
                             edit_field.update()
                             continue
 
-                        # Если кликнутая клетка не была выбрана ранее, то переводим её в выбранный режим
-                        elif clicked_square != edit_controller.selected_square:
-                            edit_controller.select_square(clicked_square)
+                # Если мышь движется с установленным флагом множественного снятия выделения с клеток
+                elif e.type == pg.MOUSEMOTION and edit_controller.is_multiple_deselection:
+                    
+                    # Получаем текущие координаты мыши
+                    mouse_pos = pg.mouse.get_pos()
+
+                    # Получаем объект, на который сейчас наведена мышь
+                    pointed_object = edit_field.get_object_by_coordinates(mouse_pos[0], mouse_pos[1])
+
+                    # Если мышь наведена на клетку поля
+                    if isinstance(pointed_object, EditSquare):
+                        
+                        # Получаем клетку, на которую наведена мышь
+                        pointed_square = pointed_object
+
+                        # Если клетка выделена, то снимаем с неё выделение
+                        if pointed_square.is_selected:
+                            edit_controller.deselect_square(pointed_square)
                             edit_field.update()
                             continue
 
@@ -147,7 +254,7 @@ class LevelEditor:
                 elif e.type == pg.MOUSEBUTTONDOWN and e.button == 3:
                     edit_field.is_moving = True
                     edit_field.skip_first_move = True
-                
+
                 # Если отпущена правая клавиша мыши, то снимаем флаг движения карты и флаг пропуска первого сдвига
                 elif e.type == pg.MOUSEBUTTONUP and e.button == 3:
                     edit_field.is_moving = False
