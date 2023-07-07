@@ -45,7 +45,7 @@ class LevelEditor:
         screen_field = pg.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
         # Устанавливаем фон
-        background = pg.image.load("design/level_editor/background.png")
+        background = pg.image.load("design/level_editor/edit_field/background.png")
         screen.blit(background, (0, 0))
         pg.display.update()
 
@@ -96,7 +96,7 @@ class LevelEditor:
                     if clicked_object is None:
                         edit_controller.deselect_square()
 
-                    # Если клик пришёлся на кнопку редактирования поля
+                    # Если клик пришёлся на кнопку изменения размера поля поля
                     elif isinstance(clicked_object, EditButton):
 
                         # Снимаем выделение с текущей выделенной клетки

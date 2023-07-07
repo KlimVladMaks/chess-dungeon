@@ -62,12 +62,12 @@ class EditButton(pg.sprite.Sprite):
         
         # Кнопка увеличения стороны
         if self.button_type == "add":
-            surface = pg.image.load("./design/level_editor/add_button.png")
+            surface = pg.image.load("./design/level_editor/edit_field/add_button.png")
             self.image.blit(surface, (0, 0))
         
         # Кнопка уменьшения стороны
         elif self.button_type == "delete":
-            surface = pg.image.load("./design/level_editor/delete_button.png")
+            surface = pg.image.load("./design/level_editor/edit_field/delete_button.png")
             self.image.blit(surface, (0, 0))
 
     def move(self, x_shift: int, y_shift: int) -> None:
@@ -106,7 +106,7 @@ class EditSquare(pg.sprite.Sprite):
         self.side_size = EDIT_SQUARE_SIDE_SIZE
 
         # Загружаем базовое изображение поверхности клетки
-        self.image = pg.image.load("./design/level_editor/square.png")
+        self.image = pg.image.load("./design/level_editor/edit_field/square.png")
 
         # Задаём область клетки, основываясь на переданных координатах
         self.rect = pg.Rect(x, y, self.side_size, self.side_size)

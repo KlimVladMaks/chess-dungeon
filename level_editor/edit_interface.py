@@ -12,28 +12,63 @@ EDIT_INTERFACE_HEIGHT = 100
 # Цвет фона интерфейса
 EDIT_INTERFACE_BACKGROUND_COLOR = (128, 128, 128)
 
+# Размеры кнопок интерфейса в формате (ширина, высота)
+EDIT_BUTTON_SIZE = (70, 70)
+
+# Расстояние между кнопками интерфейса
+EDIT_BUTTON_SPACING = 20
+
+# Список с базовыми типами для кнопок интерфейса
+EDIT_INTERFACE_BASE_LIST = ["square", "barrier", "white_piece", "black_piece"]
+
+# Список с типами белых фигур для кнопок интерфейса
+EDIT_INTERFACE_WHITE_PIECES_LIST = ["white_pawn", "white_knight", "white_bishop", 
+                                    "white_rook", "white_queen", "white_king"]
+
+# Список с типами чёрных фигур для кнопок интерфейса
+EDIT_INTERFACE_BLACK_PIECES_LIST = ["black_pawn", "black_knight", "black_bishop",
+                                    "black_rook", "black_queen", "black_king"]
+
 
 class EditInterfaceButton(pg.sprite.Sprite):
     """
     Класс для реализации кнопки интерфейса редактирования.
     """
     
-    def __init__(self, coordinates: tuple[int, int], button_size: tuple[int, int]) -> None:
+    def __init__(self, coordinates: tuple[int, int], button_size: tuple[int, int], button_type: str) -> None:
         """
         Функция для инициализации кнопки.
 
         :param coordinates: Координаты кнопки в формате (x, y).
         :param button_size: Размеры кнопки в формате (ширина, высота).
+        :param button_type: Тип кнопки.
         """
         
         # Инициализируем спрайт
         pg.sprite.Sprite.__init__(self)
+
+        # Сохраняем тип кнопки
+        self.button_type = button_type
 
         # Задаём поверхность кнопки
         self.image = pg.Surface((button_size[0], button_size[1]))
 
         # Задаём область кнопки
         self.rect = pg.Rect(coordinates[0], coordinates[1], button_size[0], button_size[1])
+
+        # Обновляем состояние кнопки
+        self.update()
+
+    def update(self) -> None:
+        """
+        Функция для обновления состояния кнопки.
+        """
+        
+        # Задаём изображение кнопки, отлавливая ошибки
+        try:
+            self.image = pg.image.load(f"./design/level_editor/edit_interface/{self.button_type}_button.png")
+        except:
+            pass
 
 
 class EditInterface(pg.sprite.Sprite):
@@ -70,6 +105,9 @@ class EditInterface(pg.sprite.Sprite):
         # Флаг, показывающий, открыт ли интерфейс
         self.is_open = False
 
+        # Группа для хранения кнопок интерфейса
+        self.button_group = pg.sprite.Group()
+
     def open(self) -> None:
         """
         Функция для открытия интерфейса редактирования.
@@ -79,7 +117,8 @@ class EditInterface(pg.sprite.Sprite):
         self.field.screen_field = pg.Surface((self.screen.get_width(), 
                                               self.screen.get_height() - EDIT_INTERFACE_HEIGHT))
         
-        # Отрисовываем интерфейс на экране
+        # Отрисовываем интерфейс на экране вместе с кнопками
+        self.button_group.draw(self.image)
         self.screen.blit(self.image, self.rect)
         pg.display.update()
 
@@ -131,6 +170,23 @@ class EditInterface(pg.sprite.Sprite):
         # Иначе возвращаем False
         else:
             return False
+
+    def add_buttons(self, button_types_list: list[str]) -> None:
+        """
+        Функция для добавления кнопок в интерфейс.
+
+        :param button_types_list: Список с типами кнопок.
+        """
+
+        # Задаём координаты для первой кнопки
+        x = EDIT_BUTTON_SPACING
+        y = (self.image.get_height() // 2) - (EDIT_BUTTON_SIZE[1] // 2)
+        
+        # Перебираем все типы кнопок и создаём соответствующие кнопки
+        for button_type in button_types_list:
+            button = EditInterfaceButton((x, y), EDIT_BUTTON_SIZE, button_type)
+            self.button_group.add(button)
+            x += EDIT_BUTTON_SIZE[0] + EDIT_BUTTON_SPACING
 
 
 # Область для отладки

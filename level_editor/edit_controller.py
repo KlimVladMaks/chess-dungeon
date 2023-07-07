@@ -2,6 +2,9 @@
 import pygame as pg
 import typing as tp
 
+# Импорт файлов
+from level_editor.edit_interface import EDIT_INTERFACE_BASE_LIST
+
 # Импорт файлов для задания типов
 if tp.TYPE_CHECKING:
     from level_editor.edit_field import EditSquare, EditField
@@ -45,7 +48,8 @@ class EditController:
         square.select()
         self.selected_square = square
 
-        # Открываем интерфейс
+        # Добавляем к интерфейсу базовый набор кнопок и открываем интерфейс 
+        self.interface.add_buttons(EDIT_INTERFACE_BASE_LIST)
         self.interface.open()
 
     def deselect_square(self) -> None:
