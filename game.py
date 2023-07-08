@@ -146,7 +146,7 @@ class Game:
         :return: Строка с текущим статусом игры:
         win - победа игрока, lose - поражение игрока, continue - игра всё ещё идёт.
         """
-
+        
         # Если у игрока не осталось фигур, возвращаем "lose"
         if len(self.player_pieces) == 0:
             return "lose"
@@ -218,6 +218,3 @@ class Game:
 
             # Обновляем игровое поле
             self.field.update()
-
-
-

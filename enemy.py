@@ -303,6 +303,13 @@ class EnemyPiece(Piece):
         Функция сдвигает фигуру по маршруту патрулирования и сменяет поведение фигуры, при обнаружении врага
         """
 
+        #Если маршрут не задан, то ничего не делаем, только смотрим на врага
+        if len(self.way_patrol) == 0:
+            if self.is_see_player_piece(self.cell):
+                self.action = "attack"
+            self.AP = 0
+            return
+
         # проверяем не видно ли на маршруте фигуру игрока
         for i in range(self.radius_move + 1):
 
