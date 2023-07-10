@@ -124,14 +124,16 @@ class EditSquare(pg.sprite.Sprite):
         """
         Функция для обновления клетки. 
         """
-        
-        # Если клетка является обычной клеткой, то задаём ей изображение обычной клетки
-        if self.square_type == "square":
-            self.image = pg.image.load("./design/field/square.png")
 
-        # Если клетка является барьером, то задаём ей изображение барьера
-        elif self.square_type == "barrier":
-            self.image = pg.image.load("./design/field/barrier.png")
+        # Задаём клетке базовый дизайн
+        self.image = pg.image.load("./design/level_editor/edit_square/square.png")
+        
+        # Задаём дизайн клетке в зависимости от её типа
+        try:
+            surface = pg.image.load(f"./design/level_editor/edit_square/{self.square_type}.png")
+            self.image.blit(surface, (0, 0))
+        except:
+            pass
 
         # Если клетка выбрана, то рисуем вокруг неё рамку и делаем заливку
         if self.is_selected:

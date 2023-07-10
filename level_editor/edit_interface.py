@@ -23,11 +23,11 @@ EDIT_INTERFACE_BASE_LIST = ["square", "barrier", "white_piece", "black_piece"]
 
 # Список с типами белых фигур для кнопок интерфейса
 EDIT_INTERFACE_WHITE_PIECES_LIST = ["white_pawn", "white_knight", "white_bishop", 
-                                    "white_rook", "white_queen", "white_king"]
+                                    "white_rook", "white_queen", "back"]
 
 # Список с типами чёрных фигур для кнопок интерфейса
 EDIT_INTERFACE_BLACK_PIECES_LIST = ["black_pawn", "black_knight", "black_bishop",
-                                    "black_rook", "black_queen", "black_king"]
+                                    "black_rook", "black_queen", "black_king", "back"]
 
 
 class EditInterfaceButton(pg.sprite.Sprite):
@@ -117,6 +117,9 @@ class EditInterface(pg.sprite.Sprite):
         self.field.screen_field = pg.Surface((self.screen.get_width(), 
                                               self.screen.get_height() - EDIT_INTERFACE_HEIGHT))
         
+        # Закрашиваем поверхность интерфейса
+        self.image.fill(EDIT_INTERFACE_BACKGROUND_COLOR)
+
         # Отрисовываем интерфейс на экране вместе с кнопками
         self.button_group.draw(self.image)
         self.screen.blit(self.image, self.rect)
@@ -124,6 +127,33 @@ class EditInterface(pg.sprite.Sprite):
 
         # Указываем, что интерфейс открыт
         self.is_open = True
+
+    def open_base_interface(self) -> None:
+        """
+        Функция для открытия базового варианта интерфейса.
+        """
+        
+        # Открываем интерфейс с базовым набором кнопок
+        self.add_buttons(EDIT_INTERFACE_BASE_LIST)
+        self.open()
+
+    def open_white_pieces_interface(self) -> None:
+        """
+        Функция для открытия интерфейса выбора белых фигур.
+        """
+        
+        # Открываем интерфейс с кнопками выбора белых фигур
+        self.add_buttons(EDIT_INTERFACE_WHITE_PIECES_LIST)
+        self.open()
+
+    def open_black_pieces_interface(self) -> None:
+        """
+        Функция для открытия интерфейса выбора чёрных фигур.
+        """
+        
+        # Открываем интерфейс с кнопками выбора чёрных фигур
+        self.add_buttons(EDIT_INTERFACE_BLACK_PIECES_LIST)
+        self.open()
 
     def close(self) -> None:
         """
@@ -177,6 +207,9 @@ class EditInterface(pg.sprite.Sprite):
 
         :param button_types_list: Список с типами кнопок.
         """
+
+        # Очищаем группу от предыдущего набора кнопок
+        self.button_group.empty()
 
         # Задаём координаты для первой кнопки
         x = EDIT_BUTTON_SPACING

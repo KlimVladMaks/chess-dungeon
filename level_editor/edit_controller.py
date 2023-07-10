@@ -88,8 +88,7 @@ class EditController:
         
         # При необходимости открываем интерфейс с базовым набором кнопок
         elif len(self.selected_squares) > 0 and not self.interface.is_open:
-            self.interface.add_buttons(EDIT_INTERFACE_BASE_LIST)
-            self.interface.open()
+            self.interface.open_base_interface()
 
 
 # Область для отладки

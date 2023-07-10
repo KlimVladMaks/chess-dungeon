@@ -112,6 +112,29 @@ class LevelEditor:
                             edit_field.update()
                             continue
 
+                        # Если нажата кнопка выбора белой фигуры, то открываем интерфейс выбора белых фигур
+                        elif button.button_type == "white_piece":
+                            edit_interface.open_white_pieces_interface()
+                            continue
+                        
+                        # Если нажата кнопка выбора чёрной фигуры, то открываем интерфейс выбора чёрных фигур
+                        elif button.button_type == "black_piece":
+                            edit_interface.open_black_pieces_interface()
+                            continue
+
+                        # При нажатии на кнопку "Назад", открываем базовый вариант интерфейса
+                        elif button.button_type == "back":
+                            edit_interface.open_base_interface()
+                            continue
+
+                        # Иначе размещаем не клетке выбранную фигуру
+                        else:
+                            for selected_square in edit_controller.selected_squares:
+                                selected_square.square_type = button.button_type
+                                selected_square.update()
+                            edit_field.update()
+                            continue
+
                     # Получаем кликнутый объект
                     clicked_object = edit_field.get_object_by_coordinates(click_coordinates[0], click_coordinates[1])
 
@@ -214,6 +237,10 @@ class LevelEditor:
                     # Получаем текущие координаты мыши
                     mouse_pos = pg.mouse.get_pos()
 
+                    # Если мышь наведена на интерфейс, то пропускаем итерацию
+                    if edit_interface.are_interface_coordinates(mouse_pos[0], mouse_pos[1]):
+                        continue
+
                     # Получаем объект, на который сейчас наведена мышь
                     pointed_object = edit_field.get_object_by_coordinates(mouse_pos[0], mouse_pos[1])
 
@@ -234,6 +261,10 @@ class LevelEditor:
                     
                     # Получаем текущие координаты мыши
                     mouse_pos = pg.mouse.get_pos()
+
+                    # Если мышь наведена на интерфейс, то пропускаем итерацию
+                    if edit_interface.are_interface_coordinates(mouse_pos[0], mouse_pos[1]):
+                        continue
 
                     # Получаем объект, на который сейчас наведена мышь
                     pointed_object = edit_field.get_object_by_coordinates(mouse_pos[0], mouse_pos[1])
