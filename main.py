@@ -549,7 +549,7 @@ def main() -> None:
 
         # Запускаем редактор уровней
         elif active_object == "level_editor":
-            LevelEditor.start(screen)
+            active_object = LevelEditor.start(screen)
 
         # Запускаем финальное меню при проигрыше
         elif active_object == "lose_menu":

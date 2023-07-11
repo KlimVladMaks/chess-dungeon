@@ -6,6 +6,7 @@ import typing as tp
 from level_editor.edit_field import EditSquare, EditButton, EditField
 from level_editor.edit_interface import EditInterface
 from level_editor.edit_controller import EditController
+from level_editor.edit_menu import EditMenu, BASE_MENU_DICT
 
 # Ширина и высота экрана
 SCREEN_WIDTH = 800
@@ -28,11 +29,12 @@ class LevelEditor:
     """
 
     @staticmethod
-    def start(screen: pg.Surface) -> None:
+    def start(screen: pg.Surface) -> str:
         """
         Метод для запуска редактора уровней.
 
         :param screen: Экран игры.
+        :return: Строка результата работы редактора уровней.
         """
 
         # Абсолютные координаты экрана относительно карты уровня
@@ -50,9 +52,12 @@ class LevelEditor:
         screen.blit(background, (0, 0))
         pg.display.update()
 
+        # Создаём меню редактирования
+        edit_menu = EditMenu(screen)
+
         # Создаём редактируемое игровое поле
         edit_field = EditField(screen, screen_field, background,
-                               screen_absolute_coordinates, INITIAL_FIELD_MAP)
+                               screen_absolute_coordinates, INITIAL_FIELD_MAP, edit_menu)
 
         # Создаём интерфейс редактирования
         edit_interface = EditInterface(screen, edit_field)
@@ -116,7 +121,7 @@ class LevelEditor:
                         elif button.button_type == "white_piece":
                             edit_interface.open_white_pieces_interface()
                             continue
-                        
+
                         # Если нажата кнопка выбора чёрной фигуры, то открываем интерфейс выбора чёрных фигур
                         elif button.button_type == "black_piece":
                             edit_interface.open_black_pieces_interface()
@@ -136,7 +141,8 @@ class LevelEditor:
                             continue
 
                     # Получаем кликнутый объект
-                    clicked_object = edit_field.get_object_by_coordinates(click_coordinates[0], click_coordinates[1])
+                    clicked_object = edit_field.get_object_by_coordinates(
+                        click_coordinates[0], click_coordinates[1])
 
                     # Если кликнутого объекта нет
                     if clicked_object is None:
@@ -149,6 +155,22 @@ class LevelEditor:
                         # Иначе снимаем выделение с текущих выделенных клеток
                         edit_controller.deselect_squares()
                         edit_field.update()
+
+                    # Если клик пришёлся на кнопку открытия меню редактора уровней
+                    elif isinstance(clicked_object, EditMenu):
+
+                        # Запускаем игровое меню и получаем значение нажатой кнопки
+                        edit_menu.add_buttons(BASE_MENU_DICT)
+                        result = edit_menu.start()
+                        
+                        # Если нажата кнопка продолжения редактирования, то переходим к следующей итерации
+                        if result == "continue":
+                            edit_field.update()
+                            continue
+
+                        # При нажатии кнопки выхода в главное меню, возвращаемся в главное меню
+                        elif result == "main_menu":
+                            return "main_menu"
 
                     # Если клик пришёлся на кнопку изменения размера поля поля
                     elif isinstance(clicked_object, EditButton):
@@ -186,7 +208,7 @@ class LevelEditor:
                         keys = pg.key.get_pressed()
                         if keys[pg.K_LCTRL] or keys[pg.K_RCTRL]:
 
-                            # Если кликнутая клетка выбрана, то снимаем флаг массового выделения и ставим флаг 
+                            # Если кликнутая клетка выбрана, то снимаем флаг массового выделения и ставим флаг
                             # массового снятия выделения с клеток
                             if clicked_square.is_selected:
                                 edit_controller.is_multiple_selection = False
@@ -196,7 +218,7 @@ class LevelEditor:
                             if clicked_square.is_selected:
                                 edit_controller.deselect_square(clicked_square)
                                 edit_field.update()
-                            
+
                             # Если кликнутая клетка не выделена, то выделяем её
                             elif not clicked_square.is_selected:
                                 edit_controller.select_square(clicked_square)
@@ -204,7 +226,7 @@ class LevelEditor:
 
                         # Если клик пришёлся на единственную выбранную клетку
                         elif (len(edit_controller.selected_squares) == 1) and \
-                           (edit_controller.selected_squares[0] == clicked_square):
+                                (edit_controller.selected_squares[0] == clicked_square):
 
                             # Снимаем выделение с ранее выделенной клетки
                             edit_controller.deselect_squares()
@@ -216,16 +238,16 @@ class LevelEditor:
                         # Иначе
                         else:
 
-                            # Снимаем выделение с ранее выделенных клеток и выделяем кликнутую клетку, 
+                            # Снимаем выделение с ранее выделенных клеток и выделяем кликнутую клетку,
                             # не закрывая интерфейс
                             edit_controller.deselect_squares()
                             edit_controller.select_square(clicked_square)
                             edit_field.update()
-                        
+
                     # Актуализируем интерфейс
                     edit_controller.fix_interface()
 
-                # Если отпущена левая клавиша мыши, то снимаем флаги множественного выделения 
+                # Если отпущена левая клавиша мыши, то снимаем флаги множественного выделения
                 # и снятия выделения с клеток
                 elif e.type == pg.MOUSEBUTTONUP and e.button == 1:
                     edit_controller.is_multiple_selection = False
@@ -233,7 +255,7 @@ class LevelEditor:
 
                 # Если мышь движется с установленным флагом множественного выделения клеток
                 elif e.type == pg.MOUSEMOTION and edit_controller.is_multiple_selection:
-                    
+
                     # Получаем текущие координаты мыши
                     mouse_pos = pg.mouse.get_pos()
 
@@ -242,11 +264,12 @@ class LevelEditor:
                         continue
 
                     # Получаем объект, на который сейчас наведена мышь
-                    pointed_object = edit_field.get_object_by_coordinates(mouse_pos[0], mouse_pos[1])
+                    pointed_object = edit_field.get_object_by_coordinates(
+                        mouse_pos[0], mouse_pos[1])
 
                     # Если мышь наведена на клетку поля
                     if isinstance(pointed_object, EditSquare):
-                        
+
                         # Получаем клетку, на которую наведена мышь
                         pointed_square = pointed_object
 
@@ -258,7 +281,7 @@ class LevelEditor:
 
                 # Если мышь движется с установленным флагом множественного снятия выделения с клеток
                 elif e.type == pg.MOUSEMOTION and edit_controller.is_multiple_deselection:
-                    
+
                     # Получаем текущие координаты мыши
                     mouse_pos = pg.mouse.get_pos()
 
@@ -267,11 +290,12 @@ class LevelEditor:
                         continue
 
                     # Получаем объект, на который сейчас наведена мышь
-                    pointed_object = edit_field.get_object_by_coordinates(mouse_pos[0], mouse_pos[1])
+                    pointed_object = edit_field.get_object_by_coordinates(
+                        mouse_pos[0], mouse_pos[1])
 
                     # Если мышь наведена на клетку поля
                     if isinstance(pointed_object, EditSquare):
-                        
+
                         # Получаем клетку, на которую наведена мышь
                         pointed_square = pointed_object
 

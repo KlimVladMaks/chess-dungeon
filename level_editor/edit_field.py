@@ -5,6 +5,7 @@ import typing as tp
 # Импорт файлов для задания типов
 if tp.TYPE_CHECKING:
     from level_editor.level_editor import LevelEditor
+    from level_editor.edit_menu import EditMenu
 
 # Размер стороны клетки редактируемого поля
 EDIT_SQUARE_SIDE_SIZE = 50
@@ -219,7 +220,8 @@ class EditField:
                  screen_field: pg.Surface,
                  background: pg.Surface,
                  screen_absolute_coordinates: list[int],
-                 initial_field_map: list[list[int]]) -> None:
+                 initial_field_map: list[list[int]],
+                 edit_menu: 'EditMenu') -> None:
         """
         Функция для инициализации поля.
 
@@ -229,6 +231,7 @@ class EditField:
         :param screen_absolute_coordinates: Абсолютные координаты экрана относительно поля.
         :param initial_field_map: Начальная карта игрового поля.
         :param edit_controller: Контроллер для управления редактированием.
+        :param edit_menu: Меню редактора уровней.
         """
         
         # Сохраняем экран игры
@@ -245,6 +248,9 @@ class EditField:
 
         # Сохраняем копию начальной карты поля
         self.field_map = initial_field_map.copy()
+
+        # Сохраняем меню редактора уровней
+        self.edit_menu = edit_menu
 
         # Двухмерный список для хранения спрайтов шахматных клеток
         self.squares_list: list[list[EditSquare]] = []
@@ -288,6 +294,10 @@ class EditField:
         self.screen_field.blit(self.background, (0, 0))
         self.squares_group.draw(self.screen_field)
         self.edit_buttons_group.draw(self.screen_field)
+        self.screen.blit(self.screen_field, (0, 0))
+
+        # Отрисовываем кнопку открытия меню редактора уровней
+        self.screen_field.blit(self.edit_menu.open_menu_button.image, self.edit_menu.open_menu_button.rect)
         self.screen.blit(self.screen_field, (0, 0))
 
         # Обновляем экран
@@ -423,7 +433,7 @@ class EditField:
         # Перемещаем поле в центр экрана
         self.move(x_shift, y_shift)
 
-    def get_object_by_coordinates(self, x: int, y: int) -> tp.Union[EditSquare, EditButton, None]:
+    def get_object_by_coordinates(self, x: int, y: int) -> tp.Union[EditSquare, EditButton, 'EditMenu', None]:
         """
         Функция для получения объекта по его координатам.
 
@@ -432,6 +442,10 @@ class EditField:
 
         :return: Объект с заданными координатами или None, если объекта не найдено.
         """
+
+        # Если нажата кнопка открытия меню редактора уровней, то возвращаем меню редактора уровней
+        if self.edit_menu.is_open_button_clicked((x, y)):
+            return self.edit_menu
         
         # Перебираем все кнопки редактирования и если координаты попадают на какую-то кнопку, то возвращаем её
         for edit_button in self.edit_buttons_group:
