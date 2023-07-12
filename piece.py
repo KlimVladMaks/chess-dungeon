@@ -18,6 +18,7 @@ class Piece:
 
         """
         :team: команда фигуры
+        :controler: определяет фигура под управлением игрока или пк
         :cell: клетка на которой расположена фигура
         :field: поле, на котором расположена фигура
         :radius_fov: радиус обзора в клетках
@@ -34,6 +35,7 @@ class Piece:
         """
 
         self.team = team
+        self.controler = "player"
         self.cell = cell
         self.game = game
         self.field = field
@@ -295,6 +297,7 @@ class Piece:
         :id_spell: кодовое слово способности
         :cell: клетка на которую способность использовали
         """
+        
         if spell.cast_type == "attack":
             cell.attack_flash(self.cell, cell)
         elif spell.cast_type == "area_attack":
@@ -333,7 +336,6 @@ class Pawn(Piece):
 
     def new_turn(self) -> None:
 
-        print(type(self.spell_list[2]).__name__, "!!!")
         if type(self.spell_list[2]).__name__ == "PawnAttack2_Attack":
             self.spell_list[2] = PawnAttack2_Move()
             self.spell_list[2].cooldown_now = self.spell_list[2].cooldown

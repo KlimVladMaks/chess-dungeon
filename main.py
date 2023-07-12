@@ -8,6 +8,7 @@ from game import *
 from menu import *
 from king_square import *
 from level_editor.level_editor import LevelEditor
+from saves import Save
 
 # Ширина и высота экрана
 SCREEN_WIDTH = 800
@@ -140,6 +141,18 @@ class GameProcess:
         # Отрисовываем игровое поле
         field.update()
 
+        game.kings_teams = {
+            "p1": player_king,
+            "Shodan": enemy_4
+        }
+
+        # Делаем первую команду активной
+        game.active_team = list(game.kings_teams.keys())[0]
+
+        save = Save(START_FIELD_MAP, GAME_DIFFICULTY, game.pieces_teams, game.kings_teams)
+        save.save("First")
+        save.format("First")
+
         # Запускаем игровой цикл
         while True:
 
@@ -157,6 +170,33 @@ class GameProcess:
                 # Если нажата кнопка Enter
                 elif e.type == pg.KEYDOWN and e.key == pg.K_RETURN:
 
+                    # Прежде чем поменять активную команду, нужно убедиться не уничтожена ли предыдущая
+                    # поскольку для определения следующей в списке команд должна остаться предыдущая
+                    # такое возможно, если игрок последней пешкой использует "Просто пешка"
+                    
+                    # Заводим флаг
+                    delete_previor_team = False
+
+                    # Убеждаемся, что прошлая команда - игрока и она уничтожена
+                    if (game.kings_teams[game.active_team].controler == "player"
+                        and len(game.pieces_teams[game.active_team]) == 0):
+                        # меняем состояние флага
+                        delete_previor_team = True
+                        # сохраняем команду
+                        previor_team = game.active_team
+
+                    # Делаем все фигуры старой команды неактивными
+                    for piece in game.pieces_teams[game.active_team]:
+                        piece.active_turn = False
+                        piece.cell.update()
+
+                    # Сдвигаем команду на следующую
+                    game.next_team()
+
+                    # удаляем короля из списка
+                    if delete_previor_team:
+                        game.del_king(game.kings_teams[previor_team])
+
                     # Очищаем все просматриваемые клетки
                     game.off_view_for_all_squares()
 
@@ -166,31 +206,17 @@ class GameProcess:
                     # Закрываем интерфейс (если он вдруг открыт)
                     interface.close()
 
-                    # TODO: Перенести механизм удаления уничтоженных фигур в класс Piece
-
-                    # Удаляем уничтоженные фигуры из соответсвующий списков
-                    game.del_destroyed_pieces()
-
-                    # Делаем новый ход для каждой фигуры игрока
-                    for piece in game.player_pieces:
+                    # Делаем новый ход для каждой фигуры активной команды
+                    for piece in game.pieces_teams[game.active_team]:
                         piece.new_turn()
                     
-                    # Делаем новый ход для короля игрока
-                    king_square.inner_piece.new_turn()
+                    # Делаем новый ход для короля активной команды
+                    game.kings_teams[game.active_team]
 
-                    # Удаляем уничтоженные фигуры из соответсвующий списков
-                    game.del_destroyed_pieces()
-
-                    # Делаем новый ход для каждой фигуры компьютера
-                    for piece in game.computer_pieces:
-                        piece.new_turn()
-
-                    # Удаляем уничтоженные фигуры из соответсвующий списков
-                    game.del_destroyed_pieces()
-
-                    # Обновляем все клетки, на которых стоят фигуры игрока
-                    for piece in game.player_pieces:
-                        piece.cell.update()
+                    # Обновляем состояние всех фигур
+                    for team in game.pieces_teams:
+                        for piece in game.pieces_teams[team]:
+                            piece.cell.update()
 
                     # Обновляем поле
                     field.update()
@@ -272,16 +298,12 @@ class GameProcess:
                             # Проводим выбранное ранее действие
                             game.selected_piece.cast_spell(game.selected_spell, square_clicked)
 
-                            # Удаляем фигуру из соответствующего списка, если она была уничтожена
-                            game.del_destroyed_pieces()
+                            # Обновляем состояние всех фигур
+                            for team in game.pieces_teams:
+                                for piece in game.pieces_teams[team]:
+                                    piece.cell.update()
 
-                            # Обновляем состояние всех вражеских фигур
-                            for piece in game.computer_pieces:
-                                piece.cell.update()
-
-                            # Обновляем все клетки, на которых стоят фигуры игрока
-                            for piece in game.player_pieces:
-                                piece.cell.update()
+                            print('Hi')
 
                             # Проверяем игру на завершение и при необходимости возвращаем результат игрового процесса
                             match game.get_game_status():
@@ -549,7 +571,7 @@ def main() -> None:
 
         # Запускаем редактор уровней
         elif active_object == "level_editor":
-            active_object = LevelEditor.start(screen)
+            LevelEditor.start(screen)
 
         # Запускаем финальное меню при проигрыше
         elif active_object == "lose_menu":

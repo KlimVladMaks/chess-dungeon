@@ -25,6 +25,7 @@ class EnemyPiece(Piece):
         max_damage = int(max_damage * difficulty)
 
         super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+        self.controler = "comp"
         self.action = "patrol"
         self.way_patrol = []
         self.pos_patrol = 0
@@ -635,6 +636,11 @@ class EnemyBishop(EnemyPiece, Bishop):
             print(f"Ближайщей цели нет, враг бездействует")
             self.AP = 0
             pass
+
+    def destroy(self):
+        self.game.del_king(self)
+        self.cell.del_inner_piece()
+        print(f"Король убит! Команда {self.team} растеряна и сдаётся в плен")
 
 class EnemyKnight(EnemyPiece, Knight):
 

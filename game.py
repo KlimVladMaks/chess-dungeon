@@ -3,6 +3,7 @@ import typing as tp
 
 if tp.TYPE_CHECKING:
     from piece import Piece
+    from piece import King
     from field import Field
     from field import Square
     from spell import Spell
@@ -31,6 +32,11 @@ class Game:
 
         # Словарь для хранения команд фигур
         self.pieces_teams: dict[str, list[Piece]] = {}
+        # Словарь для хранения команд королей
+        self.kings_teams: dict[str, list[King]] = {}
+
+        # Команда, чей ход
+        self.active_team: str = ""
 
         # Списки для хранения фигур игрока и фигур компьютера
         self.player_pieces: list[Piece] = []
@@ -110,15 +116,11 @@ class Game:
         Функция для удаления всех уничтоженных фигур из соответствующего списка.
         """
 
-        # Перебираем все фигуры игрока и удаляем те, у которых HP меньше нуля
-        for piece in self.player_pieces:
-            if piece.hp <= 0:
-                self.player_pieces.remove(piece)
-
-        # Перебираем все фигуры компьютера и удаляем те, у которых HP меньше нуля
-        for piece in self.computer_pieces:
-            if piece.hp <= 0:
-                self.computer_pieces.remove(piece)
+        # Перебираем все фигуры и удаляем те, у которых HP меньше нуля
+        for team in self.pieces_teams:
+            for piece in self.pieces_teams[team]:
+                if piece.hp <= 0:
+                    self.player_pieces.remove(piece)
 
     def del_piece(self, piece: 'Piece') -> None:
         """
@@ -127,17 +129,33 @@ class Game:
         :param piece: Фигура, которую нужно удалить.
         """
 
-        # Перебираем все фигуры игрока и если там есть совпадающая с заданной, то удаляем её
-        for player_piece in self.player_pieces:
-            if player_piece == piece:
-                self.player_pieces.remove(player_piece)
-                return
+        # Удаляем фигуру из соответсвующего списка
+        self.pieces_teams[piece.team].remove(piece)
 
-        # Перебираем все фигуры компьютера и если там есть совпадающая с заданной, то удаляем её
-        for computer_piece in self.computer_pieces:
-            if computer_piece == piece:
-                self.computer_pieces.remove(computer_piece)
-                return
+    def del_king(self, king: "King") -> None:
+        """
+        Функция обрабатывает смерть короля
+
+        :param piece: Фигура, которую нужно удалить.
+        """
+        
+        # Удаляем команду Короля из словаря с Королями
+        self.kings_teams.pop(king.team)
+
+    def next_team(self) -> None:
+        
+        """
+        Функция меняет атрибут активной команды на следющую в списке команд
+        """
+
+        # Берём список команд как список ключей из словаря с Королями
+        teams = list(self.kings_teams.keys())
+
+        # Находим индекс следующей команды (+1 к предыдущему, циклично)
+        index = (teams.index(self.active_team) + 1) % len(teams)
+
+        # меняем команду
+        self.active_team = teams[index]
 
     def get_game_status(self) -> str:
         """
@@ -152,12 +170,12 @@ class Game:
             return "lose"
 
         # Если у компьютера не осталось фигур, возвращаем "win"
-        if len(self.computer_pieces) == 0:
+        if len(self.computer_pieces) == -1:
             return "win"
 
         # Если у противника есть король и он уничтожен, возвращаем "win"
         if self.computer_king is not None:
-            if self.computer_king.hp <= 0:
+            if self.computer_king.hp <= -10:
                 return "win"
 
         # Иначе возвращаем "continue"
@@ -218,6 +236,3 @@ class Game:
 
             # Обновляем игровое поле
             self.field.update()
-
-
-
