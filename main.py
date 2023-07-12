@@ -95,29 +95,29 @@ class GameProcess:
         game = Game(field)
 
         # Создаём клетку (кнопку) короля игрока
-        player_king = King('p1', game, field, None, 10, 1, 1, 3, 0, 0)
+        player_king = King('p1', game, field, None)
         king_square = KingSquare(field, player_king)
         player_king.cell = king_square
         field.king_square = king_square
 
         # Тест расположения фигуры
-        piece_1 = Pawn('p1', game, field, field.get_square_by_pos(6, 6), 10, 0.7, 1, 3, 3, 4)
-        piece_2 = Bishop('p1', game, field, field.get_square_by_pos(5, 5), 10, 0.7, 1, 3, 3, 4)
-        piece_3 = Knight('p1', game, field, field.get_square_by_pos(5, 6), 10, 0.7, 1, 3, 3, 4)
-        piece_4 = Rook('p1', game, field, field.get_square_by_pos(6, 5), 10, 0.7, 1, 3, 3, 4)
-        piece_5 = Queen('p1', game, field, field.get_square_by_pos(7, 6), 10, 0.7, 1, 3, 3, 4)
+        piece_1 = Pawn('p1', game, field, field.get_square_by_pos(6, 6))
+        piece_2 = Bishop('p1', game, field, field.get_square_by_pos(5, 5))
+        piece_3 = Knight('p1', game, field, field.get_square_by_pos(5, 6))
+        piece_4 = Rook('p1', game, field, field.get_square_by_pos(6, 5))
+        piece_5 = Queen('p1', game, field, field.get_square_by_pos(7, 6))
 
-        enemy_1 = EnemyPawn('Shodan', game, field, field.get_square_by_pos(15, 17), 10, 0.7, 1, 3, 3, 4, GAME_DIFFICULTY)
+        enemy_1 = EnemyPawn('Shodan', game, field, field.get_square_by_pos(15, 17), GAME_DIFFICULTY)
         enemy_1.set_way_patrol(field.get_square_by_pos(8, 6))
-        enemy_2 = EnemyRook('Shodan', game, field, field.get_square_by_pos(18, 19), 10, 0.7, 1, 3, 3, 4, GAME_DIFFICULTY)
+        enemy_2 = EnemyRook('Shodan', game, field, field.get_square_by_pos(18, 19), GAME_DIFFICULTY)
         enemy_2.set_way_patrol(field.get_square_by_pos(6, 19))
-        enemy_3 = EnemyBishop('Shodan', game, field, field.get_square_by_pos(18, 17), 10, 0.7, 1, 3, 3, 4, GAME_DIFFICULTY)
+        enemy_3 = EnemyBishop('Shodan', game, field, field.get_square_by_pos(18, 17), GAME_DIFFICULTY)
         enemy_3.set_way_patrol(field.get_square_by_pos(5, 17))
-        enemy_5 = EnemyKnight('Shodan', game, field, field.get_square_by_pos(18, 20), 10, 0.7, 1, 3, 3, 4, GAME_DIFFICULTY)
+        enemy_5 = EnemyKnight('Shodan', game, field, field.get_square_by_pos(18, 20), GAME_DIFFICULTY)
         enemy_5.set_way_patrol(field.get_square_by_pos(5, 19))
-        enemy_6 = EnemyQueen('Shodan', game, field, field.get_square_by_pos(18, 16), 10, 0.7, 1, 3, 3, 4, GAME_DIFFICULTY)
+        enemy_6 = EnemyQueen('Shodan', game, field, field.get_square_by_pos(18, 16), GAME_DIFFICULTY)
         enemy_6.set_way_patrol(field.get_square_by_pos(16, 17))
-        enemy_4 = EnemyKing('Shodan', game, field, field.get_square_by_pos(18, 18), 20, 0.7, 1, 3, 3, 4, GAME_DIFFICULTY)
+        enemy_4 = EnemyKing('Shodan', game, field, field.get_square_by_pos(18, 18), GAME_DIFFICULTY)
 
         # Помещаем все фигуры в соответствующие списки
         game.player_pieces = [piece_1, piece_2, piece_3, piece_4, piece_5]

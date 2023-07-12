@@ -1,0 +1,55 @@
+{
+    "pawn": {
+        "max_hp": 8,
+        "accuracy": 0.65,
+        "min_damage": 1,
+        "max_damage": 2,
+        "radius_move": 3,
+        "radius_fov": 4
+    },
+
+    "bishop": {
+        "max_hp": 7,
+        "accuracy": 0.9,
+        "min_damage": 2,
+        "max_damage": 3,
+        "radius_move": 3,
+        "radius_fov": 5
+    },
+
+    "knight": {
+        "max_hp": 9,
+        "accuracy": 0.6,
+        "min_damage": 1,
+        "max_damage": 4,
+        "radius_move": 4,
+        "radius_fov": 5
+    },
+
+    "rook": {
+        "max_hp": 10,
+        "accuracy": 0.8,
+        "min_damage": 2,
+        "max_damage": 3,
+        "radius_move": 2,
+        "radius_fov": 6
+    },
+
+    "queen": {
+        "max_hp": 11,
+        "accuracy": 1,
+        "min_damage": 2,
+        "max_damage": 4,
+        "radius_move": 5,
+        "radius_fov": 7
+    }, 
+
+    "king": {
+        "max_hp": 15,
+        "accuracy": 1,
+        "min_damage": 1,
+        "max_damage": 2,
+        "radius_move": 0,
+        "radius_fov": 8
+    }
+}

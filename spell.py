@@ -267,9 +267,9 @@ class PawnAttack1(Spell):
 
         for cell in target:
             price = 100 - cell.inner_piece.hp
-            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+            if cell.inner_piece.rang == "pawn":
                 price *= 0.5
-            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+            elif cell.inner_piece.rang == "queen":
                 price *= 2
             priority.append((price, cell))
         
@@ -387,9 +387,9 @@ class PawnAttack2_Attack(Spell):
 
         for cell in target:
             price = 100 - cell.inner_piece.hp
-            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+            if cell.inner_piece.rang == "pawn":
                 price *= 0.5
-            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+            elif cell.inner_piece.rang == "queen":
                 price *= 2
             priority.append((price, cell))
         
@@ -459,9 +459,9 @@ class PawnUtility(Spell):
 
         for cell in target:
             price = 100 - cell.inner_piece.hp
-            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+            if cell.inner_piece.rang == "pawn":
                 price *= 0.5
-            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+            elif cell.inner_piece.rang == "queen":
                 price *= 2
             priority.append((price, cell))
         
@@ -550,9 +550,9 @@ class BishopAttack1(Spell):
             accuracy_coefficient = 0.4
             accuracy = self.accuracy * (1 / range_shot) ** (accuracy_coefficient)
             price = (100 - cell.inner_piece.hp) * accuracy
-            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+            if cell.inner_piece.rang == "pawn":
                 price *= 0.5
-            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+            elif cell.inner_piece.rang == "queen":
                 price *= 2
             priority.append((price, cell))
         
@@ -644,11 +644,11 @@ class BishopAttack2(Spell):
             accuracy = self.accuracy * (1 / range_shot) ** (accuracy_coefficient)
             price = (100 - cell.inner_piece.hp) * accuracy
 
-            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+            if cell.inner_piece.rang == "pawn":
                 price *= 0.5
-            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+            elif cell.inner_piece.rang == "queen":
                 price *= 2
-            elif type(cell.inner_piece).__name__ in ["Knight", "EnemyKnight"]:
+            elif cell.inner_piece.rang == "knight":
                 price *= 1.5
                 
             priority.append((price, cell))
@@ -715,9 +715,9 @@ class BishopUtility(Spell):
 
         for cell in target:
             price = cell.inner_piece.max_hp - cell.inner_piece.hp
-            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+            if cell.inner_piece.rang == "pawn":
                 price *= 0.5
-            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+            elif cell.inner_piece.rang == "queen":
                 price *= 2
             priority.append((price, cell))
         
@@ -850,7 +850,7 @@ class KnightAttack1_Attack(Spell):
 
         for cell in target:
             price = 100 - cell.inner_piece.hp
-            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+            if cell.inner_piece.rang == "pawn":
                 price *= 0.5
             priority.append((price, cell))
         
@@ -1134,9 +1134,9 @@ class RookAttack1(Spell):
 
         for cell in target:
             price = 100 - cell.inner_piece.hp
-            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+            if cell.inner_piece.rang == "pawn":
                 price *= 0.5
-            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+            elif cell.inner_piece.rang == "queen":
                 price *= 2
             priority.append((price, cell))
         
@@ -1201,9 +1201,9 @@ class RookAttack2(Spell):
 
         for cell in target:
             price = 100 - cell.inner_piece.hp
-            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+            if cell.inner_piece.rang == "pawn":
                 price *= 0.5
-            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+            elif cell.inner_piece.rang == "queen":
                 price *= 2
             priority.append((price, cell))
         
@@ -1271,9 +1271,9 @@ class RookUtility(Spell):
             price = 100 - cell.inner_piece.hp
             if cell.inner_piece == self:
                 price *= 3
-            elif type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+            elif cell.inner_piece.rang == "pawn":
                 price *= 0.5
-            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+            elif cell.inner_piece.rang == "queen":
                 price *= 2
             priority.append((price, cell))
         
@@ -1344,9 +1344,9 @@ class QueenAttack1(Spell):
 
         for cell in target:
             price = 100 - cell.inner_piece.hp
-            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+            if cell.inner_piece.rang == "pawn":
                 price *= 0.5
-            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+            elif cell.inner_piece.rang == "queen":
                 price *= 2
             priority.append((price, cell))
         
@@ -1448,9 +1448,9 @@ class QueenAttack2(Spell):
 
         for cell in target:
             price = 100 - cell.inner_piece.hp
-            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+            if cell.inner_piece.rang == "pawn":
                 price *= 0.5
-            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+            elif cell.inner_piece.rang == "queen":
                 price *= 2
             priority.append((price, cell))
         
@@ -1485,11 +1485,7 @@ class KingAttack1(Spell):
 
     def zone(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
         
-        if type(self).__name__ == "EnemyKing":
-            return self.game.get_overview_for_computer_pieces()
-        
-        elif type(self).__name__ == "King":
-            return self.game.get_overview_for_player_pieces()
+        return self.game.get_overview_for_team(self.team)
 
     def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
 
@@ -1519,9 +1515,9 @@ class KingAttack1(Spell):
             price = 0
             for effect in cell.inner_piece.effect_list:
                 price += (effect.strength + effect.timer)
-            if type(cell.inner_piece).__name__ in ["Pawn", "EnemyPawn"]:
+            if cell.inner_piece.rang == "pawn":
                 price *= 0.5
-            elif type(cell.inner_piece).__name__ in ["Queen", "EnemyQueen"]:
+            elif cell.inner_piece.rang == "queen":
                 price *= 2
             priority.append((price, cell))
         
@@ -1534,11 +1530,7 @@ class KingAttack2(Spell):
 
     def zone(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
         
-        if type(self).__name__ == "EnemyKing":
-            return self.game.get_overview_for_computer_pieces()
-        
-        elif type(self).__name__ == "King":
-            return self.game.get_overview_for_player_pieces()
+        return self.game.get_overview_for_team(self.team)
 
     def target(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
 
@@ -1578,9 +1570,9 @@ class KingAttack2(Spell):
         for cell in target:
             price = 0
             for enemy in spell.give_enemies_in_area(self, cell):
-                if type(enemy).__name__ in ["Pawn", "EnemyPawn"]:
+                if enemy.inner_piece.rang == "pawn":
                     price += 0.5
-                elif type(enemy).__name__ in ["Queen", "EnemyQueen"]:
+                elif enemy.inner_piece.rang == "queen":
                     price += 2
                 else:
                     price += 1

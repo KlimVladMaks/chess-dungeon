@@ -18,13 +18,9 @@ if tp.TYPE_CHECKING:
 
 class EnemyPiece(Piece):
 
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int, difficulty: float):
-        max_hp = int(max_hp * difficulty)
-        accuracy = accuracy * difficulty
-        min_damage = int(min_damage * difficulty)
-        max_damage = int(max_damage * difficulty)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", difficulty: float):
 
-        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+        super().__init__(team, game, field, cell)
         self.controler = "comp"
         self.action = "patrol"
         self.way_patrol = []
@@ -383,8 +379,13 @@ class EnemyPiece(Piece):
 
 class EnemyPawn(EnemyPiece, Pawn):
 
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int, difficulty: float):
-        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov, difficulty)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", difficulty: float):
+        super().__init__(team, game, field, cell, difficulty)
+        self.max_hp = int(self.max_hp * self.difficulty)
+        self.hp = self.max_hp
+        self.accuracy = self.accuracy * self.difficulty
+        self.min_damage = int(self.min_damage * self.difficulty)
+        self.max_damage = int(self.max_damage * self.difficulty)
 
     def alarm(self):
 
@@ -491,9 +492,14 @@ class EnemyPawn(EnemyPiece, Pawn):
             pass
 
 class EnemyKing(EnemyPiece, King):
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int, difficulty: float):
-        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov, difficulty)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", difficulty: float):
+        super().__init__(team, game, field, cell, difficulty)
         self.action = "attack"
+        self.max_hp = int(self.max_hp * self.difficulty)
+        self.hp = self.max_hp
+        self.accuracy = self.accuracy * self.difficulty
+        self.min_damage = int(self.min_damage * self.difficulty)
+        self.max_damage = int(self.max_damage * self.difficulty)
 
     def alarm(self):
 
@@ -532,8 +538,8 @@ class EnemyKing(EnemyPiece, King):
 
 class EnemyBishop(EnemyPiece, Bishop):
 
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int, difficulty: float):
-        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov, difficulty)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", difficulty: float):
+        super().__init__(team, game, field, cell, difficulty)
 
     def alarm(self):
 
@@ -644,8 +650,13 @@ class EnemyBishop(EnemyPiece, Bishop):
 
 class EnemyKnight(EnemyPiece, Knight):
 
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int, difficulty: float):
-        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov, difficulty)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", difficulty: float):
+        super().__init__(team, game, field, cell, difficulty)
+        self.max_hp = int(self.max_hp * self.difficulty)
+        self.hp = self.max_hp
+        self.accuracy = self.accuracy * self.difficulty
+        self.min_damage = int(self.min_damage * self.difficulty)
+        self.max_damage = int(self.max_damage * self.difficulty)
 
     def alarm(self):
 
@@ -730,8 +741,13 @@ class EnemyKnight(EnemyPiece, Knight):
 
 class EnemyRook(EnemyPiece, Rook):
 
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int, difficulty: float):
-        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov, difficulty)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", difficulty: float):
+        super().__init__(team, game, field, cell, difficulty)
+        self.max_hp = int(self.max_hp * self.difficulty)
+        self.hp = self.max_hp
+        self.accuracy = self.accuracy * self.difficulty
+        self.min_damage = int(self.min_damage * self.difficulty)
+        self.max_damage = int(self.max_damage * self.difficulty)
 
     def alarm(self):
 
@@ -823,8 +839,13 @@ class EnemyRook(EnemyPiece, Rook):
 
 class EnemyQueen(EnemyPiece, Queen):
 
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int, difficulty: float):
-        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov, difficulty)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", difficulty: float):
+        super().__init__(team, game, field, cell, difficulty)
+        self.max_hp = int(self.max_hp * self.difficulty)
+        self.hp = self.max_hp
+        self.accuracy = self.accuracy * self.difficulty
+        self.min_damage = int(self.min_damage * self.difficulty)
+        self.max_damage = int(self.max_damage * self.difficulty)
 
     def alarm(self):
 

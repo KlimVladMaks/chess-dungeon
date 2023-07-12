@@ -1,6 +1,7 @@
 import typing as tp
 from field import Square
 from spell import *
+import json
 
 if tp.TYPE_CHECKING:
     from field import Square, Field
@@ -14,12 +15,13 @@ class Piece:
     Класс для шаблона Фигуры.
     """
 
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square"):
 
         """
         :team: команда фигуры
         :controler: определяет фигура под управлением игрока или пк
         :cell: клетка на которой расположена фигура
+        :game: объект игры
         :field: поле, на котором расположена фигура
         :radius_fov: радиус обзора в клетках
         :radius_move: дальность перемещения в клетках
@@ -31,26 +33,31 @@ class Piece:
         :min_damage: минимальный базовый урон атаки
         :max_damage: базовый урон атаки
         :spell_list: лист со скилами
+        :effect_list: список текущих эффектов
         :active_turn: bool параметр хранящий может ли походить клетка в этот ход
+        :AP: ОД фигуры
+        :shield: значение дополнительных очков здоровья (щит) у фигуры
+        :rang: Тип фигуры
         """
 
         self.team = team
-        self.controler = "player"
+        self.controler: str = "player"
         self.cell = cell
         self.game = game
         self.field = field
-        self.radius_fov = radius_fov
-        self.radius_move = radius_move
-        self.max_hp = max_hp
-        self.hp = max_hp
-        self.accuracy = accuracy
-        self.min_damage = min_damage
-        self.max_damage = max_damage
+        self.radius_fov: int = 0
+        self.radius_move: int = 0
+        self.max_hp: int = 1
+        self.hp: int = 1
+        self.accuracy: float = 0
+        self.min_damage: int = 0
+        self.max_damage: int = 0
         self.spell_list = [Piece_Move()]
         self.effect_list: list["Effect"] = []
-        self.active_turn = True
-        self.AP = 2
-        self.shield = 0
+        self.active_turn: bool = True
+        self.AP: int = 2
+        self.shield: int = 0
+        self.rang: str = ""
 
     def get_fovs(self, cell = None, opaque_piece = False) -> list["Square"]:
         """
@@ -317,11 +324,25 @@ class Pawn(Piece):
     Класс пешки
     """
 
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square"):
         #инициируем фигуру
-        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+        super().__init__(team, game, field, cell)
         #собираем спелы специальной функцией
         self.create_spell_list()
+        #Задаём ранг
+        self.rang = "pawn"
+
+        # Открываем файл с описанием фигур и берём нужную
+        with open("settings/settings_of_pieces.json") as pieces_stats:
+            stats = json.load(pieces_stats)[self.rang]
+        self.radius_fov = stats["radius_fov"]
+        self.radius_move = stats["radius_move"]
+        self.max_hp = stats["max_hp"]
+        self.hp = stats["max_hp"]
+        self.accuracy = stats["accuracy"]
+        self.min_damage = stats["min_damage"]
+        self.max_damage = stats["max_damage"]
+
 
     def create_spell_list(self) -> None:
         
@@ -336,7 +357,7 @@ class Pawn(Piece):
 
     def new_turn(self) -> None:
 
-        if type(self.spell_list[2]).__name__ == "PawnAttack2_Attack":
+        if self.spell_list[2].id == "lunge_attack":
             self.spell_list[2] = PawnAttack2_Move()
             self.spell_list[2].cooldown_now = self.spell_list[2].cooldown
 
@@ -348,9 +369,21 @@ class Bishop(Piece):
     Класс слона
     """
 
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square"):
+        super().__init__(team, game, field, cell)
         self.create_spell_list()
+        self.rang = "bishop"
+
+        # Открываем файл с описанием фигур и берём нужную
+        with open("settings/settings_of_pieces.json") as pieces_stats:
+            stats = json.load(pieces_stats)[self.rang]
+        self.radius_fov = stats["radius_fov"]
+        self.radius_move = stats["radius_move"]
+        self.max_hp = stats["max_hp"]
+        self.hp = stats["max_hp"]
+        self.accuracy = stats["accuracy"]
+        self.min_damage = stats["min_damage"]
+        self.max_damage = stats["max_damage"]
 
     def create_spell_list(self) -> None:
         
@@ -365,9 +398,21 @@ class Bishop(Piece):
 
 class Knight(Piece):
 
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square"):
+        super().__init__(team, game, field, cell)
         self.create_spell_list()
+        self.rang = "knight"
+
+        # Открываем файл с описанием фигур и берём нужную
+        with open("settings/settings_of_pieces.json") as pieces_stats:
+            stats = json.load(pieces_stats)[self.rang]
+        self.radius_fov = stats["radius_fov"]
+        self.radius_move = stats["radius_move"]
+        self.max_hp = stats["max_hp"]
+        self.hp = stats["max_hp"]
+        self.accuracy = stats["accuracy"]
+        self.min_damage = stats["min_damage"]
+        self.max_damage = stats["max_damage"]
 
     def create_spell_list(self) -> None:
         
@@ -382,7 +427,7 @@ class Knight(Piece):
 
     def new_turn(self) -> None:
 
-        if type(self.spell_list[1]).__name__ == "KnightAttack1_Attack":
+        if self.spell_list[1].id == "swift_attack_attack":
             self.spell_list[1] = KnightAttack1_Move()
             self.spell_list[1].cooldown_now = self.spell_list[1].cooldown
 
@@ -390,9 +435,21 @@ class Knight(Piece):
 
 class Rook(Piece):
 
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square"):
+        super().__init__(team, game, field, cell)
         self.create_spell_list()
+        self.rang = "rook"
+
+        # Открываем файл с описанием фигур и берём нужную
+        with open("settings/settings_of_pieces.json") as pieces_stats:
+            stats = json.load(pieces_stats)[self.rang]
+        self.radius_fov = stats["radius_fov"]
+        self.radius_move = stats["radius_move"]
+        self.max_hp = stats["max_hp"]
+        self.hp = stats["max_hp"]
+        self.accuracy = stats["accuracy"]
+        self.min_damage = stats["min_damage"]
+        self.max_damage = stats["max_damage"]
 
     def create_spell_list(self) -> None:
         
@@ -407,9 +464,21 @@ class Rook(Piece):
 
 class Queen(Piece):
 
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square"):
+        super().__init__(team, game, field, cell)
         self.create_spell_list()
+        self.rang = "queen"
+
+        # Открываем файл с описанием фигур и берём нужную
+        with open("settings/settings_of_pieces.json") as pieces_stats:
+            stats = json.load(pieces_stats)[self.rang]
+        self.radius_fov = stats["radius_fov"]
+        self.radius_move = stats["radius_move"]
+        self.max_hp = stats["max_hp"]
+        self.hp = stats["max_hp"]
+        self.accuracy = stats["accuracy"]
+        self.min_damage = stats["min_damage"]
+        self.max_damage = stats["max_damage"]
 
     def create_spell_list(self) -> None:
         
@@ -431,9 +500,21 @@ class Queen(Piece):
 
 class King(Piece):
 
-    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", max_hp: int, accuracy: float, min_damage: int, max_damage: int, radius_move: int, radius_fov: int):
-        super().__init__(team, game, field, cell, max_hp, accuracy, min_damage, max_damage, radius_move, radius_fov)
+    def __init__(self, team: str, game: "Game", field: "Field", cell: "Square"):
+        super().__init__(team, game, field, cell)
         self.create_spell_list()
+        self.rang = "king"
+
+        # Открываем файл с описанием фигур и берём нужную
+        with open("settings/settings_of_pieces.json") as pieces_stats:
+            stats = json.load(pieces_stats)[self.rang]
+        self.radius_fov = stats["radius_fov"]
+        self.radius_move = stats["radius_move"]
+        self.max_hp = stats["max_hp"]
+        self.hp = stats["max_hp"]
+        self.accuracy = stats["accuracy"]
+        self.min_damage = stats["min_damage"]
+        self.max_damage = stats["max_damage"]
 
     def create_spell_list(self) -> None:
         
