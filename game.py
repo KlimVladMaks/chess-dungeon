@@ -120,7 +120,7 @@ class Game:
         for team in self.pieces_teams:
             for piece in self.pieces_teams[team]:
                 if piece.hp <= 0:
-                    self.player_pieces.remove(piece)
+                    self.pieces_teams[team].remove(piece)
 
     def del_piece(self, piece: 'Piece') -> None:
         """
@@ -197,7 +197,7 @@ class Game:
 
         # Возвращаем полученное множество
         return pieces_overview_set
-
+    
     def get_overview_for_computer_pieces(self) -> set['Square']:
         """
         Функция для получения клеток в области обзора всех фигур компьютера.
@@ -210,6 +210,24 @@ class Game:
 
         # Перебираем все фигуры и собираем клетки из их области обзора
         for piece in self.computer_pieces:
+            pieces_overview_set.update(piece.get_fovs())
+
+        # Возвращаем полученное множество
+        return pieces_overview_set
+
+    def get_overview_for_team(self, team: str) -> set['Square']:
+        """
+        Функция для получения клеток в области обзора всех фигур заданной команды.
+
+        :team: Команда требующая обзор
+        :return: Множество, содержащее клетки из области обзора.
+        """
+
+        # Множество для хранения клеток из области обзора
+        pieces_overview_set = set()
+
+        # Перебираем все фигуры и собираем клетки из их области обзора
+        for piece in self.pieces_teams[team]:
             pieces_overview_set.update(piece.get_fovs())
 
         # Возвращаем полученное множество
