@@ -117,7 +117,7 @@ class Spell:
 class Piece_Move(Spell):
 
     def __init__(self):
-        super().__init__('move', "move", "Перемещение", "Переместитесь на клетку в зоне движения", 0, 1)
+        super().__init__("move", "move", "Перемещение", "Переместитесь на клетку в зоне движения", 0, 1)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
         return spell.target(self)
@@ -470,7 +470,7 @@ class PawnUtility(Spell):
 class BishopAttack1(Spell):
 
     def __init__(self):
-        super().__init__('shot', "attack", "Выстрел", "Обычная атака (дальний бой)", 1, 2)
+        super().__init__("shot", "attack", "Выстрел", "Обычная атака (дальний бой)", 1, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -561,7 +561,7 @@ class BishopAttack1(Spell):
 class BishopAttack2(Spell):
 
     def __init__(self):
-        super().__init__('poisoned_arrow', "attack", "Отравленная стрела", "Атакует и снижает меткость противника (дальний бой)", 2, 2)
+        super().__init__("poisoned_arrow", "attack", "Отравленная стрела", "Атакует и снижает меткость противника (дальний бой)", 2, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -1282,7 +1282,7 @@ class RookUtility(Spell):
 class QueenAttack1(Spell):
     
     def __init__(self):
-        super().__init__('into_the_heart', "attack", "В самое сердце", "Наносит урон игнорируя защиту (дальний бой)", 1, 2)
+        super().__init__("into_the_heart", "attack", "В самое сердце", "Наносит урон игнорируя защиту (дальний бой)", 1, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None):
 
@@ -1481,7 +1481,7 @@ class QueenUtility(Spell):
 class KingAttack1(Spell):
 
     def __init__(self):
-        super().__init__("royal_grace", "assistance",  "Королевская милость", "Снимает с союзной фигуры все негативные эффекты", 3, 2)
+        super().__init__("royal_grace", "assistance",  "Королевская милость", "Снимает с союзной фигуры все негативные эффекты", 2, 2)
 
     def zone(spell, self: "Piece", host_cell: "Square" = None) -> list["Square"]:
         
