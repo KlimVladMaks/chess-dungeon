@@ -318,7 +318,7 @@ class Square(SquareTemplate):
                 pass
 
             # Если клетка не имеет доступных ходов и это не вражеская клетка, преобразуем её в чёрно-белые тона
-            if (not self.inner_piece.active_turn) and ("Enemy" not in type(self.inner_piece).__name__):
+            if (not self.inner_piece.active_turn) and self.inner_piece.controler != "comp":
                 surface = pg.Surface(self.image.get_size(), pg.SRCALPHA)
                 surface.fill(GRAY_FILTER)
                 self.image.blit(surface, (0, 0))
