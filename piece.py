@@ -19,7 +19,7 @@ class Piece:
 
         """
         :team: команда фигуры
-        :controler: определяет фигура под управлением игрока или пк
+        :controller: определяет фигура под управлением игрока или пк
         :cell: клетка на которой расположена фигура
         :game: объект игры
         :field: поле, на котором расположена фигура
@@ -41,7 +41,7 @@ class Piece:
         """
 
         self.team = team
-        self.controler: str = "player"
+        self.controller: str = "player"
         self.cell = cell
         self.game = game
         self.field = field

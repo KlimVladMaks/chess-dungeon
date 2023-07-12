@@ -21,7 +21,7 @@ class EnemyPiece(Piece):
     def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", difficulty: float):
 
         super().__init__(team, game, field, cell)
-        self.controler = "comp"
+        self.controller = "comp"
         self.action = "patrol"
         self.way_patrol = []
         self.pos_patrol = 0

@@ -178,7 +178,7 @@ class GameProcess:
                     delete_previor_team = False
 
                     # Убеждаемся, что прошлая команда - игрока и она уничтожена
-                    if (game.kings_teams[game.active_team].controler == "player"
+                    if (game.kings_teams[game.active_team].controller == "player"
                         and len(game.pieces_teams[game.active_team]) == 0):
                         # меняем состояние флага
                         delete_previor_team = True
