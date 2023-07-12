@@ -7,6 +7,13 @@ from level_editor.edit_field import EditSquare, EditButton, EditField
 from level_editor.edit_interface import EditInterface
 from level_editor.edit_controller import EditController
 from level_editor.edit_menu import EditMenu, BASE_MENU_DICT
+from saves import Save
+from level_editor.edit_piece import EditPiece
+
+
+# Импорт файлов для проверки типов
+if tp.TYPE_CHECKING:
+    from piece import Piece
 
 # Ширина и высота экрана
 SCREEN_WIDTH = 800
@@ -47,8 +54,7 @@ class LevelEditor:
         screen_field = pg.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
         # Устанавливаем фон
-        background = pg.image.load(
-            "design/field/background.png")
+        background = pg.image.load("design/field/background.png")
         screen.blit(background, (0, 0))
         pg.display.update()
 
@@ -141,8 +147,7 @@ class LevelEditor:
                             continue
 
                     # Получаем кликнутый объект
-                    clicked_object = edit_field.get_object_by_coordinates(
-                        click_coordinates[0], click_coordinates[1])
+                    clicked_object = edit_field.get_object_by_coordinates(click_coordinates[0], click_coordinates[1])
 
                     # Если кликнутого объекта нет
                     if clicked_object is None:
@@ -165,6 +170,12 @@ class LevelEditor:
                         
                         # Если нажата кнопка продолжения редактирования, то переходим к следующей итерации
                         if result == "continue":
+                            edit_field.update()
+                            continue
+
+                        # Если нажата кнопка сохранения, то сохраняем уровень
+                        elif result == "save":
+                            LevelEditor.save(edit_field)
                             edit_field.update()
                             continue
 
@@ -332,6 +343,72 @@ class LevelEditor:
                     edit_field.move(x_shift, y_shift)
                     edit_field.update()
 
+    @staticmethod
+    def save(edit_field: EditField) -> None:
+        """
+        Функция для сохранения уровня, созданного в редакторе уровней.
+
+        :param edit_field: Игровое поле.
+        """
+        
+        # Двойной список для хранения карты уровня
+        field_map: list[list[int]] = []
+
+        # Сложность уровня
+        difficulty = 1
+
+        # Словарь для хранения фигур из различных команд
+        pieces: dict[str, list['EditPiece']] = {"white": [], "black": []}
+
+        # Словарь для хранения королей различных команд
+        kings: dict[str, list['EditPiece']] = {"white": [], "black": []}
+
+        #* Заполняем карту игрового поля
+        # Перебираем все строки с клетками игрового поля
+        for square_row_list in edit_field.squares_list:
+
+            # Список для создания карты строки игрового поля
+            field_map_row: list[int] = []
+
+            # Перебираем все клетки из строки игрового поля
+            for square in square_row_list:
+
+                # Если клетка является барьером, записываем её как ноль
+                if square.square_type == "barrier":
+                    field_map_row.append(0)
+                
+                # Все остальные типы клеток записываем как единица
+                else:
+                    field_map_row.append(1)
+            
+            # Добавляем карту строки поля в общую карту поля
+            field_map.append(field_map_row)
+
+        #* Заполняем список фигур
+        # Перебираем все клетки игрового поля
+        for square_row_list in edit_field.squares_list:
+            for square in square_row_list:
+                
+                # Если на клетке стоит белая или чёрная фигура
+                if ("white" in square.square_type) or ("black" in square.square_type):
+                    
+                    # Получаем команду фигуры
+                    team = square.square_type.split("_")[0]
+
+                    # Получаем ранг фигуры
+                    rang = square.square_type.split("_")[1]
+
+                    # Если фигура является королём, добавляем её в список королей
+                    if rang == "king":
+                        kings[team].append(EditPiece(team, square, rang))
+                    
+                    # Иначе добавляем фигуру в список обычных фигур
+                    else:
+                        pieces[team].append(EditPiece(team, square, rang))
+
+        # Сохраняем данные уровня
+        save = Save(field_map, difficulty, pieces, kings)
+        save.save("edit_level")
 
 # Область для отладки
 if __name__ == "__main__":

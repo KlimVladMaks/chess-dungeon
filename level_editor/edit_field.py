@@ -209,6 +209,17 @@ class EditSquare(pg.sprite.Sprite):
         self.square_type = "square"
         self.update()
 
+    def get_pos(self) -> tuple[int, int]:
+        """
+        Функция для получения позиции клетки на карте поля.
+        """
+        
+        # Перебираем позиции всех клеток на карте поля и при совпадении возвращаем позицию данной клетки
+        for i in range(len(self.field.squares_list)):
+            for j in range(len(self.field.squares_list[i])):
+                if self.field.squares_list[i][j] == self:
+                    return i, j
+
 
 class EditField:
     """
@@ -477,6 +488,20 @@ class EditField:
 
         # Возвращаем найденную клетку
         return found_square
+
+    def get_pos_by_square(self, square: EditSquare) -> tuple[int, int]:
+        """
+        Функция, возвращающая позицию переданной клетки в списке клеток игрового поля.
+
+        :param square: Клетка игрового поля.
+        :return: Позиция клетки в списке клеток игрового поля.
+        """
+
+        # Находим и возвращаем позицию клетки в списке клеток игрового поля
+        for i in range(len(self.squares_list)):
+            for j in range(len(self.squares_list[i])):
+                if self.squares_list[i][j] == square:
+                    return i, j
 
     def increase_side(self, side_type: str) -> None:
         """
