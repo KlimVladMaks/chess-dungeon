@@ -28,8 +28,8 @@ class Save:
         for team in pieces.keys():
             for piece in pieces[team]:
                 depack_piece = {}
-                depack_piece["controler"] = piece.controler
-                if depack_piece["controler"] == "comp":
+                depack_piece["controller"] = piece.controller
+                if depack_piece["controller"] == "comp":
                     depack_piece["action"] = piece.action
                     depack_piece["pos_patrol"] = piece.pos_patrol
                     depack_piece["way_patrol"] = []
@@ -79,7 +79,9 @@ class Save:
         for team in kings.keys():
             king = kings[team]
             depack_king = {}
-            depack_king["controler"] = king.controler
+            depack_king["controller"] = king.controller
+            if depack_piece["controller"] == "comp":
+                    depack_piece["action"] = piece.action
             depack_king["team"] = king.team
             depack_king["cell"] = king.cell.get_pos()
             depack_king["max_hp"] = king.max_hp
