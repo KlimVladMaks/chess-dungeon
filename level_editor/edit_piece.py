@@ -138,3 +138,5 @@ class EditPiece():
         self.spell_list = []
         for spell in SPELL_FOR_RANG[self.rang]:
             self.spell_list.append(EditSpell(spell["id"], spell["cooldown"]))
+
+        self.controller = "player"
