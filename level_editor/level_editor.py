@@ -361,7 +361,7 @@ class LevelEditor:
         pieces: dict[str, list['EditPiece']] = {"white": [], "black": []}
 
         # Словарь для хранения королей различных команд
-        kings: dict[str, list['EditPiece']] = {"white": [], "black": []}
+        kings: dict[str, 'EditPiece'] = {}
 
         #* Заполняем карту игрового поля
         # Перебираем все строки с клетками игрового поля
@@ -398,9 +398,9 @@ class LevelEditor:
                     # Получаем ранг фигуры
                     rang = square.square_type.split("_")[1]
 
-                    # Если фигура является королём, добавляем её в список королей
+                    # Если фигура является королём, добавляем её в словарь в качестве короля
                     if rang == "king":
-                        kings[team].append(EditPiece(team, square, rang))
+                        kings[team] = EditPiece(team, square, rang)
                     
                     # Иначе добавляем фигуру в список обычных фигур
                     else:
