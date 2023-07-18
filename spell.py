@@ -38,42 +38,61 @@ class Spell:
     def give_object_by_id(id: str) -> "Spell":
         if id == "move":
             return Piece_Move()
+        
         elif id == "attack":
             return PawnAttack1()
+        
         elif id == "lunge_move":
             return PawnAttack2_Move()
+        
         elif id == "lunge_attack":
             return PawnAttack2_Attack()
+        
         elif id == "just_pawn":
             return PawnUtility()
+        
         elif id == "shot":
             return BishopAttack1()
+        
         elif id == "poisoned_arrow":
             return BishopAttack2()
+        
         elif id == "emergency_care":
             return BishopUtility()
+        
         elif id == "swift_attack_move":
             return KnightAttack1_Move()
+        
         elif id == "swift_attack_attack":
             return KnightAttack1_Attack()
+        
         elif id == "tactical_retreat":
             return KnightAttack2()
+        
         elif id == "sabotage":
             return KnightUtility()
+        
         elif id == "tactical_offensive":
             return RookAttack1()
+        
         elif id == "shield_strike":
             return RookAttack2()
+        
         elif id == "fortress":
             return RookUtility()
+        
         elif id == "into_the_heart":
             return QueenAttack1()
+        
         elif id == "bitchiness":
             return QueenAttack2()
+        
         elif id == "courtesy_of_kings":
             return QueenUtility()
+        
         elif id == "royal_grace":
             return KingAttack1()
+        
         elif id == "a_volley_of_arrows":
             return KingAttack2()
 

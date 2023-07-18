@@ -127,6 +127,10 @@ class GameProcess:
                     pack_piece = EnemyRook(team, game, field, cell, save.difficulty)
                 elif piece["rang"] == "queen":
                     pack_piece = EnemyQueen(team, game, field, cell, save.difficulty)
+                for cell in piece["way_patrol"]:
+                    pack_piece.way_patrol.append(field.get_square_by_pos(cell[0], cell[1]))
+                pack_piece.pos_patrol = piece["pos_patrol"]
+                pack_piece.action = piece["action"]
 
             pack_piece.hp = piece["hp"]
             pack_piece.AP = piece["AP"]
