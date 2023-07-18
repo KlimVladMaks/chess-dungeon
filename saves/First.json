@@ -1206,39 +1206,6 @@
             ]
         },
         {
-            "rang": "king",
-            "controller": "comp",
-            "action": "attack",
-            "pos_patrol": 0,
-            "way_patrol": [],
-            "team": "Shodan",
-            "cell": [
-                18,
-                18
-            ],
-            "max_hp": 15,
-            "hp": 15,
-            "accuracy": 1,
-            "min_damage": 1,
-            "max_damage": 2,
-            "radius_move": 0,
-            "radius_fov": 8,
-            "AP": 2,
-            "shield": 0,
-            "active_turn": true,
-            "effect_list": [],
-            "spell_list": [
-                {
-                    "id": "royal_grace",
-                    "cooldown_now": 0
-                },
-                {
-                    "id": "a_volley_of_arrows",
-                    "cooldown_now": 0
-                }
-            ]
-        },
-        {
             "rang": "knight",
             "controller": "comp",
             "action": "patrol",
