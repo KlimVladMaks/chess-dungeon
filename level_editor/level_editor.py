@@ -1,6 +1,7 @@
 # Импорты библиотек
 import pygame as pg
 import typing as tp
+import copy
 
 # Импорты файлов
 from level_editor.edit_field import EditSquare, EditButton, EditField
@@ -63,7 +64,7 @@ class LevelEditor:
 
         # Создаём редактируемое игровое поле
         edit_field = EditField(screen, screen_field, background,
-                               screen_absolute_coordinates, INITIAL_FIELD_MAP, edit_menu)
+                               screen_absolute_coordinates, copy.deepcopy(INITIAL_FIELD_MAP), edit_menu)
 
         # Создаём интерфейс редактирования
         edit_interface = EditInterface(screen, edit_field)
@@ -171,6 +172,7 @@ class LevelEditor:
                         # Если нажата кнопка продолжения редактирования, то переходим к следующей итерации
                         if result == "continue":
                             edit_field.update()
+                            edit_interface.open()
                             continue
 
                         # Если нажата кнопка сохранения, то сохраняем уровень
