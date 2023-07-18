@@ -52,7 +52,7 @@ class Piece:
         self.accuracy: float = 0
         self.min_damage: int = 0
         self.max_damage: int = 0
-        self.spell_list = [Piece_Move()]
+        self.spell_list: list["Spell"] = [Piece_Move()]
         self.effect_list: list["Effect"] = []
         self.active_turn: bool = True
         self.AP: int = 2

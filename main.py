@@ -60,11 +60,14 @@ class GameProcess:
     """
 
     @staticmethod
-    def start(screen: pg.Surface) -> str:
+    def start(save: Save, screen: pg.Surface) -> str:
+
+        #Загружаем игру из файла
         """
-        Функция для запуска основного игрового процесса.
+        Функция для запуска основного игрового процесса из файла.
 
         :param screen: Экран игры.
+        :param save: Объект сохранения.
         :return: Строка результата игрового процесса.
         """
 
@@ -86,7 +89,7 @@ class GameProcess:
         game_menu = GameMenu(screen)
 
         # Создаём игровое поле
-        field = Field(screen, screen_field, background, screen_absolute_coordinates, START_FIELD_MAP, game_menu)
+        field = Field(screen, screen_field, background, screen_absolute_coordinates, save.field_map, game_menu)
 
         # Создаём интерфейс для управления фигурами
         interface = Interface(screen, field)
@@ -94,34 +97,112 @@ class GameProcess:
         # Создаём экземпляр класса для управления процессом игры
         game = Game(field)
 
-        # Создаём клетку (кнопку) короля игрока
-        player_king = King('p1', game, field, None)
+        for piece in save.pieces:
+            team = piece["team"]
+            cell_row = piece["cell"][0]
+            cell_col = piece["cell"][1]
+            cell = field.get_square_by_pos(cell_row, cell_col)
+
+            game.pieces_teams.setdefault(team, [])
+            if piece["controller"] == "player":
+                if piece["rang"] == "pawn":
+                    pack_piece = Pawn(team, game, field, cell)
+                elif piece["rang"] == "bishop":
+                    pack_piece = Bishop(team, game, field, cell)
+                elif piece["rang"] == "knight":
+                    pack_piece = Knight(team, game, field, cell)
+                elif piece["rang"] == "rook":
+                    pack_piece = Rook(team, game, field, cell)
+                elif piece["rang"] == "queen":
+                    pack_piece = Queen(team, game, field, cell)
+
+            elif piece["controller"] == "comp":
+                if piece["rang"] == "pawn":
+                    pack_piece = EnemyPawn(team, game, field, cell, save.difficulty)
+                elif piece["rang"] == "bishop":
+                    pack_piece = EnemyBishop(team, game, field, cell, save.difficulty)
+                elif piece["rang"] == "knight":
+                    pack_piece = EnemyKnight(team, game, field, cell, save.difficulty)
+                elif piece["rang"] == "rook":
+                    pack_piece = EnemyRook(team, game, field, cell, save.difficulty)
+                elif piece["rang"] == "queen":
+                    pack_piece = EnemyQueen(team, game, field, cell, save.difficulty)
+
+            pack_piece.hp = piece["hp"]
+            pack_piece.AP = piece["AP"]
+            pack_piece.shield = piece["shield"]
+            pack_piece.active_turn = piece["active_turn"]
+            pack_piece.max_hp = piece["max_hp"]
+            pack_piece.accuracy = piece["accuracy"]
+            pack_piece.min_damage = piece["min_damage"]
+            pack_piece.max_damage = piece["max_damage"]
+            pack_piece.radius_move = piece["radius_move"]
+            pack_piece.radius_fov = piece["radius_fov"]
+            pack_piece.effect_list: list["Effect"] = []
+            for effect in piece["effect_list"]:
+                pack_piece.give_effect(Effect.give_effect_by_id(effect["id"], effect["timer"], effect["strength"]))
+            pack_piece.spell_list: list["Spell"] = []
+            for spell in piece["spell_list"]:
+                pack_piece.spell_list.append(Spell.give_object_by_id(spell["id"]))
+                pack_piece.spell_list[-1].cooldown_now = spell["cooldown_now"]
+
+            game.pieces_teams[team].append(pack_piece)
+
+        for piece in save.kings:
+            team = piece["team"]
+            if piece["cell"] is None:
+                cell = None
+            else:
+                cell_row = piece["cell"][0]
+                cell_col = piece["cell"][1]
+                cell = field.get_square_by_pos(cell_row, cell_col)
+
+            if piece["controller"] == "player":
+                pack_piece = King(team, game, field, cell)
+            elif piece["controller"] == "comp":
+                pack_piece = EnemyKing(team, game, field, cell, save.difficulty)
+
+            pack_piece.hp = piece["hp"]
+            pack_piece.AP = piece["AP"]
+            pack_piece.shield = piece["shield"]
+            pack_piece.active_turn = piece["active_turn"]
+            pack_piece.max_hp = piece["max_hp"]
+            pack_piece.accuracy = piece["accuracy"]
+            pack_piece.min_damage = piece["min_damage"]
+            pack_piece.max_damage = piece["max_damage"]
+            pack_piece.radius_move = piece["radius_move"]
+            pack_piece.radius_fov = piece["radius_fov"]
+            pack_piece.effect_list: list["Effect"] = []
+            for effect in piece["effect_list"]:
+                pack_piece.give_effect(Effect.give_effect_by_id(effect["id"], effect["timer"], effect["strength"]))
+            pack_piece.spell_list: list["Spell"] = []
+            for spell in piece["spell_list"]:
+                pack_piece.spell_list.append(Spell.give_object_by_id(spell["id"]))
+                pack_piece.spell_list[-1].cooldown_now = spell["cooldown_now"]
+
+            game.kings_teams[team] = pack_piece
+
+        '''
+        Часть для адаптации к текущей версии
+        '''
+
+        player_king = game.kings_teams['p1']
         king_square = KingSquare(field, player_king)
         player_king.cell = king_square
         field.king_square = king_square
 
-        # Тест расположения фигуры
-        piece_1 = Pawn('p1', game, field, field.get_square_by_pos(6, 6))
-        piece_2 = Bishop('p1', game, field, field.get_square_by_pos(5, 5))
-        piece_3 = Knight('p1', game, field, field.get_square_by_pos(5, 6))
-        piece_4 = Rook('p1', game, field, field.get_square_by_pos(6, 5))
-        piece_5 = Queen('p1', game, field, field.get_square_by_pos(7, 6))
+        # Сохраняем вражеского короля
+        game.computer_king = game.kings_teams['Shodan']
 
-        enemy_1 = EnemyPawn('Shodan', game, field, field.get_square_by_pos(15, 17), GAME_DIFFICULTY)
-        enemy_1.set_way_patrol(field.get_square_by_pos(8, 6))
-        enemy_2 = EnemyRook('Shodan', game, field, field.get_square_by_pos(18, 19), GAME_DIFFICULTY)
-        enemy_2.set_way_patrol(field.get_square_by_pos(6, 19))
-        enemy_3 = EnemyBishop('Shodan', game, field, field.get_square_by_pos(18, 17), GAME_DIFFICULTY)
-        enemy_3.set_way_patrol(field.get_square_by_pos(5, 17))
-        enemy_5 = EnemyKnight('Shodan', game, field, field.get_square_by_pos(18, 20), GAME_DIFFICULTY)
-        enemy_5.set_way_patrol(field.get_square_by_pos(5, 19))
-        enemy_6 = EnemyQueen('Shodan', game, field, field.get_square_by_pos(18, 16), GAME_DIFFICULTY)
-        enemy_6.set_way_patrol(field.get_square_by_pos(16, 17))
-        enemy_4 = EnemyKing('Shodan', game, field, field.get_square_by_pos(18, 18), GAME_DIFFICULTY)
+        # Делаем первую команду активной
+        game.active_team = list(game.kings_teams.keys())[0]
 
         # Помещаем все фигуры в соответствующие списки
-        game.player_pieces = [piece_1, piece_2, piece_3, piece_4, piece_5]
-        game.computer_pieces = [enemy_1, enemy_2, enemy_3, enemy_4, enemy_5, enemy_6]
+        for player_piece in game.pieces_teams['p1']:
+            game.player_pieces.append(player_piece)
+        for computer_piece in game.pieces_teams['Shodan']:
+            game.computer_pieces.append(computer_piece)
+        game.computer_pieces.append(game.kings_teams['Shodan'])
 
         for piece in game.player_pieces:
             piece.cell.add_inner_piece(piece)
@@ -129,29 +210,11 @@ class GameProcess:
         for piece in game.computer_pieces:
             piece.cell.add_inner_piece(piece)
 
-        # Формируем словарь с командами фигур
-        game.pieces_teams[game.player_pieces[0].team] = game.player_pieces
-        game.pieces_teams[game.computer_pieces[0].team] = game.computer_pieces
-
-        # Сохраняем вражеского короля
-        game.computer_king = enemy_4
 
         # Тест расположения фигуры - КОНЕЦ
 
         # Отрисовываем игровое поле
         field.update()
-
-        game.kings_teams = {
-            "p1": player_king,
-            "Shodan": enemy_4
-        }
-
-        # Делаем первую команду активной
-        game.active_team = list(game.kings_teams.keys())[0]
-
-        save = Save(START_FIELD_MAP, GAME_DIFFICULTY, game.pieces_teams, game.kings_teams)
-        save.save("First")
-        save.format("First")
 
         # Запускаем игровой цикл
         while True:
@@ -567,7 +630,8 @@ def main() -> None:
 
         # Запускаем демо игровой процесс
         elif active_object == "demo_start":
-            active_object = GameProcess.start(screen)
+            save = Save(save_name="First")
+            active_object = GameProcess.start(save, screen)
 
         # Запускаем редактор уровней
         elif active_object == "level_editor":

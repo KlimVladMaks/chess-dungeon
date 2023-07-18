@@ -28,6 +28,7 @@ class Save:
         for team in pieces.keys():
             for piece in pieces[team]:
                 depack_piece = {}
+                depack_piece["rang"] = piece.rang
                 depack_piece["controller"] = piece.controller
                 if depack_piece["controller"] == "comp":
                     depack_piece["action"] = piece.action
@@ -61,17 +62,6 @@ class Save:
                     depack_spell["cooldown_now"] = spell.cooldown_now
                     depack_piece["spell_list"].append(depack_spell)
 
-                if isinstance(piece, Pawn):
-                    depack_piece["rang"] = "pawn"
-                elif isinstance(piece, Bishop):
-                    depack_piece["rang"] = "bishop"
-                elif isinstance(piece, Knight):
-                    depack_piece["rang"] = "knignt"
-                elif isinstance(piece, Rook):
-                    depack_piece["rang"] = "rook"
-                elif isinstance(piece, Queen):
-                    depack_piece["rang"] = "queen"
-
                 self.pieces.append(depack_piece)
                     
 
@@ -79,6 +69,7 @@ class Save:
         for team in kings.keys():
             king = kings[team]
             depack_king = {}
+            depack_piece["rang"] = piece.rang
             depack_king["controller"] = king.controller
             if depack_piece["controller"] == "comp":
                     depack_piece["action"] = piece.action
