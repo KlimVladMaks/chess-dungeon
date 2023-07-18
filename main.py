@@ -203,17 +203,9 @@ class GameProcess:
 
         # Помещаем все фигуры в соответствующие списки
         for player_piece in game.pieces_teams['p1']:
-            game.player_pieces.append(player_piece)
+            player_piece.cell.add_inner_piece(player_piece)
         for computer_piece in game.pieces_teams['Shodan']:
-            game.computer_pieces.append(computer_piece)
-        game.computer_pieces.append(game.kings_teams['Shodan'])
-
-        for piece in game.player_pieces:
-            piece.cell.add_inner_piece(piece)
-
-        for piece in game.computer_pieces:
-            piece.cell.add_inner_piece(piece)
-
+            computer_piece.cell.add_inner_piece(computer_piece)
 
         # Тест расположения фигуры - КОНЕЦ
 

@@ -38,10 +38,6 @@ class Game:
         # Команда, чей ход
         self.active_team: str = ""
 
-        # Списки для хранения фигур игрока и фигур компьютера
-        self.player_pieces: list[Piece] = []
-        self.computer_pieces: list[Piece] = []
-
         # Свойство для хранения вражеского короля
         self.computer_king: tp.Union[Piece, None] = None
 
@@ -166,54 +162,20 @@ class Game:
         """
 
         # Если у игрока не осталось фигур, возвращаем "lose"
-        if len(self.player_pieces) == 0:
-            return "lose"
+        # if len(self.player_pieces) == 0:
+        #     return "lose"
 
         # Если у компьютера не осталось фигур, возвращаем "win"
-        if len(self.computer_pieces) == -1:
-            return "win"
+        # if len(self.computer_pieces) == 0:
+        #     return "win"
 
         # Если у противника есть король и он уничтожен, возвращаем "win"
-        if self.computer_king is not None:
-            if self.computer_king.hp <= -10:
-                return "win"
+        # if self.computer_king is not None:
+        #     if self.computer_king.hp <= -10:
+        #         return "win"
 
         # Иначе возвращаем "continue"
         return "continue"
-
-    def get_overview_for_player_pieces(self) -> set['Square']:
-        """
-        Функция для получения клеток в области обзора всех фигур игрока.
-
-        :return: Множество, содержащее клетки из области обзора.
-        """
-
-        # Множество для хранения клеток из области обзора
-        pieces_overview_set = set()
-
-        # Перебираем все фигуры и собираем клетки из их области обзора
-        for piece in self.player_pieces:
-            pieces_overview_set.update(piece.get_fovs())
-
-        # Возвращаем полученное множество
-        return pieces_overview_set
-    
-    def get_overview_for_computer_pieces(self) -> set['Square']:
-        """
-        Функция для получения клеток в области обзора всех фигур компьютера.
-
-        :return: Множество, содержащее клетки из области обзора.
-        """
-
-        # Множество для хранения клеток из области обзора
-        pieces_overview_set = set()
-
-        # Перебираем все фигуры и собираем клетки из их области обзора
-        for piece in self.computer_pieces:
-            pieces_overview_set.update(piece.get_fovs())
-
-        # Возвращаем полученное множество
-        return pieces_overview_set
 
     def get_overview_for_team(self, team: str) -> set['Square']:
         """
