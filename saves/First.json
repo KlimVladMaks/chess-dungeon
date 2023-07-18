@@ -1,0 +1,1515 @@
+{
+    "field_map": [
+        [
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0
+        ],
+        [
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0
+        ],
+        [
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0
+        ],
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        ],
+        [
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0
+        ],
+        [
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0
+        ],
+        [
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0
+        ]
+    ],
+    "difficulty": 1,
+    "pieces": [
+        {
+            "rang": "pawn",
+            "controller": "player",
+            "team": "p1",
+            "cell": [
+                6,
+                6
+            ],
+            "max_hp": 8,
+            "hp": 8,
+            "accuracy": 0.65,
+            "min_damage": 1,
+            "max_damage": 2,
+            "radius_move": 3,
+            "radius_fov": 4,
+            "AP": 2,
+            "shield": 0,
+            "active_turn": true,
+            "effect_list": [],
+            "spell_list": [
+                {
+                    "id": "move",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "attack",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "lunge_move",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "just_pawn",
+                    "cooldown_now": 0
+                }
+            ]
+        },
+        {
+            "rang": "bishop",
+            "controller": "player",
+            "team": "p1",
+            "cell": [
+                5,
+                5
+            ],
+            "max_hp": 7,
+            "hp": 7,
+            "accuracy": 0.9,
+            "min_damage": 2,
+            "max_damage": 3,
+            "radius_move": 3,
+            "radius_fov": 5,
+            "AP": 2,
+            "shield": 0,
+            "active_turn": true,
+            "effect_list": [],
+            "spell_list": [
+                {
+                    "id": "move",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "shot",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "poisoned_arrow",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "emergency_care",
+                    "cooldown_now": 0
+                }
+            ]
+        },
+        {
+            "rang": "knight",
+            "controller": "player",
+            "team": "p1",
+            "cell": [
+                5,
+                6
+            ],
+            "max_hp": 9,
+            "hp": 9,
+            "accuracy": 0.6,
+            "min_damage": 1,
+            "max_damage": 4,
+            "radius_move": 4,
+            "radius_fov": 5,
+            "AP": 2,
+            "shield": 0,
+            "active_turn": true,
+            "effect_list": [
+                {
+                    "id": "speed_reduction",
+                    "timer": 2,
+                    "strength": 2
+                }
+            ],
+            "spell_list": [
+                {
+                    "id": "move",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "swift_attack_attack",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "tactical_retreat",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "sabotage",
+                    "cooldown_now": 0
+                }
+            ]
+        },
+        {
+            "rang": "rook",
+            "controller": "player",
+            "team": "p1",
+            "cell": [
+                6,
+                5
+            ],
+            "max_hp": 10,
+            "hp": 10,
+            "accuracy": 0.8,
+            "min_damage": 2,
+            "max_damage": 3,
+            "radius_move": 2,
+            "radius_fov": 6,
+            "AP": 2,
+            "shield": 0,
+            "active_turn": true,
+            "effect_list": [],
+            "spell_list": [
+                {
+                    "id": "move",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "tactical_offensive",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "shield_strike",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "fortress",
+                    "cooldown_now": 0
+                }
+            ]
+        },
+        {
+            "rang": "queen",
+            "controller": "player",
+            "team": "p1",
+            "cell": [
+                7,
+                6
+            ],
+            "max_hp": 11,
+            "hp": 11,
+            "accuracy": 1,
+            "min_damage": 2,
+            "max_damage": 4,
+            "radius_move": 5,
+            "radius_fov": 7,
+            "AP": 2,
+            "shield": 0,
+            "active_turn": true,
+            "effect_list": [],
+            "spell_list": [
+                {
+                    "id": "move",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "into_the_heart",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "bitchiness",
+                    "cooldown_now": 0
+                }
+            ]
+        },
+        {
+            "rang": "pawn",
+            "controller": "comp",
+            "action": "patrol",
+            "pos_patrol": 0,
+            "way_patrol": [
+                [
+                    15,
+                    17
+                ],
+                [
+                    14,
+                    17
+                ],
+                [
+                    13,
+                    17
+                ],
+                [
+                    12,
+                    17
+                ],
+                [
+                    12,
+                    16
+                ],
+                [
+                    12,
+                    15
+                ],
+                [
+                    12,
+                    14
+                ],
+                [
+                    12,
+                    13
+                ],
+                [
+                    12,
+                    12
+                ],
+                [
+                    12,
+                    11
+                ],
+                [
+                    12,
+                    10
+                ],
+                [
+                    11,
+                    10
+                ],
+                [
+                    10,
+                    10
+                ],
+                [
+                    9,
+                    10
+                ],
+                [
+                    8,
+                    10
+                ],
+                [
+                    8,
+                    9
+                ],
+                [
+                    8,
+                    8
+                ],
+                [
+                    8,
+                    7
+                ],
+                [
+                    8,
+                    6
+                ],
+                [
+                    8,
+                    7
+                ],
+                [
+                    8,
+                    8
+                ],
+                [
+                    8,
+                    9
+                ],
+                [
+                    8,
+                    10
+                ],
+                [
+                    9,
+                    10
+                ],
+                [
+                    10,
+                    10
+                ],
+                [
+                    11,
+                    10
+                ],
+                [
+                    12,
+                    10
+                ],
+                [
+                    12,
+                    11
+                ],
+                [
+                    12,
+                    12
+                ],
+                [
+                    12,
+                    13
+                ],
+                [
+                    12,
+                    14
+                ],
+                [
+                    12,
+                    15
+                ],
+                [
+                    12,
+                    16
+                ],
+                [
+                    12,
+                    17
+                ],
+                [
+                    13,
+                    17
+                ],
+                [
+                    14,
+                    17
+                ]
+            ],
+            "team": "Shodan",
+            "cell": [
+                15,
+                17
+            ],
+            "max_hp": 8,
+            "hp": 8,
+            "accuracy": 0.65,
+            "min_damage": 1,
+            "max_damage": 2,
+            "radius_move": 3,
+            "radius_fov": 4,
+            "AP": 2,
+            "shield": 0,
+            "active_turn": true,
+            "effect_list": [],
+            "spell_list": [
+                {
+                    "id": "move",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "attack",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "lunge_move",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "just_pawn",
+                    "cooldown_now": 0
+                }
+            ]
+        },
+        {
+            "rang": "rook",
+            "controller": "comp",
+            "action": "patrol",
+            "pos_patrol": 0,
+            "way_patrol": [
+                [
+                    18,
+                    19
+                ],
+                [
+                    17,
+                    19
+                ],
+                [
+                    16,
+                    19
+                ],
+                [
+                    15,
+                    19
+                ],
+                [
+                    14,
+                    19
+                ],
+                [
+                    13,
+                    19
+                ],
+                [
+                    12,
+                    19
+                ],
+                [
+                    11,
+                    19
+                ],
+                [
+                    10,
+                    19
+                ],
+                [
+                    9,
+                    19
+                ],
+                [
+                    8,
+                    19
+                ],
+                [
+                    7,
+                    19
+                ],
+                [
+                    6,
+                    19
+                ],
+                [
+                    7,
+                    19
+                ],
+                [
+                    8,
+                    19
+                ],
+                [
+                    9,
+                    19
+                ],
+                [
+                    10,
+                    19
+                ],
+                [
+                    11,
+                    19
+                ],
+                [
+                    12,
+                    19
+                ],
+                [
+                    13,
+                    19
+                ],
+                [
+                    14,
+                    19
+                ],
+                [
+                    15,
+                    19
+                ],
+                [
+                    16,
+                    19
+                ],
+                [
+                    17,
+                    19
+                ]
+            ],
+            "team": "Shodan",
+            "cell": [
+                18,
+                19
+            ],
+            "max_hp": 10,
+            "hp": 10,
+            "accuracy": 0.8,
+            "min_damage": 2,
+            "max_damage": 3,
+            "radius_move": 2,
+            "radius_fov": 6,
+            "AP": 2,
+            "shield": 0,
+            "active_turn": true,
+            "effect_list": [],
+            "spell_list": [
+                {
+                    "id": "move",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "tactical_offensive",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "shield_strike",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "fortress",
+                    "cooldown_now": 0
+                }
+            ]
+        },
+        {
+            "rang": "bishop",
+            "controller": "comp",
+            "action": "patrol",
+            "pos_patrol": 0,
+            "way_patrol": [
+                [
+                    18,
+                    17
+                ],
+                [
+                    17,
+                    17
+                ],
+                [
+                    16,
+                    17
+                ],
+                [
+                    15,
+                    17
+                ],
+                [
+                    14,
+                    17
+                ],
+                [
+                    13,
+                    17
+                ],
+                [
+                    12,
+                    17
+                ],
+                [
+                    11,
+                    17
+                ],
+                [
+                    10,
+                    17
+                ],
+                [
+                    9,
+                    17
+                ],
+                [
+                    8,
+                    17
+                ],
+                [
+                    7,
+                    17
+                ],
+                [
+                    6,
+                    17
+                ],
+                [
+                    5,
+                    17
+                ],
+                [
+                    6,
+                    17
+                ],
+                [
+                    7,
+                    17
+                ],
+                [
+                    8,
+                    17
+                ],
+                [
+                    9,
+                    17
+                ],
+                [
+                    10,
+                    17
+                ],
+                [
+                    11,
+                    17
+                ],
+                [
+                    12,
+                    17
+                ],
+                [
+                    13,
+                    17
+                ],
+                [
+                    14,
+                    17
+                ],
+                [
+                    15,
+                    17
+                ],
+                [
+                    16,
+                    17
+                ],
+                [
+                    17,
+                    17
+                ]
+            ],
+            "team": "Shodan",
+            "cell": [
+                18,
+                17
+            ],
+            "max_hp": 7,
+            "hp": 7,
+            "accuracy": 0.9,
+            "min_damage": 2,
+            "max_damage": 3,
+            "radius_move": 3,
+            "radius_fov": 5,
+            "AP": 2,
+            "shield": 0,
+            "active_turn": true,
+            "effect_list": [],
+            "spell_list": [
+                {
+                    "id": "move",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "shot",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "poisoned_arrow",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "emergency_care",
+                    "cooldown_now": 0
+                }
+            ]
+        },
+        {
+            "rang": "king",
+            "controller": "comp",
+            "action": "attack",
+            "pos_patrol": 0,
+            "way_patrol": [],
+            "team": "Shodan",
+            "cell": [
+                18,
+                18
+            ],
+            "max_hp": 15,
+            "hp": 15,
+            "accuracy": 1,
+            "min_damage": 1,
+            "max_damage": 2,
+            "radius_move": 0,
+            "radius_fov": 8,
+            "AP": 2,
+            "shield": 0,
+            "active_turn": true,
+            "effect_list": [],
+            "spell_list": [
+                {
+                    "id": "royal_grace",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "a_volley_of_arrows",
+                    "cooldown_now": 0
+                }
+            ]
+        },
+        {
+            "rang": "knight",
+            "controller": "comp",
+            "action": "patrol",
+            "pos_patrol": 0,
+            "way_patrol": [
+                [
+                    18,
+                    20
+                ],
+                [
+                    17,
+                    20
+                ],
+                [
+                    16,
+                    20
+                ],
+                [
+                    15,
+                    20
+                ],
+                [
+                    14,
+                    20
+                ],
+                [
+                    13,
+                    20
+                ],
+                [
+                    12,
+                    20
+                ],
+                [
+                    11,
+                    20
+                ],
+                [
+                    10,
+                    20
+                ],
+                [
+                    9,
+                    20
+                ],
+                [
+                    8,
+                    20
+                ],
+                [
+                    7,
+                    20
+                ],
+                [
+                    6,
+                    20
+                ],
+                [
+                    5,
+                    20
+                ],
+                [
+                    5,
+                    19
+                ],
+                [
+                    5,
+                    20
+                ],
+                [
+                    6,
+                    20
+                ],
+                [
+                    7,
+                    20
+                ],
+                [
+                    8,
+                    20
+                ],
+                [
+                    9,
+                    20
+                ],
+                [
+                    10,
+                    20
+                ],
+                [
+                    11,
+                    20
+                ],
+                [
+                    12,
+                    20
+                ],
+                [
+                    13,
+                    20
+                ],
+                [
+                    14,
+                    20
+                ],
+                [
+                    15,
+                    20
+                ],
+                [
+                    16,
+                    20
+                ],
+                [
+                    17,
+                    20
+                ]
+            ],
+            "team": "Shodan",
+            "cell": [
+                18,
+                20
+            ],
+            "max_hp": 9,
+            "hp": 9,
+            "accuracy": 0.6,
+            "min_damage": 1,
+            "max_damage": 4,
+            "radius_move": 4,
+            "radius_fov": 5,
+            "AP": 2,
+            "shield": 0,
+            "active_turn": true,
+            "effect_list": [],
+            "spell_list": [
+                {
+                    "id": "move",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "swift_attack_move",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "tactical_retreat",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "sabotage",
+                    "cooldown_now": 0
+                }
+            ]
+        },
+        {
+            "rang": "queen",
+            "controller": "comp",
+            "action": "patrol",
+            "pos_patrol": 0,
+            "way_patrol": [
+                [
+                    18,
+                    16
+                ],
+                [
+                    17,
+                    16
+                ],
+                [
+                    16,
+                    16
+                ],
+                [
+                    16,
+                    17
+                ],
+                [
+                    16,
+                    16
+                ],
+                [
+                    17,
+                    16
+                ]
+            ],
+            "team": "Shodan",
+            "cell": [
+                18,
+                16
+            ],
+            "max_hp": 11,
+            "hp": 11,
+            "accuracy": 1,
+            "min_damage": 2,
+            "max_damage": 4,
+            "radius_move": 5,
+            "radius_fov": 7,
+            "AP": 2,
+            "shield": 0,
+            "active_turn": true,
+            "effect_list": [],
+            "spell_list": [
+                {
+                    "id": "move",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "into_the_heart",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "bitchiness",
+                    "cooldown_now": 0
+                }
+            ]
+        }
+    ],
+    "kings": [
+        {
+            "controller": "player",
+            "team": "p1",
+            "cell": null,
+            "max_hp": 15,
+            "hp": 15,
+            "accuracy": 1,
+            "min_damage": 1,
+            "max_damage": 2,
+            "radius_move": 0,
+            "radius_fov": 8,
+            "AP": 2,
+            "shield": 0,
+            "active_turn": true,
+            "effect_list": [],
+            "spell_list": [
+                {
+                    "id": "royal_grace",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "a_volley_of_arrows",
+                    "cooldown_now": 0
+                }
+            ]
+        },
+        {
+            "controller": "comp",
+            "team": "Shodan",
+            "cell": [
+                18,
+                18
+            ],
+            "max_hp": 15,
+            "hp": 15,
+            "accuracy": 1,
+            "min_damage": 1,
+            "max_damage": 2,
+            "radius_move": 0,
+            "radius_fov": 8,
+            "AP": 2,
+            "shield": 0,
+            "active_turn": true,
+            "effect_list": [],
+            "spell_list": [
+                {
+                    "id": "royal_grace",
+                    "cooldown_now": 0
+                },
+                {
+                    "id": "a_volley_of_arrows",
+                    "cooldown_now": 0
+                }
+            ]
+        }
+    ]
+}
