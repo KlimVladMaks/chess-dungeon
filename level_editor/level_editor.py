@@ -400,11 +400,11 @@ class LevelEditor:
 
                     # Если фигура является королём, добавляем её в словарь в качестве короля
                     if rang == "king":
-                        kings[team] = EditPiece(team, square, rang)
+                        kings[team] = EditPiece(team, square, rang, 'player')
                     
                     # Иначе добавляем фигуру в список обычных фигур
                     else:
-                        pieces[team].append(EditPiece(team, square, rang))
+                        pieces[team].append(EditPiece(team, square, rang, 'player'))
 
         # Сохраняем данные уровня
         save = Save(field_map, difficulty, pieces, kings)

@@ -114,8 +114,18 @@ class EditSpell():
         
 class EditPiece():
 
-    def __init__(self, team: str, cell: "EditSquare", rang: str) -> None:
+    def __init__(self, team: str, cell: "EditSquare", rang: str, controller: str, action: str = 'patrol', pos_patrol: int = 0, way_patrol: list["EditSquare"] = []) -> None:
         
+        """
+        :param team: Команда к которой пренадлежит фигура
+        :param cell: Клетка на которой находится фигура
+        :param rang: Вид фигуры
+        :param controler: 'player' или 'comp' определяет кто управляет фигурой
+        :param action: Создаётся только при controler == 'comp'; Определяет поведение фигуры
+        :param way_patrol: Создаётся только при controler == 'comp'; Определяет марштур патруля
+        :param pos_patrol: Создаётся только при controler == 'comp'; Определяет положение фигуры на маршруте патруля
+        """
+
         self.rang = rang
         self.team = team
         self.cell = cell
@@ -139,4 +149,8 @@ class EditPiece():
         for spell in SPELL_FOR_RANG[self.rang]:
             self.spell_list.append(EditSpell(spell["id"], spell["cooldown"]))
 
-        self.controller = "player"
+        self.controller = controller
+        if self.controller == 'comp':
+            self.action = action
+            self.pos_patrol = pos_patrol
+            self.way_patrol = way_patrol
