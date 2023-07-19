@@ -161,20 +161,16 @@ class Game:
         win - победа игрока, lose - поражение игрока, continue - игра всё ещё идёт.
         """
 
-        # Если у игрока не осталось фигур, возвращаем "lose"
-        # if len(self.player_pieces) == 0:
-        #     return "lose"
+        # Получаем все активные на данный момент команды
+        active_teams = list(self.kings_teams.keys())
 
-        # Если у компьютера не осталось фигур, возвращаем "win"
-        # if len(self.computer_pieces) == 0:
-        #     return "win"
+        # Возвращаем результат игры в зависимости от того, какой команды нет в списке
+        if "p1" not in active_teams:
+            return "lose"
+        elif "Shodan" not in active_teams:
+            return "win"
 
-        # Если у противника есть король и он уничтожен, возвращаем "win"
-        # if self.computer_king is not None:
-        #     if self.computer_king.hp <= -10:
-        #         return "win"
-
-        # Иначе возвращаем "continue"
+        # Если все команды есть в списке, возвращаем "continue"
         return "continue"
 
     def get_overview_for_team(self, team: str) -> set['Square']:
