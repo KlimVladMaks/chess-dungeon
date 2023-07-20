@@ -546,7 +546,7 @@
         {
             "rang": "pawn",
             "controller": "player",
-            "team": "p1",
+            "team": "white",
             "cell": [
                 6,
                 6
@@ -584,7 +584,7 @@
         {
             "rang": "bishop",
             "controller": "player",
-            "team": "p1",
+            "team": "white",
             "cell": [
                 5,
                 5
@@ -622,7 +622,7 @@
         {
             "rang": "knight",
             "controller": "player",
-            "team": "p1",
+            "team": "white",
             "cell": [
                 5,
                 6
@@ -666,7 +666,7 @@
         {
             "rang": "rook",
             "controller": "player",
-            "team": "p1",
+            "team": "white",
             "cell": [
                 6,
                 5
@@ -704,7 +704,7 @@
         {
             "rang": "queen",
             "controller": "player",
-            "team": "p1",
+            "team": "white",
             "cell": [
                 7,
                 6
@@ -886,7 +886,7 @@
                     17
                 ]
             ],
-            "team": "Shodan",
+            "team": "black",
             "cell": [
                 15,
                 17
@@ -1024,7 +1024,7 @@
                     19
                 ]
             ],
-            "team": "Shodan",
+            "team": "black",
             "cell": [
                 18,
                 19
@@ -1170,7 +1170,7 @@
                     17
                 ]
             ],
-            "team": "Shodan",
+            "team": "black",
             "cell": [
                 18,
                 17
@@ -1324,7 +1324,7 @@
                     20
                 ]
             ],
-            "team": "Shodan",
+            "team": "black",
             "cell": [
                 18,
                 20
@@ -1390,7 +1390,7 @@
                     16
                 ]
             ],
-            "team": "Shodan",
+            "team": "black",
             "cell": [
                 18,
                 16
@@ -1425,7 +1425,7 @@
     "kings": [
         {
             "controller": "player",
-            "team": "p1",
+            "team": "white",
             "cell": null,
             "max_hp": 15,
             "hp": 15,
@@ -1451,7 +1451,7 @@
         },
         {
             "controller": "comp",
-            "team": "Shodan",
+            "team": "black",
             "cell": [
                 18,
                 18

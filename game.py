@@ -162,13 +162,13 @@ class Game:
         """
 
         # Получаем все активные на данный момент команды
-        active_teams = list(self.kings_teams.keys())
+        # active_teams = list(self.kings_teams.keys())
 
         # Возвращаем результат игры в зависимости от того, какой команды нет в списке
-        if "p1" not in active_teams:
-            return "lose"
-        elif "Shodan" not in active_teams:
-            return "win"
+        # if "white" not in active_teams:
+        #     return "lose"
+        # elif "black" not in active_teams:
+        #     return "win"
 
         # Если все команды есть в списке, возвращаем "continue"
         return "continue"

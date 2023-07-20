@@ -10,7 +10,7 @@ from level_editor.edit_controller import EditController
 from level_editor.edit_menu import EditMenu, BASE_MENU_DICT
 from saves import Save
 from level_editor.edit_piece import EditPiece
-
+from game_process import GameProcess
 
 # Импорт файлов для проверки типов
 if tp.TYPE_CHECKING:
@@ -175,11 +175,11 @@ class LevelEditor:
                             edit_interface.open()
                             continue
 
-                        # Если нажата кнопка сохранения, то сохраняем уровень
-                        elif result == "save":
-                            LevelEditor.save(edit_field)
-                            edit_field.update()
-                            continue
+                        # Если нажата кнопка запуска уровня, то сохраняем и запускаем редактируемый уровень
+                        elif result == "start":
+                            LevelEditor.save(edit_field, "edit_level")
+                            save = Save(save_name="edit_level")
+                            return GameProcess.start(save, screen)
 
                         # При нажатии кнопки выхода в главное меню, возвращаемся в главное меню
                         elif result == "main_menu":
@@ -346,11 +346,12 @@ class LevelEditor:
                     edit_field.update()
 
     @staticmethod
-    def save(edit_field: EditField) -> None:
+    def save(edit_field: EditField, save_name: str) -> None:
         """
         Функция для сохранения уровня, созданного в редакторе уровней.
 
         :param edit_field: Игровое поле.
+        :param saving_name: Имя сохраняемого уровня.
         """
         
         # Двойной список для хранения карты уровня
@@ -407,10 +408,13 @@ class LevelEditor:
                     # Иначе добавляем фигуру в список обычных фигур
                     else:
                         pieces[team].append(EditPiece(team, square, rang, 'player'))
+        
+        # Добавляем короля игрока в соответствующий список
+        kings["white"] = EditPiece("white", edit_field.squares_list[0][0], "king", "player")
 
         # Сохраняем данные уровня
         save = Save(field_map, difficulty, pieces, kings)
-        save.save("edit_level")
+        save.save(save_name)
 
 # Область для отладки
 if __name__ == "__main__":
