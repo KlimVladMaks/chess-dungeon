@@ -403,11 +403,17 @@ class LevelEditor:
 
                     # Если фигура является королём, добавляем её в словарь в качестве короля
                     if rang == "king":
-                        kings[team] = EditPiece(team, square, rang, 'player')
+                        if team == "white":
+                            kings[team] = EditPiece(team, square, rang, 'player')
+                        elif team == "black":
+                            kings[team] = EditPiece(team, square, rang, 'comp')
                     
                     # Иначе добавляем фигуру в список обычных фигур
                     else:
-                        pieces[team].append(EditPiece(team, square, rang, 'player'))
+                        if team == "white":
+                            pieces[team].append(EditPiece(team, square, rang, 'player'))
+                        elif team == "black":
+                            pieces[team].append(EditPiece(team, square, rang, 'comp'))
         
         # Добавляем короля игрока в соответствующий список
         kings["white"] = EditPiece("white", edit_field.squares_list[0][0], "king", "player")
