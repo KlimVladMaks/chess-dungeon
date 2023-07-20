@@ -168,10 +168,9 @@ class GameProcess:
         game.active_team = list(game.kings_teams.keys())[0]
 
         # Помещаем все фигуры в соответствующие списки
-        for player_piece in game.pieces_teams['white']:
-            player_piece.cell.add_inner_piece(player_piece)
-        for computer_piece in game.pieces_teams['black']:
-            computer_piece.cell.add_inner_piece(computer_piece)
+        for team in game.pieces_teams:
+            for piece in game.pieces_teams[team]:
+                piece.cell.add_inner_piece(piece)
 
         # Тест расположения фигуры - КОНЕЦ
 
