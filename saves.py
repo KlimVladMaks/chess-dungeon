@@ -69,10 +69,10 @@ class Save:
         for team in kings.keys():
             king = kings[team]
             depack_king = {}
-            depack_piece["rang"] = piece.rang
+            depack_king["rang"] = king.rang
             depack_king["controller"] = king.controller
-            if depack_piece["controller"] == "comp":
-                    depack_piece["action"] = piece.action
+            if depack_king["controller"] == "comp":
+                    depack_king["action"] = king.action
             depack_king["team"] = king.team
             depack_king["cell"] = king.cell.get_pos()
             depack_king["max_hp"] = king.max_hp
