@@ -240,7 +240,7 @@ class GameProcess:
                         piece.new_turn()
                     
                     # Делаем новый ход для короля активной команды
-                    game.kings_teams[game.active_team]
+                    game.kings_teams[game.active_team].new_turn()
 
                     # Обновляем состояние всех фигур
                     for team in game.pieces_teams:
