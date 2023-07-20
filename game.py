@@ -33,7 +33,7 @@ class Game:
         # Словарь для хранения команд фигур
         self.pieces_teams: dict[str, list[Piece]] = {}
         # Словарь для хранения команд королей
-        self.kings_teams: dict[str, list[King]] = {}
+        self.kings_teams: dict[str, King] = {}
 
         # Команда, чей ход
         self.active_team: str = ""
@@ -162,15 +162,16 @@ class Game:
         """
 
         # Получаем все активные на данный момент команды
-        # active_teams = list(self.kings_teams.keys())
+        active_teams = list(self.kings_teams.keys())
 
         # Возвращаем результат игры в зависимости от того, какой команды нет в списке
-        # if "white" not in active_teams:
-        #     return "lose"
-        # elif "black" not in active_teams:
-        #     return "win"
+        if "white" not in active_teams:
+             return "lose"
+        elif "black" not in active_teams:
+             return "win"
 
         # Если все команды есть в списке, возвращаем "continue"
+        print(active_teams)
         return "continue"
 
     def get_overview_for_team(self, team: str) -> set['Square']:

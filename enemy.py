@@ -536,6 +536,11 @@ class EnemyKing(EnemyPiece, King):
         #Пропускаем ход, коль ничего не сделали
         self.AP = 0
 
+    def destroy(self):
+        self.game.del_king(self)
+        self.cell.del_inner_piece()
+        print(f"Король убит! Команда {self.team} растеряна и сдаётся в плен")
+
 class EnemyBishop(EnemyPiece, Bishop):
 
     def __init__(self, team: str, game: "Game", field: "Field", cell: "Square", difficulty: float):
@@ -642,11 +647,6 @@ class EnemyBishop(EnemyPiece, Bishop):
             print(f"Ближайщей цели нет, враг бездействует")
             self.AP = 0
             pass
-
-    def destroy(self):
-        self.game.del_king(self)
-        self.cell.del_inner_piece()
-        print(f"Король убит! Команда {self.team} растеряна и сдаётся в плен")
 
 class EnemyKnight(EnemyPiece, Knight):
 

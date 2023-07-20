@@ -172,6 +172,11 @@ class GameProcess:
             for piece in game.pieces_teams[team]:
                 piece.cell.add_inner_piece(piece)
 
+        # И не забываем королей!
+        for king in game.kings_teams.values():
+            if king.controller == 'comp':
+                king.cell.add_inner_piece(king)
+
         # Тест расположения фигуры - КОНЕЦ
 
         # Отрисовываем игровое поле
