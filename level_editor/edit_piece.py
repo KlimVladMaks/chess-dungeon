@@ -129,6 +129,7 @@ class EditPiece():
         self.rang = rang
         self.team = team
         self.cell = cell
+        self.controller = controller
         
         with open("settings/settings_of_pieces.json") as pieces_stats:
             stats = json.load(pieces_stats)[self.rang]
@@ -142,14 +143,17 @@ class EditPiece():
 
         self.AP = 2
         self.shield = 0
-        self.active_turn = True
+
+        if self.controller == 'player':
+            self.active_turn = True
+        elif self.controller == 'comp':
+            self.active_turn = False
 
         self.effect_list = []
         self.spell_list = []
         for spell in SPELL_FOR_RANG[self.rang]:
             self.spell_list.append(EditSpell(spell["id"], 0))
 
-        self.controller = controller
         if self.controller == 'comp':
             self.action = action
             self.pos_patrol = pos_patrol
