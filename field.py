@@ -518,15 +518,6 @@ class Square(SquareTemplate):
         :param attacked_square: Клетка, которую атакуют.
         """
 
-        # Если действие совершает фигура игрока и атакуемая клетка не занята, то просто завершаем функцию
-        # if (not attacked_square.is_occupied) and ("Enemy" not in type(attack_square.inner_piece).__name__):
-        #     return
-
-        # Если атакуемая клетка не занята, то совершаем небольшую задержку и завершаем функцию
-        # if not attacked_square.is_occupied:
-        #     pg.time.delay(FLASH_DELAY)
-        #     return
-
         # Закрашиваем атакующие клетки
         if isinstance(attack_square, Square):
             attack_square.flash("blue")
@@ -836,8 +827,6 @@ class Field:
         self.screen_absolute_coordinates[0] -= x_shift
         self.screen_absolute_coordinates[1] -= y_shift
 
-    """Совместно с svgarik"""
-
     def is_into_map(self, row_pos: int, col_pos: int) -> bool:
         """
         Функция, проверяющая, существует ли клетка с заданными координатами.
@@ -859,8 +848,6 @@ class Field:
 
         return True
 
-    """Совместно с svgarik"""
-
     def is_barrier(self, row_pos: int, col_pos: int) -> bool:
         """
         Функция, проверяющая, является ли заданная клетка непроницаемой для движения.
@@ -881,8 +868,6 @@ class Field:
 
         return True
 
-    """Совместно с svgarik"""
-
     def is_fog(self, row_pos: int, col_pos: int) -> bool:
         """
         Функция, проверяющая, является ли заданная клетка непроницаемой для обзора.
@@ -902,8 +887,6 @@ class Field:
             return False
 
         return True
-
-    """Совместно с svgarik"""
 
     def get_way(self, start: Square, end: Square, piece_is_barrier: bool = False) -> tp.Union[list[SquareTemplate], None]:
         """
@@ -991,8 +974,6 @@ class Field:
         else:
             return None
 
-    """Совместно с svgarik"""
-
     def get_nearest(self, start: "Square", endest: list["Square"]) -> tp.Union["Square", None]:
 
         """
@@ -1063,8 +1044,6 @@ class Field:
 
         return nearest_cell
     
-        """Совместно с svgarik"""
-
     def get_farthest(self, start: "Square", endest: list["Square"]) -> tp.Union["Square", None]:
 
         """
