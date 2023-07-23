@@ -811,16 +811,21 @@ class Field:
         field_width = self.get_field_width()
         field_height = self.get_field_height()
 
+        # Получаем размеры одной клетки
+        square_side_size = SQUARE_SIDE_SIZE
+
         # Получаем размеры экрана
         screen_width = self.screen_field.get_width()
         screen_height = self.screen_field.get_height()
 
-        # Если координата x выходит за пределы поля больше чем наполовину размера экрана, то обнуляем сдвиг по x
-        if (x_screen_test < -(screen_width / 2)) or (x_screen_test + (screen_width / 2) > field_width):
+        # Если при сдвиге по X на экран не попадает ни одной целой клетки, то обнуляем сдвиг по X
+        if (x_screen_test < -(screen_width - square_side_size)) or \
+           (x_screen_test > (field_width - square_side_size)):
             x_shift = 0
-
-        # Если координата y выходит за пределы поля больше чем наполовину размера экрана, то обнуляем сдвиг по y
-        if (y_screen_test < -(screen_height / 2)) or (y_screen_test + (screen_height / 2) > field_height):
+        
+        # Если при сдвиге по Y на экран не попадает ни одной целой клетки, то обнуляем сдвиг по Y
+        if (y_screen_test < -(screen_height - square_side_size)) or \
+           (y_screen_test > (field_height - square_side_size)):
             y_shift = 0
 
         # Сдвигаем каждую клетку игрового поля
