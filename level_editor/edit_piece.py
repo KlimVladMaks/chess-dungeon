@@ -146,7 +146,7 @@ class EditPiece():
 
         if self.controller == 'player':
             self.active_turn = True
-        elif self.controller == 'comp':
+        else:
             self.active_turn = False
 
         self.effect_list = []
