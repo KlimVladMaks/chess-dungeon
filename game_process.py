@@ -131,6 +131,7 @@ class GameProcess:
                 pack_piece = King(team, game, field, cell)
             elif piece["controller"] == "comp":
                 pack_piece = EnemyKing(team, game, field, cell, save.difficulty)
+                game.pieces_teams[team].append(pack_piece)
 
             pack_piece.hp = piece["hp"]
             pack_piece.AP = piece["AP"]
@@ -367,8 +368,8 @@ class GameProcess:
                             if game.selected_spell is not None:
                                 continue
 
-                            # Если игрок нажал на вражескую фигуру, то пропускаем итерацию
-                            if square_clicked.inner_piece.team == "Shodan":
+                            # Если игрок нажал на фигуру компьютера, то пропускаем итерацию
+                            if square_clicked.inner_piece.controller == "comp":
                                 continue
 
                             # Если существовала ранее выбранная фигура, то завершаем предыдущий игровой такт
