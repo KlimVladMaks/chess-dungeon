@@ -61,7 +61,7 @@ class GameProcess:
         interface = Interface(screen, field)
 
         # Создаём экземпляр класса для управления процессом игры
-        game = Game(field)
+        game = Game(field, interface)
 
         for piece in save.pieces:
             team = piece["team"]
@@ -200,56 +200,8 @@ class GameProcess:
                 # Если нажата кнопка Enter
                 elif e.type == pg.KEYDOWN and e.key == pg.K_RETURN:
 
-                    # Прежде чем поменять активную команду, нужно убедиться не уничтожена ли предыдущая
-                    # поскольку для определения следующей в списке команд должна остаться предыдущая
-                    # такое возможно, если игрок последней пешкой использует "Просто пешка"
-                    
-                    # Заводим флаг
-                    delete_previor_team = False
-
-                    # Убеждаемся, что прошлая команда - игрока и она уничтожена
-                    if (game.kings_teams[game.active_team].controller == "player"
-                        and len(game.pieces_teams[game.active_team]) == 0):
-                        # меняем состояние флага
-                        delete_previor_team = True
-                        # сохраняем команду
-                        previor_team = game.active_team
-
-                    # Делаем все фигуры старой команды неактивными
-                    for piece in game.pieces_teams[game.active_team]:
-                        piece.active_turn = False
-                        piece.cell.update()
-
-                    # Сдвигаем команду на следующую
-                    game.next_team()
-
-                    # удаляем короля из списка
-                    if delete_previor_team:
-                        game.del_king(game.kings_teams[previor_team])
-
-                    # Очищаем все просматриваемые клетки
-                    game.off_view_for_all_squares()
-
-                    # Завершаем текущий игровой такт
-                    game.finish_game_tact()
-
-                    # Закрываем интерфейс (если он вдруг открыт)
-                    interface.close()
-
-                    # Делаем новый ход для каждой фигуры активной команды
-                    for piece in game.pieces_teams[game.active_team]:
-                        piece.new_turn()
-                    
-                    # Делаем новый ход для короля активной команды
-                    game.kings_teams[game.active_team].new_turn()
-
-                    # Обновляем состояние всех фигур
-                    for team in game.pieces_teams:
-                        for piece in game.pieces_teams[team]:
-                            piece.cell.update()
-
-                    # Обновляем поле
-                    field.update()
+                    # Переходим к следующему игровому ходу
+                    game.next_move()
 
                     # Проверяем игру на завершение и при необходимости возвращаем результат игрового процесса
                     match game.get_game_status():

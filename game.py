@@ -7,6 +7,7 @@ if tp.TYPE_CHECKING:
     from field import Field
     from field import Square
     from spell import Spell
+    from interface import Interface
 
 
 class Game:
@@ -14,15 +15,19 @@ class Game:
     Класс для управления игровым процессом.
     """
 
-    def __init__(self, field: 'Field') -> None:
+    def __init__(self, field: 'Field', interface: 'Interface') -> None:
         """
         Функция для инициализации игрового процесса.
 
         :param field: Игровое поле.
+        :param interface: Игровой интерфейс.
         """
 
         # Сохраняем экземпляр игрового поля
         self.field = field
+
+        # Сохраняем экземпляр интерфейса
+        self.interface = interface
 
         # Свойство для хранения выбранной фигуры
         self.selected_piece: tp.Union[Piece, None] = None
@@ -213,3 +218,59 @@ class Game:
 
             # Обновляем игровое поле
             self.field.update()
+
+    def next_move(self) -> None:
+        """
+        Функция для перехода к следующему игровому ходу.
+        """
+        
+        # Прежде чем поменять активную команду, нужно убедиться не уничтожена ли предыдущая
+        # поскольку для определения следующей в списке команд должна остаться предыдущая
+        # такое возможно, если игрок последней пешкой использует "Просто пешка"
+        
+        # Заводим флаг
+        delete_previor_team = False
+
+        # Убеждаемся, что прошлая команда - игрока и она уничтожена
+        if (self.kings_teams[self.active_team].controller == "player"
+            and len(self.pieces_teams[self.active_team]) == 0):
+            # меняем состояние флага
+            delete_previor_team = True
+            # сохраняем команду
+            previor_team = self.active_team
+
+        # Делаем все фигуры старой команды неактивными
+        for piece in self.pieces_teams[self.active_team]:
+            piece.active_turn = False
+            piece.cell.update()
+
+        # Сдвигаем команду на следующую
+        self.next_team()
+
+        # удаляем короля из списка
+        if delete_previor_team:
+            self.del_king(self.kings_teams[previor_team])
+
+        # Очищаем все просматриваемые клетки
+        self.off_view_for_all_squares()
+
+        # Завершаем текущий игровой такт
+        self.finish_game_tact()
+
+        # Закрываем интерфейс (если он вдруг открыт)
+        self.interface.close()
+
+        # Делаем новый ход для каждой фигуры активной команды
+        for piece in self.pieces_teams[self.active_team]:
+            piece.new_turn()
+        
+        # Делаем новый ход для короля активной команды
+        self.kings_teams[self.active_team].new_turn()
+
+        # Обновляем состояние всех фигур
+        for team in self.pieces_teams:
+            for piece in self.pieces_teams[team]:
+                piece.cell.update()
+
+        # Обновляем поле
+        self.field.update()
