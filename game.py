@@ -43,6 +43,9 @@ class Game:
         # Команда, чей ход
         self.active_team: str = ""
 
+        # Список очереди (нужен для коректной передачи очереди при любом удалении команд)
+        self.queue_teams: list[str] = list(self.kings_teams.keys())
+
         # Свойство для хранения вражеского короля
         self.computer_king: tp.Union[Piece, None] = None
 
@@ -132,6 +135,11 @@ class Game:
 
         # Удаляем фигуру из соответсвующего списка
         self.pieces_teams[piece.team].remove(piece)
+        if piece.controller == "player":
+            if not self.pieces_teams[piece.team]:
+
+                self.del_king(self.kings_teams[piece.team])
+
 
     def del_king(self, king: "King") -> None:
         """
@@ -139,24 +147,32 @@ class Game:
 
         :param piece: Фигура, которую нужно удалить.
         """
-        
+
         # Удаляем команду Короля из словаря с Королями
         self.kings_teams.pop(king.team)
+        if king.controller == "comp":
+            print(f"Король убит! Команда {king.team} растеряна и сдаётся в плен")
+        elif king.controller == "player":
+            print(f"Вся команда {king.team} уничтожена!")
 
     def next_team(self) -> None:
         
         """
-        Функция меняет атрибут активной команды на следющую в списке команд
+        Функция меняет атрибут активной команды на следущую в списке команд
         """
 
         # Берём список команд как список ключей из словаря с Королями
-        teams = list(self.kings_teams.keys())
+        active_teams = list(self.kings_teams.keys())
 
-        # Находим индекс следующей команды (+1 к предыдущему, циклично)
-        index = (teams.index(self.active_team) + 1) % len(teams)
+        # Находим индекс текущей команды
+        index = (self.queue_teams.index(self.active_team))
 
-        # меняем команду
-        self.active_team = teams[index]
+        for i in range(1, len(self.queue_teams)):
+            if self.queue_teams[(index + i) % len(self.queue_teams)] in active_teams:
+                self.active_team = self.queue_teams[(index + i) % len(self.queue_teams)]
+                break
+        
+        # Если мы не нашли команду, то значит осталась всего 1 или 0 живых и мы должны были уже узнать поюедителя
 
     def get_game_status(self) -> str:
         """
@@ -227,29 +243,19 @@ class Game:
         # Прежде чем поменять активную команду, нужно убедиться не уничтожена ли предыдущая
         # поскольку для определения следующей в списке команд должна остаться предыдущая
         # такое возможно, если игрок последней пешкой использует "Просто пешка"
-        
-        # Заводим флаг
-        delete_previor_team = False
-
-        # Убеждаемся, что прошлая команда - игрока и она уничтожена
-        if (self.kings_teams[self.active_team].controller == "player"
-            and len(self.pieces_teams[self.active_team]) == 0):
-            # меняем состояние флага
-            delete_previor_team = True
-            # сохраняем команду
-            previor_team = self.active_team
 
         # Делаем все фигуры старой команды неактивными
         for piece in self.pieces_teams[self.active_team]:
             piece.active_turn = False
             piece.cell.update()
 
+
+        print(self.active_team, 'prev_active_team')
+
         # Сдвигаем команду на следующую
         self.next_team()
 
-        # удаляем короля из списка
-        if delete_previor_team:
-            self.del_king(self.kings_teams[previor_team])
+        print(self.active_team, 'active_team')
 
         # Очищаем все просматриваемые клетки
         self.off_view_for_all_squares()
@@ -274,3 +280,13 @@ class Game:
 
         # Обновляем поле
         self.field.update()
+
+        match self.get_game_status():
+            case "lose":
+                return "lose"
+            case "win":
+                return "win"
+
+        # Если ходил компьютер, то он сам Передаёт ход
+        if self.kings_teams[self.active_team].controller == "comp":
+            self.next_move()

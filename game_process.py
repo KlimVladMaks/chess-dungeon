@@ -166,9 +166,11 @@ class GameProcess:
         game.computer_king = game.kings_teams['black']
 
         # Делаем первую команду активной
-        game.active_team = list(game.kings_teams.keys())[0]
+        game.active_team = list(game.kings_teams.keys())[-1]
+        game.queue_teams = list(game.kings_teams.keys())
+        game.next_move()
 
-        # Помещаем все фигуры в соответствующие списки
+        # Помещаем все фигуры на клетки
         for team in game.pieces_teams:
             for piece in game.pieces_teams[team]:
                 piece.cell.add_inner_piece(piece)
@@ -200,11 +202,9 @@ class GameProcess:
                 # Если нажата кнопка Enter
                 elif e.type == pg.KEYDOWN and e.key == pg.K_RETURN:
 
-                    # Переходим к следующему игровому ходу
-                    game.next_move()
-
+                    # Переходим к следующему игровому ходу и
                     # Проверяем игру на завершение и при необходимости возвращаем результат игрового процесса
-                    match game.get_game_status():
+                    match game.next_move():
                         case "lose":
                             return "lose_menu"
                         case "win":
@@ -284,8 +284,6 @@ class GameProcess:
                             for team in game.pieces_teams:
                                 for piece in game.pieces_teams[team]:
                                     piece.cell.update()
-
-                            print('Hi')
 
                             # Проверяем игру на завершение и при необходимости возвращаем результат игрового процесса
                             match game.get_game_status():

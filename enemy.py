@@ -537,9 +537,8 @@ class EnemyKing(EnemyPiece, King):
         self.AP = 0
 
     def destroy(self):
-        self.game.del_king(self)
         self.cell.del_inner_piece()
-        print(f"Король убит! Команда {self.team} растеряна и сдаётся в плен")
+        self.game.del_king(self)
 
 class EnemyBishop(EnemyPiece, Bishop):
 
