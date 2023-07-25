@@ -144,10 +144,7 @@ class EditPiece():
         self.AP = 2
         self.shield = 0
 
-        if self.controller == 'player':
-            self.active_turn = True
-        else:
-            self.active_turn = False
+        self.active_turn = False
 
         self.effect_list = []
         self.spell_list = []
