@@ -3,7 +3,7 @@ import pygame as pg
 import typing as tp
 
 # Импорты файлов
-from menu import *
+from menu import Menu, FinalMenu
 from level_editor.level_editor import LevelEditor
 from saves import Save
 from game_process import GameProcess
@@ -64,16 +64,25 @@ def main() -> None:
     # Запускаем основной цикл приложения
     while True:
 
+        if active_object == "quit":
+            pg.quit()
+            raise SystemExit
+
         # Запускаем главное меню
         if active_object == "main_menu":
-            main_menu = MainMenu(screen)
-            main_menu.add_buttons(["demo", "level_editor", "quit"])
+            main_menu = Menu(screen)
+            main_menu.add_buttons({"demo": "Демоверсия", 
+                                   "level_editor": "Редактор уровней", 
+                                   "quit": "Выход"})
             active_object = main_menu.start()
         
         # Перед началом игры спрашиваем уровень сложности
         elif (active_object == "demo") or (active_object == "restart"):
-            difficulty_menu = DifficultyMenu(screen)
-            difficulty_menu.add_buttons(["hard", "normal", "easy", "main_menu"])
+            difficulty_menu = Menu(screen)
+            difficulty_menu.add_buttons({"hard": "Высокая сложность", 
+                                         "normal": "Нормальная сложность", 
+                                         "easy": "Низкая сложность", 
+                                         "main_menu": "Главное меню"})
             difficulty = difficulty_menu.start()
             if difficulty == "main_menu":
                 active_object = "main_menu"

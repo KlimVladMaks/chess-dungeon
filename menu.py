@@ -20,7 +20,7 @@ OPEN_BUTTON_SIZE = (40, 40)
 OPEN_BUTTON_MARGIN = 20
 
 
-class MenuButton(pg.sprite.Sprite):
+class MenuButtonOld(pg.sprite.Sprite):
     """
     Класс для реализации кнопки меню.
     """
@@ -77,109 +77,6 @@ class MenuButton(pg.sprite.Sprite):
             self.image = pg.image.load("design/menu/level_editor_button.png")
 
 
-class MainMenu:
-    """
-    Класс для реализации главного меню.
-    """
-
-    def __init__(self, screen: pg.Surface) -> None:
-        """
-        Функция для инициализации главного меню.
-
-        :param screen: Экран игры.
-        """
-
-        # Сохраняем экран игры
-        self.screen = screen
-
-        # Создаём группу для хранения спрайтов кнопок меню
-        self.buttons_group = pg.sprite.Group()
-
-    def add_buttons(self, button_values: list[str]) -> None:
-        """
-        Функция для добавления кнопок меню.
-
-        :param button_values: Список значений кнопок.
-        """
-
-        # Задаём начальные координаты
-        x = self.screen.get_width() // 2 - BUTTON_SIZE[0] // 2
-        y = TOP_MARGIN
-
-        # Формируем кнопки и добавляем их в группу спрайтов
-        for value in button_values:
-            button = MenuButton(value, (x, y), BUTTON_SIZE)
-            self.buttons_group.add(button)
-            y += BUTTON_SIZE[1] + SPACE_BETWEEN_BUTTONS
-
-    def start(self) -> str:
-        """
-        Функция для запуска главного меню.
-
-        :return: Значение выбранной кнопки.
-        """
-
-        # Устанавливаем фон
-        background = pg.image.load("design/menu/main_background.png")
-        self.screen.blit(background, (0, 0))
-        pg.display.update()
-
-        # Отрисовываем кнопки меню на экране
-        self.buttons_group.draw(self.screen)
-        pg.display.update()
-
-        # Запускаем бесконечный цикл
-        while True:
-
-            # Перебираем игровые события
-            for e in pg.event.get():
-
-                # При закрытии игрового окна завершаем программу
-                if e.type == pg.QUIT:
-                    pg.quit()
-                    raise SystemExit
-
-                # Если нажата левая клавиша мыши
-                elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
-
-                    # Получаем относительные координаты клика
-                    click_coordinates = pg.mouse.get_pos()
-
-                    # Получаем нажатую кнопку
-                    click_button = self.get_button_by_coordinates(click_coordinates[0], click_coordinates[1])
-
-                    # Если нажатая кнопка равна None (т.е. никакая кнопка не нажата), то переходим к следующей итерации
-                    if click_button is None:
-                        continue
-
-                    # Если нажата кнопка выхода, то завершаем игру
-                    if click_button.value == "quit":
-                        pg.quit()
-                        raise SystemExit
-
-                    # Иначе возвращаем значение нажатой кнопки
-                    return click_button.value
-
-    def get_button_by_coordinates(self, x: int, y: int) -> tp.Union[MenuButton, None]:
-        """
-        Функция для получения кнопки, расположенной по заданным координатам.
-
-        :param x: Координата x кнопки на экране.
-        :param y: Координата y кнопки на экране.
-        :return: Кнопка или None, если по заданным координатам кнопка не найдена.
-        """
-
-        # Перебираем все кнопки из соответствующей группы спрайтов
-        for button in self.buttons_group:
-
-            # Если координаты кнопки попадают в область интерфейса, то возвращаем кнопку
-            if button.rect.collidepoint(x, y):
-                return button
-
-        # Иначе возвращаем None
-        return None
-
-
 class FinalMenu:
     """
     Класс для реализации финального меню (появляется после завершения игровой сессии).
@@ -211,7 +108,7 @@ class FinalMenu:
 
         # Формируем кнопки и добавляем их в группу спрайтов
         for value in button_values:
-            button = MenuButton(value, (x, y), BUTTON_SIZE)
+            button = MenuButtonOld(value, (x, y), BUTTON_SIZE)
             self.buttons_group.add(button)
             y -= BUTTON_SIZE[1] + SPACE_BETWEEN_BUTTONS
 
@@ -267,7 +164,7 @@ class FinalMenu:
                     # Иначе возвращаем значение нажатой кнопки
                     return click_button.value
 
-    def get_button_by_coordinates(self, x: int, y: int) -> tp.Union[MenuButton, None]:
+    def get_button_by_coordinates(self, x: int, y: int) -> tp.Union[MenuButtonOld, None]:
         """
         Функция для получения кнопки, расположенной по заданным координатам.
 
@@ -287,129 +184,157 @@ class FinalMenu:
         return None
 
 
-class GameMenu:
+# -----------------------------------------------------------
+
+BUTTON_SIZE = (400, 50)
+BUTTON_BACKGROUND_COLOR = (255, 145, 77)
+BUTTON_FONT_SIZE = 40
+BUTTON_FONT_COLOR = (0, 0, 0)
+
+OPEN_BUTTON_SIZE = (40, 40)
+OPEN_BUTTON_MARGIN = 20
+
+MENU_MARGIN = 50
+SPACE_BETWEEN_BUTTONS = 40
+
+
+class OpenMenuButton(pg.sprite.Sprite):
     """
-    Класс для реализации игрового меню.
+    Класс для реализации кнопки отрытия меню.
     """
 
     def __init__(self, screen: pg.Surface) -> None:
         """
-        Функция для инициализации игрового меню.
+        Функция для инициализации кнопки открытия меню.
 
         :param screen: Экран игры.
         """
+        
+        pg.sprite.Sprite.__init__(self)
 
-        # Сохраняем экран игры
+        coordinates = (screen.get_width() - OPEN_BUTTON_MARGIN - OPEN_BUTTON_SIZE[0], OPEN_BUTTON_MARGIN)
+        size = (OPEN_BUTTON_SIZE[0], OPEN_BUTTON_SIZE[1])
+
+        self.image = pg.image.load("./design/level_editor/edit_menu/open_edit_menu_button.png")
+        self.rect = pg.Rect(coordinates[0], coordinates[1], size[0], size[1])
+
+
+class MenuButton(pg.sprite.Sprite):
+    """
+    Класс для реализации кнопки меню.
+    """
+    
+    def __init__(self, key: str, text: str, coordinates: tuple[int, int], size: tuple[int, int]) -> None:
+        """
+        Функция для инициализации кнопки меню.
+
+        :param key: Уникальный ключ кнопки.
+        :param text: Текст надписи на кнопке.
+        :param coordinates: Координаты кнопки в формате (x, y).
+        :param size: Размер кнопки в формате (ширина, высота).
+        """
+
+        pg.sprite.Sprite.__init__(self)
+
+        self.key = key
+        self.text = text
+
+        self.image = pg.Surface((size[0], size[1]))
+        self.image.fill(BUTTON_BACKGROUND_COLOR)
+
+        self.rect = pg.Rect(coordinates[0], coordinates[1], size[0], size[1])
+
+        self.font = pg.font.Font(None, BUTTON_FONT_SIZE)
+
+        text_surface = self.font.render(self.text, True, BUTTON_FONT_COLOR)
+        self.image.blit(text_surface, 
+                        (self.image.get_width() // 2 - text_surface.get_width() // 2, 
+                         self.image.get_height() // 2 - text_surface.get_height() // 2))
+
+
+class Menu:
+    """
+    Класс для реализации меню с кнопками выбора.
+    """
+    
+    def __init__(self, screen: pg.Surface) -> None:
+        """
+        Функция для инициализации меню.
+
+        :param screen: Экран игры.
+        """
+        
         self.screen = screen
-
-        # Создаём кнопку открытия меню
-        self.open_menu_button = MenuButton("game_menu",
-                                           (self.screen.get_width() - OPEN_BUTTON_MARGIN - OPEN_BUTTON_SIZE[0],
-                                            OPEN_BUTTON_MARGIN),
-                                           (OPEN_BUTTON_SIZE[0], OPEN_BUTTON_SIZE[1]))
-
-        # Создаём группу для хранения спрайтов кнопок меню
         self.buttons_group = pg.sprite.Group()
-
-    def is_open_button_clicked(self, click_coordinates: tuple[int, int]) -> bool:
+        self.open_menu_button = OpenMenuButton(screen)
+    
+    def add_buttons(self, button_keys_texts_dict: dict[str, str]) -> None:
         """
-        Функция для проверки того, была ли нажата кнопка открытия игрового меню.
+        Функция для добавления кнопок меню.
 
-        :param click_coordinates: Координаты клика.
-        :return: True - если кнопка открытия игрового меню нажата, False - если нет.
-        """
-
-        # Возвращаем результат проверки
-        return self.open_menu_button.rect.collidepoint(click_coordinates)
-
-    def add_buttons(self, button_values: list[str]) -> None:
-        """
-        Функция для добавления кнопок игрового меню в развёрнутом состоянии.
-
-        :param button_values: Список значений кнопок.
+        :param button_keys_texts_dict: Словарь с ключами и надписями кнопок в формате {ключ: надпись}.
         """
 
-        # Задаём начальные координаты
         x = self.screen.get_width() // 2 - BUTTON_SIZE[0] // 2
-        y = TOP_MARGIN
+        y = MENU_MARGIN
 
-        # Формируем кнопки и добавляем их в группу спрайтов
-        for value in button_values:
-            button = MenuButton(value, (x, y), BUTTON_SIZE)
+        for key in button_keys_texts_dict:
+            button = MenuButton(key, button_keys_texts_dict[key], (x, y), BUTTON_SIZE)
             self.buttons_group.add(button)
             y += BUTTON_SIZE[1] + SPACE_BETWEEN_BUTTONS
 
+    def is_open_button_clicked(self, click_coordinates: tuple[int, int]) -> bool:
+        """
+        Функция для проверки того, была ли нажата кнопка открытия меню.
+
+        :param click_coordinates: Координаты клика.
+        :return: True - если кнопка открытия меню нажата, False - если нет.
+        """
+
+        return self.open_menu_button.rect.collidepoint(click_coordinates)
+
     def start(self) -> str:
         """
-        Функция для запуска игрового меню в развёрнутом состоянии.
+        Функция для запуска (открытия) экрана меню.
 
         :return: Значение выбранной кнопки.
         """
-
-        # Устанавливаем фон
+        
         background = pg.image.load("design/menu/main_background.png")
         self.screen.blit(background, (0, 0))
-        pg.display.update()
-
-        # Отрисовываем кнопки меню на экране
         self.buttons_group.draw(self.screen)
         pg.display.update()
 
-        # Запускаем бесконечный цикл
         while True:
 
-            # Перебираем игровые события
             for e in pg.event.get():
 
-                # При закрытии игрового окна завершаем программу
                 if e.type == pg.QUIT:
                     pg.quit()
                     raise SystemExit
-
-                # Если нажата левая клавиша мыши
+                
+                # Нажатие правой клавиши мыши
                 elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
 
-                    # Получаем относительные координаты клика
                     click_coordinates = pg.mouse.get_pos()
-
-                    # Получаем нажатую кнопку
                     click_button = self.get_button_by_coordinates(click_coordinates[0], click_coordinates[1])
 
-                    # Если нажатая кнопка равна None (т.е. никакая кнопка не нажата), то переходим к следующей итерации
                     if click_button is None:
                         continue
 
-                    # Если нажата кнопка выхода, то завершаем игру
-                    if click_button.value == "quit":
-                        pg.quit()
-                        raise SystemExit
-
-                    # Иначе возвращаем значение нажатой кнопки
-                    return click_button.value
+                    return click_button.key
 
     def get_button_by_coordinates(self, x: int, y: int) -> tp.Union[MenuButton, None]:
         """
-        Функция для получения кнопки, расположенной по заданным координатам.
+        Функция для получения кнопки меню, расположенной по заданным координатам.
 
-        :param x: Координата x кнопки на экране.
-        :param y: Координата y кнопки на экране.
+        :param x: Координата x кнопки.
+        :param y: Координата y кнопки.
         :return: Кнопка или None, если по заданным координатам кнопка не найдена.
         """
 
-        # Перебираем все кнопки из соответствующей группы спрайтов
         for button in self.buttons_group:
-
-            # Если координаты кнопки попадают в область интерфейса, то возвращаем кнопку
             if button.rect.collidepoint(x, y):
                 return button
-
-        # Иначе возвращаем None
+        
         return None
-
-
-class DifficultyMenu(MainMenu):
-    """
-    Меню для выбора сложности игры.
-    """
-    pass
-

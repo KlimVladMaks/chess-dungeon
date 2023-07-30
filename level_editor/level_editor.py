@@ -7,10 +7,10 @@ import copy
 from level_editor.edit_field import EditSquare, EditButton, EditField
 from level_editor.edit_interface import EditInterface
 from level_editor.edit_controller import EditController
-from level_editor.edit_menu import EditMenu, BASE_MENU_DICT
 from saves import Save
 from level_editor.edit_piece import EditPiece
 from game_process import GameProcess
+from menu import Menu
 
 # Импорт файлов для проверки типов
 if tp.TYPE_CHECKING:
@@ -30,6 +30,9 @@ INITIAL_FIELD_MAP = [[1, 1, 1, 1, 1],
                      [1, 1, 1, 1, 1],
                      [1, 1, 1, 1, 1]]
 
+EDIT_MENU_DICT = {"continue": "Продолжить",
+                  "start": "Запустить",
+                  "main_menu": "Главное меню"}
 
 class LevelEditor:
     """
@@ -60,7 +63,7 @@ class LevelEditor:
         pg.display.update()
 
         # Создаём меню редактирования
-        edit_menu = EditMenu(screen)
+        edit_menu = Menu(screen)
 
         # Создаём редактируемое игровое поле
         edit_field = EditField(screen, screen_field, background,
@@ -163,10 +166,10 @@ class LevelEditor:
                         edit_field.update()
 
                     # Если клик пришёлся на кнопку открытия меню редактора уровней
-                    elif isinstance(clicked_object, EditMenu):
+                    elif isinstance(clicked_object, Menu):
 
                         # Запускаем игровое меню и получаем значение нажатой кнопки
-                        edit_menu.add_buttons(BASE_MENU_DICT)
+                        edit_menu.add_buttons(EDIT_MENU_DICT)
                         result = edit_menu.start()
                         
                         # Если нажата кнопка продолжения редактирования, то переходим к следующей итерации

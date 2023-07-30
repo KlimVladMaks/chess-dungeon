@@ -5,7 +5,7 @@ import typing as tp
 # Импорт файлов для задания типов
 if tp.TYPE_CHECKING:
     from level_editor.level_editor import LevelEditor
-    from level_editor.edit_menu import EditMenu
+    from menu import Menu
 
 # Размер стороны клетки редактируемого поля
 EDIT_SQUARE_SIDE_SIZE = 50
@@ -232,7 +232,7 @@ class EditField:
                  background: pg.Surface,
                  screen_absolute_coordinates: list[int],
                  initial_field_map: list[list[int]],
-                 edit_menu: 'EditMenu') -> None:
+                 edit_menu: 'Menu') -> None:
         """
         Функция для инициализации поля.
 
@@ -444,7 +444,7 @@ class EditField:
         # Перемещаем поле в центр экрана
         self.move(x_shift, y_shift)
 
-    def get_object_by_coordinates(self, x: int, y: int) -> tp.Union[EditSquare, EditButton, 'EditMenu', None]:
+    def get_object_by_coordinates(self, x: int, y: int) -> tp.Union[EditSquare, EditButton, 'Menu', None]:
         """
         Функция для получения объекта по его координатам.
 

@@ -3,7 +3,7 @@ import typing as tp
 
 if tp.TYPE_CHECKING:
     from piece import Piece
-    from menu import GameMenu
+    from menu import Menu
     from king_square import KingSquare
 
 # Размер стороны шахматной клетки
@@ -591,7 +591,7 @@ class Field:
                  background: pg.Surface,
                  screen_absolute_coordinates: list[int],
                  field_map: list[list[int]],
-                 game_menu: 'GameMenu') -> None:
+                 game_menu: 'Menu') -> None:
         """
         Функция для инициализации игрового поля.
 

@@ -8,7 +8,7 @@ from piece import *
 from enemy import *
 from interface import *
 from game import *
-from menu import *
+from menu import Menu
 from king_square import *
 from saves import Save
 
@@ -52,7 +52,7 @@ class GameProcess:
         pg.display.update()
 
         # Создаём игровое меню
-        game_menu = GameMenu(screen)
+        game_menu = Menu(screen)
 
         # Создаём игровое поле
         field = Field(screen, screen_field, background, screen_absolute_coordinates, save.field_map, game_menu)
@@ -220,7 +220,9 @@ class GameProcess:
                     if game_menu.is_open_button_clicked(click_coordinates):
 
                         # Запускаем игровое меню и получаем значение нажатой кнопки
-                        game_menu.add_buttons(["continue_game", "restart", "main_menu"])
+                        game_menu.add_buttons({"continue_game": "Продолжить", 
+                                               "restart": "Начать сначала", 
+                                               "main_menu": "Главное меню"})
                         result = game_menu.start()
 
                         # Если нажата кнопка продолжения игры, то обновляем поле и переходим к следующей итерации
