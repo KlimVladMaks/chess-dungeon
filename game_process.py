@@ -11,6 +11,7 @@ from game import *
 from menu import Menu
 from king_square import *
 from saves import Save
+from settings.controls import Controls
 
 # Ширина и высота экрана
 SCREEN_WIDTH = 800
@@ -195,12 +196,12 @@ class GameProcess:
             for e in pg.event.get():
 
                 # При закрытии игрового окна завершаем программу
-                if e.type == pg.QUIT:
+                if Controls.is_quit(e):
                     pg.quit()
                     raise SystemExit
 
                 # Если нажата кнопка Enter
-                elif e.type == pg.KEYDOWN and e.key == pg.K_RETURN:
+                elif Controls.is_next_move(e):
 
                     # Переходим к следующему игровому ходу и
                     # Проверяем игру на завершение и при необходимости возвращаем результат игрового процесса
@@ -211,7 +212,7 @@ class GameProcess:
                             return "win_menu"
 
                 # Если нажата левая клавиша мыши
-                elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
+                elif Controls.is_selection(e):
 
                     # Получаем относительные координаты клика
                     click_coordinates = pg.mouse.get_pos()
@@ -360,12 +361,12 @@ class GameProcess:
                         field.update()
 
                 # Если нажата правая клавиша мыши, то ставим флаг движения карты и флаг для пропуска первого сдвига
-                elif e.type == pg.MOUSEBUTTONDOWN and e.button == 3:
+                elif Controls.is_start_map_shift(e):
                     field.is_moving = True
                     field.skip_first_move = True
 
                 # Если мышь движется с установленным флагом движения карты
-                elif e.type == pg.MOUSEMOTION and field.is_moving:
+                elif Controls.is_cursor_motion(e) and field.is_moving:
 
                     # Находим сдвиг курсора по x и y
                     mouse_shift = pg.mouse.get_rel()
@@ -382,12 +383,12 @@ class GameProcess:
                     field.update()
 
                 # Если отпущена правая клавиша мыши, то снимаем флаг движения карты и флаг пропуска первого сдвига
-                elif e.type == pg.MOUSEBUTTONUP and e.button == 3:
+                elif Controls.is_stop_map_shift(e):
                     field.is_moving = False
                     field.skip_first_move = False
 
                 # Если курсор движется
-                elif e.type == pg.MOUSEMOTION:
+                elif Controls.is_cursor_motion(e):
 
                     # Получаем координаты курсора
                     mouse_pos = pg.mouse.get_pos()

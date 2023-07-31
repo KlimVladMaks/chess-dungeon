@@ -11,6 +11,7 @@ from saves import Save
 from level_editor.edit_piece import EditPiece
 from game_process import GameProcess
 from menu import Menu
+from settings.controls import Controls
 
 # Импорт файлов для проверки типов
 if tp.TYPE_CHECKING:
@@ -92,12 +93,12 @@ class LevelEditor:
             for e in pg.event.get():
 
                 # При закрытии игрового окна завершаем программу
-                if e.type == pg.QUIT:
+                if Controls.is_quit(e):
                     pg.quit()
                     raise SystemExit
 
                 # Если нажата левая клавиша мыши
-                elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
+                elif Controls.is_selection(e):
 
                     # Получаем координаты клика
                     click_coordinates = pg.mouse.get_pos()
@@ -265,12 +266,12 @@ class LevelEditor:
 
                 # Если отпущена левая клавиша мыши, то снимаем флаги множественного выделения
                 # и снятия выделения с клеток
-                elif e.type == pg.MOUSEBUTTONUP and e.button == 1:
+                elif Controls.is_stop_selection(e):
                     edit_controller.is_multiple_selection = False
                     edit_controller.is_multiple_deselection = False
 
                 # Если мышь движется с установленным флагом множественного выделения клеток
-                elif e.type == pg.MOUSEMOTION and edit_controller.is_multiple_selection:
+                elif Controls.is_cursor_motion(e) and edit_controller.is_multiple_selection:
 
                     # Получаем текущие координаты мыши
                     mouse_pos = pg.mouse.get_pos()
@@ -296,7 +297,7 @@ class LevelEditor:
                             continue
 
                 # Если мышь движется с установленным флагом множественного снятия выделения с клеток
-                elif e.type == pg.MOUSEMOTION and edit_controller.is_multiple_deselection:
+                elif Controls.is_cursor_motion(e) and edit_controller.is_multiple_deselection:
 
                     # Получаем текущие координаты мыши
                     mouse_pos = pg.mouse.get_pos()
@@ -322,17 +323,17 @@ class LevelEditor:
                             continue
 
                 # Если нажата правая клавиша мыши, то ставим флаг движения карты и флаг для пропуска первого сдвига
-                elif e.type == pg.MOUSEBUTTONDOWN and e.button == 3:
+                elif Controls.is_start_map_shift(e):
                     edit_field.is_moving = True
                     edit_field.skip_first_move = True
 
                 # Если отпущена правая клавиша мыши, то снимаем флаг движения карты и флаг пропуска первого сдвига
-                elif e.type == pg.MOUSEBUTTONUP and e.button == 3:
+                elif Controls.is_stop_map_shift(e):
                     edit_field.is_moving = False
                     edit_field.skip_first_move = False
 
                 # Если мышь движется с установленным флагом движения карты
-                elif e.type == pg.MOUSEMOTION and edit_field.is_moving:
+                elif Controls.is_cursor_motion(e) and edit_field.is_moving:
 
                     # Находим сдвиг курсора по x и y
                     mouse_shift = pg.mouse.get_rel()

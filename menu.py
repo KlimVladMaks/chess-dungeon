@@ -1,5 +1,6 @@
 import pygame as pg
 import typing as tp
+from settings.controls import Controls
 
 BUTTON_SIZE = (400, 50)
 BUTTON_BACKGROUND_COLOR = (255, 145, 77)
@@ -147,12 +148,12 @@ class Menu:
 
             for e in pg.event.get():
 
-                if e.type == pg.QUIT:
+                if Controls.is_quit(e):
                     pg.quit()
                     raise SystemExit
                 
                 # Нажатие правой клавиши мыши
-                elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
+                elif Controls.is_selection(e):
 
                     click_coordinates = pg.mouse.get_pos()
                     click_button = self.get_button_by_coordinates(click_coordinates[0], click_coordinates[1])
