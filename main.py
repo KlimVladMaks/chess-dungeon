@@ -3,7 +3,7 @@ import pygame as pg
 import typing as tp
 
 # Импорты файлов
-from menu import Menu, FinalMenu
+from menu import Menu
 from level_editor.level_editor import LevelEditor
 from saves import Save
 from game_process import GameProcess
@@ -107,15 +107,21 @@ def main() -> None:
 
         # Запускаем финальное меню при проигрыше
         elif active_object == "lose_menu":
-            final_menu = FinalMenu(screen)
-            final_menu.add_buttons(["quit", "restart", "main_menu"])
-            active_object = final_menu.start(False)
+            final_menu = Menu(screen)
+            final_menu.add_buttons({"quit": "Выход", 
+                                    "restart": "Начать сначала", 
+                                    "main_menu": "Главное меню"}, 
+                                    menu_layout="bottom")
+            active_object = final_menu.start(background_type="lose")
 
         # Запускаем финальное меню при победе
         elif active_object == "win_menu":
-            final_menu = FinalMenu(screen)
-            final_menu.add_buttons(["quit", "restart", "main_menu"])
-            active_object = final_menu.start(True)
+            final_menu = Menu(screen)
+            final_menu.add_buttons({"quit": "Выход", 
+                                    "restart": "Начать сначала", 
+                                    "main_menu": "Главное меню"}, 
+                                    menu_layout="bottom")
+            active_object = final_menu.start(background_type="win")
 
 
 # Запускаем Main-функцию
