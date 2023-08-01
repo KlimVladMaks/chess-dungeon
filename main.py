@@ -7,6 +7,7 @@ from menu import Menu
 from level_editor.level_editor import LevelEditor
 from saves import Save
 from game_process import GameProcess
+from level_menu import LevelMenu
 
 # Ширина и высота экрана
 SCREEN_WIDTH = 800
@@ -71,8 +72,9 @@ def main() -> None:
         # Запускаем главное меню
         if active_object == "main_menu":
             main_menu = Menu(screen)
-            main_menu.add_buttons({"demo": "Демоверсия", 
-                                   "level_editor": "Редактор уровней", 
+            main_menu.add_buttons({"demo": "Демоверсия",
+                                   "level_select": "Выбор уровня",
+                                   "level_editor": "Редактор уровней",
                                    "quit": "Выход"})
             active_object = main_menu.start()
         
@@ -100,6 +102,9 @@ def main() -> None:
         elif active_object == "demo_start":
             save = Save(save_name="First")
             active_object = GameProcess.start(save, screen)
+
+        elif active_object == "level_select":
+            active_object = LevelMenu.start(screen)
 
         # Запускаем редактор уровней
         elif active_object == "level_editor":
